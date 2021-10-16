@@ -1,6 +1,7 @@
 #!/bin/bash
-
-javac -d out -cp "./lib;./lib/*" ./src/main/*.java
+sudo rm -rf out
+mkdir out
+javac -d out -cp "./lib:./lib/*" ./src/main/*.java
 
 cp ./lib/jcef.jar ./out
 
@@ -11,9 +12,9 @@ export LIB_PATH=$(readlink -f "./lib/linux64")
 if [ -n "$LD_LIBRARY_PATH" ]; then
   LD_LIBRARY_PATH=$LIB_PATH:${LD_LIBRARY_PATH}
 else
-  LD_LIBRARY_PATH=$LIB_PATH
+  LD_LIBRARY_PATH=$LIB_PATH:/usr/lib/jvm/java-11-openjdk-amd64/lib/
 fi
 export LD_LIBRARY_PATH
 
 # Preload libcef.so to avoid crashes.
-LD_PRELOAD=$LIB_PATH/libcef.so java -cp "./out;./out/*;" -Djava.library.path=$LIB_PATH main.Main "$@"
+LD_PRELOAD=$LIB_PATH/libcef.so java -cp "./out:./out/*" -Djava.library.path=$LIB_PATH main.Main "$@"
