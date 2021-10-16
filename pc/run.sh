@@ -1,19 +1,16 @@
 #!/bin/bash
-sudo rm -rf out
+rm -rf out
 mkdir out
 javac -d out -cp "./lib:./lib/*" ./src/main/*.java
-
 cp ./lib/jcef.jar ./out
 
 # Determine the absolute path to the library directory.
 export LIB_PATH=$(readlink -f "./lib/linux64")
 
 # Necessary for jcef_helper to find libcef.so.
-if [ -n "$LD_LIBRARY_PATH" ]; then
-  LD_LIBRARY_PATH=$LIB_PATH:${LD_LIBRARY_PATH}
-else
-  LD_LIBRARY_PATH=$LIB_PATH:/usr/lib/jvm/java-11-openjdk-amd64/lib/
-fi
+JAVA_PATH=$(readlink -f $(which java))
+JWT_SO=$(dirname $(dirname $(readlink -f $(which java))))
+LD_LIBRARY_PATH=$LIB_PATH:$JWT_SO/lib/
 export LD_LIBRARY_PATH
 
 # Preload libcef.so to avoid crashes.

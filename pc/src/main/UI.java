@@ -20,7 +20,10 @@ import org.cef.handler.CefAppHandlerAdapter;
 import org.cef.handler.CefMessageRouterHandlerAdapter;
 
 public class UI extends JFrame {
-    final String url = "file:///public/index.html";
+
+    final String workingDirectory = System.getProperty("user.dir");
+    final String url = "file:///" + workingDirectory + "/public/index.html";
+
     final CefBrowser browser;
 
     public UI() {
