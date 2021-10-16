@@ -1,10 +1,12 @@
 <html>
     <head></head>
-    <body>
+    <body style="user-select: none;">
         <h1>PROVOLA</h1>
         <button onclick="scan()">Scan</button>
         <div id="response"></div>
         <script>
+            document.addEventListener('contextmenu', event => event.preventDefault());
+
             function scan() {
                 let res = cefQuery({
                     request: "Hello World",
@@ -16,6 +18,25 @@
                     }
                 })
                 //document.getElementById("response").innerHTML = res;
+            }
+
+
+            function call(fun) {
+                let funName = fun.split("(")[0]
+                //TODO add params
+                let funCall = {
+                    name : funName,
+                    params : []
+                }
+                let res = cefQuery({
+                    request: JSON.stringify(funCall),
+                    onSuccess: (response) => {
+                        console.log(response);
+                    },
+                    onFailure: (response) => {
+                        console.log("Error ")
+                    }
+                })
             }
         </script>
     </body>
