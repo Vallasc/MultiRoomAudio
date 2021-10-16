@@ -1,0 +1,22 @@
+<html>
+    <head></head>
+    <body>
+        <h1>PROVOLA</h1>
+        <button onclick="scan()">Scan</button>
+        <div id="response"></div>
+        <script>
+            function scan() {
+                let res = cefQuery({
+                    request: "Hello World",
+                    onSuccess: (response) => {
+                        console.log(response);
+                    },
+                    onFailure: (response) => {
+                        console.log("Error ")
+                    }
+                })
+                //document.getElementById("response").innerHTML = res;
+            }
+        </script>
+    </body>
+</html>
