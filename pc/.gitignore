@@ -1,3 +1,4 @@
 out
 debug.log
-lib
+lib/linux64
+lib/win64
