@@ -1,9 +1,8 @@
 package main.ui;
 
-public class JavascriptInterface {
-    
-    public String print(String text){
-        //System.out.println(text);
-        return text;
-    }
+import java.lang.annotation.*;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface JavascriptInterface {
 }
