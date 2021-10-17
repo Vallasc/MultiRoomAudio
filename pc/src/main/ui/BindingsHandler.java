@@ -90,7 +90,7 @@ public class BindingsHandler {
             sb.append(innerSb.toString());
         }
         browser.executeJavaScript(sb.toString(), browser.getURL(), 0);
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
     }
 
 }

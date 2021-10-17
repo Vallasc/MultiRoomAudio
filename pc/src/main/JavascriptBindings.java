@@ -6,8 +6,8 @@ public class JavascriptBindings {
     // Javascript non supporta overloading => NON FARE metodi con lo stesso nome 
 
     @JavascriptInterface
-    public String print(){
-        return "Ciao da vallasc";
+    public String printHello(){
+        return "Ciao da Java";
     }
 
     @JavascriptInterface

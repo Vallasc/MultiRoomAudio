@@ -15,6 +15,7 @@ import org.cef.browser.CefFrame;
 import org.cef.browser.CefMessageRouter;
 import org.cef.callback.CefQueryCallback;
 import org.cef.handler.CefAppHandlerAdapter;
+import org.cef.handler.CefLoadHandlerAdapter;
 import org.cef.handler.CefMessageRouterHandlerAdapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +26,6 @@ public class UI extends JFrame {
     final String url = "file:///" + workingDirectory + "/public/index.html";
 
     final CefBrowser browser;
-    //final JFrame _this;
     final BindingsHandler bindingsHandler;
 
     public UI(String title, Class<?> javascriptInterface) {
@@ -45,6 +45,7 @@ public class UI extends JFrame {
         final CefApp cefApp = CefApp.getInstance(settings);
 
         final CefClient client = cefApp.createClient();
+        client.addLoadHandler(new LoadHandler());
 
         CefMessageRouter msgRouter = CefMessageRouter.create();
         msgRouter.addHandler(new MessageRouterHandler(), true);
@@ -67,21 +68,6 @@ public class UI extends JFrame {
             }
         });
 
-        //_this = this;
-        // Wait until UI is loaded
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) { }
-                //_this.setVisible(true);
-                //String jscode = "document.getElementById(\"response\").innerHTML = \"Init done\"";
-                //browser.executeJavaScript(jscode, browser.getURL(), 0);
-                bindingsHandler.injectJavascriptInterface(browser);
-            }
-        }).start();
-
         bindingsHandler = new BindingsHandler(javascriptInterface);
     }
 
@@ -97,6 +83,13 @@ public class UI extends JFrame {
                 callback.success(e.toString());
             }
             return true;
+        }
+    }
+
+    class LoadHandler extends CefLoadHandlerAdapter {
+        @Override
+        public void onLoadEnd(CefBrowser browser, CefFrame frame, int status) {
+            bindingsHandler.injectJavascriptInterface(browser);
         }
     }
     
