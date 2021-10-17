@@ -7,36 +7,8 @@
         <script>
             document.addEventListener('contextmenu', event => event.preventDefault());
 
-            function scan() {
-                let res = cefQuery({
-                    request: "Hello World",
-                    onSuccess: (response) => {
-                        console.log(response);
-                    },
-                    onFailure: (response) => {
-                        console.log("Error ")
-                    }
-                })
-                //document.getElementById("response").innerHTML = res;
-            }
-
-
-            function call(fun) {
-                let funName = fun.split("(")[0]
-                //TODO add params
-                let funCall = {
-                    name : funName,
-                    params : []
-                }
-                let res = cefQuery({
-                    request: JSON.stringify(funCall),
-                    onSuccess: (response) => {
-                        console.log(response);
-                    },
-                    onFailure: (response) => {
-                        console.log("Error ")
-                    }
-                })
+            async function scan() {
+                console.log( await print())
             }
         </script>
     </body>

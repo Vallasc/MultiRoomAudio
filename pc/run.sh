@@ -2,7 +2,7 @@
 rm -rf out
 mkdir out
 javac -d out -cp "./lib:./lib/*" ./src/main/*.java ./src/main/ui/*.java
-cp ./lib/jcef.jar ./out
+cp ./lib/*.jar ./out
 
 # Determine the absolute path to the library directory.
 export LIB_PATH=$(readlink -f "./lib/linux64")
