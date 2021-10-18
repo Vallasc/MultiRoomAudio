@@ -1,12 +1,7 @@
 package message_handler;
 
-/**
- * 
- * @author Francesco Biancucci
- * @file MsgTypes.java
- * @brief defines the types of message exchanged between the different
- * entities in the system
- *
+/* 
+  Describes the different messages between entities
  */
 public class MsgTypes {
 	//position registering
@@ -27,10 +22,10 @@ public class MsgTypes {
 		è mantenuto direttamente sullo SLAC allora il problema non si pone. 
 		Comunque faccio i diagrammini tra poco per sta roba.
 		*/
-
-	public int PAUSE = 22;//[client] music handling, everything sent to the SLAC
-	public int STOP = 23;//[client]
-	public int RESUME = 24;//[client]
+	public static int PLAY = 22;
+	public static int PAUSE = 23;//[client] music handling, everything sent to the SLAC
+	public static int STOP = 24;//[client]
+	public static int RESUME = 25;//[client]
 
 	//music handling response
 	public static int SEND_MUSIC_LIST = 30;//[SLAC] answer to msg 20
