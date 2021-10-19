@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.channels.IllegalBlockingModeException;
 
@@ -12,17 +15,10 @@ public class MulThread extends Thread{
 
     private final String multicastIp = "232.232.232.232";
     private final int multicastPort = 8265;
-    private static MulticastSocket m_socket;
+    private MulticastSocket mySocket;
+
     
     public void run(){
-        try {
-            m_socket = new MulticastSocket(multicastPort);
-            
-            m_socket.joinGroup(InetAddress.getByName(multicastIp));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        /*questo devo farlo dopo aver ricevuto un messaggio in multicast in cui mi dicono "AOH ME VOGLIO CONNETTE"*/
         String msg = null;
         try{
             msg = InetAddress.getLocalHost().getHostName().toString();
@@ -33,12 +29,31 @@ public class MulThread extends Thread{
         try {
             arr = msg.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {}
+        
+        try {
+            InetAddress mcastaddr = InetAddress.getByName(multicastIp);
+            InetSocketAddress group = new InetSocketAddress(mcastaddr, multicastPort);
+            NetworkInterface netIf = NetworkInterface.getByInetAddress(InetAddress.getByName("localhost"));
+            MulticastSocket m_socket = new MulticastSocket(multicastPort);
+            mySocket = m_socket;
+            mySocket.joinGroup(group, netIf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        DatagramPacket multicastPacket;
         try{
-            DatagramPacket multicastPacket = new DatagramPacket(arr, arr.length, InetAddress.getByName(multicastIp), multicastPort);
-            m_socket.send(multicastPacket);
+            multicastPacket = new DatagramPacket(arr, arr.length, InetAddress.getByName(multicastIp), multicastPort);
         } catch (IOException | SecurityException | IllegalBlockingModeException | IllegalArgumentException e) {
             //needed for debug
             e.printStackTrace();
         }
+        
+        /*
+        while(){
+            qua sto in ascolto di messaggi in multicast in cui mi dicono "AOH ME VOGLIO CONNETTE" e poi quando ricevo sto messaggio mando il pacchetto
+            quante volte lo mando? Boh, cazzi sua
+            mySocket.send(multicastPacket);
+        }*/
     }
 }
