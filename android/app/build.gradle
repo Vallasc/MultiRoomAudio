@@ -6,7 +6,7 @@ android {
     compileSdk 30
 
     defaultConfig {
-        applicationId "com.giacomovallorani.multiroomaudio"
+        applicationId "it.unibo.sca.multiroomaudio"
         minSdk 22
         targetSdk 30
         versionCode 1

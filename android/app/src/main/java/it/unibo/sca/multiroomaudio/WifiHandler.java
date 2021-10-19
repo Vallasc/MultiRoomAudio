@@ -1,4 +1,4 @@
-package com.giacomovallorani.multiroomaudio;
+package it.unibo.sca.multiroomaudio;
 
 import android.content.Context;
 import android.content.IntentFilter;

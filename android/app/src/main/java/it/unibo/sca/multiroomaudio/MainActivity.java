@@ -1,4 +1,4 @@
-package com.giacomovallorani.multiroomaudio;
+package it.unibo.sca.multiroomaudio;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
