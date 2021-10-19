@@ -356,12 +356,12 @@ var MultiRoomAudio = (function () {
     			t1 = text("!");
     			t2 = space();
     			button = element("button");
-    			button.textContent = "Provami";
+    			button.textContent = "Provami ORA";
     			attr_dev(h1, "class", "svelte-1tky8bj");
-    			add_location(h1, file, 9, 1, 103);
-    			add_location(button, file, 10, 1, 121);
+    			add_location(h1, file, 10, 1, 117);
+    			add_location(button, file, 11, 1, 135);
     			attr_dev(main, "class", "svelte-1tky8bj");
-    			add_location(main, file, 8, 0, 95);
+    			add_location(main, file, 9, 0, 109);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -408,7 +408,7 @@ var MultiRoomAudio = (function () {
     	let { name } = $$props;
 
     	async function hello() {
-    		$$invalidate(0, name = await printHello());
+    		$$invalidate(0, name = await JSInterface.printHello());
     	}
 
     	const writable_props = ['name'];
