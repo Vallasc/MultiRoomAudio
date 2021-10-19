@@ -2,13 +2,14 @@
 	export let name;
 
 	async function hello(){
-		name = await printHello()
+		name = await JSInterface.printHello()
 	}
+	
 </script>
 
 <main>
 	<h1>{name}!</h1>
-	<button on:click={hello}>Provami</button>
+	<button on:click={hello}>Provami ORA</button>
 </main>
 
 <style>
