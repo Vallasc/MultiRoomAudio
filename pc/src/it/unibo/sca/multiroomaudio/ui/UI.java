@@ -1,4 +1,4 @@
-package main.ui;
+package it.unibo.sca.multiroomaudio.ui;
 
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -28,7 +28,7 @@ public class UI extends JFrame {
     final CefBrowser browser;
     final BindingsHandler bindingsHandler;
 
-    public UI(String title, Class<?> javascriptInterface) {
+    public UI(String title, Object javascriptInterface, String interfaceName) {
         CefApp.addAppHandler(new CefAppHandlerAdapter(null) {
             @Override
             public void stateHasChanged(CefAppState state) {
@@ -68,7 +68,7 @@ public class UI extends JFrame {
             }
         });
 
-        bindingsHandler = new BindingsHandler(javascriptInterface);
+        bindingsHandler = new BindingsHandler(javascriptInterface, interfaceName);
     }
 
     class MessageRouterHandler extends CefMessageRouterHandlerAdapter {

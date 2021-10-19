@@ -1,6 +1,6 @@
-package main.ui;
+package it.unibo.sca.multiroomaudio.ui;
 
-import main.ui.ParamDTO.TypeNotSupportedException;
+import it.unibo.sca.multiroomaudio.ui.ParamDTO.TypeNotSupportedException;
 
 public class MethodDTO {
     public String name;

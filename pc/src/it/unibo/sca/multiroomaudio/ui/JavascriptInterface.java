@@ -1,4 +1,4 @@
-package main.ui;
+package it.unibo.sca.multiroomaudio.ui;
 
 import java.lang.annotation.*;
 

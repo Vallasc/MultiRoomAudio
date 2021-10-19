@@ -1,6 +1,6 @@
-package main;
+package it.unibo.sca.multiroomaudio.shared;
 
-import main.ui.JavascriptInterface;
+import it.unibo.sca.multiroomaudio.ui.JavascriptInterface;
 
 public class JavascriptBindings {
     // Javascript non supporta overloading => NON FARE metodi con lo stesso nome 
