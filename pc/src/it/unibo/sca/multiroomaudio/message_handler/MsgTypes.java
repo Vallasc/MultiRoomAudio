@@ -1,4 +1,4 @@
-package message_handler;
+package it.unibo.sca.multiroomaudio.message_handler;
 
 /* 
   Describes the different messages between entities

@@ -1,4 +1,4 @@
-package message_handler;
+package it.unibo.sca.multiroomaudio.message_handler;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
