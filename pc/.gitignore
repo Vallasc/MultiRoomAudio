@@ -2,3 +2,4 @@ out
 debug.log
 lib/linux64
 lib/win64
+lib/jcef.jar
