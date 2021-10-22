@@ -10,7 +10,7 @@ public abstract class Msg implements Serializable {
 	}
 
 	public MsgTypes getType() {
-		return type;
+		return this.type;
 	}
 
 }

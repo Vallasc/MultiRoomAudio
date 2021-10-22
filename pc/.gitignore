@@ -1,5 +1,6 @@
 out
 outServer
+outClient
 debug.log
 lib/linux64
 lib/win64
