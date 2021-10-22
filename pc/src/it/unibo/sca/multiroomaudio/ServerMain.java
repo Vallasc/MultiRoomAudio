@@ -1,10 +1,11 @@
-package it.unibo.sca.multiroomaudio.server;
+package it.unibo.sca.multiroomaudio;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import it.unibo.sca.multiroomaudio.server_pkg.*;
 
-public class Server {
+public class ServerMain {
 
     private final static int servport = 8497;
     public static void main(String[] args){

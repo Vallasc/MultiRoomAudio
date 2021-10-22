@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.server;
+package it.unibo.sca.multiroomaudio.server_pkg;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
