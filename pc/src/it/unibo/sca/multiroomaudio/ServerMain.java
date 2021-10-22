@@ -11,7 +11,7 @@ public class ServerMain {
     public static void main(String[] args){
         Thread threadexec = new Executor();
         Thread multicastThread = new MulThread();
-        multicastThread.run();
+        multicastThread.start();
         
 
         threadexec.start();
@@ -32,7 +32,8 @@ public class ServerMain {
 			e.printStackTrace();
 			return;
 		}
-
+        
     }
+   
 
 }

@@ -30,7 +30,7 @@ public class MulThread extends Thread{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try{
             ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(new MsgHelloBack(InetAddress.getLocalHost().getHostName().toString()));
+            oos.writeObject(new MsgHelloBack(InetAddress.getLocalHost().getHostAddress()));
         }catch(IOException e){
             System.err.println("Something went wrong while setting up the message with the ip");
             e.printStackTrace();
@@ -49,9 +49,9 @@ public class MulThread extends Thread{
             e.printStackTrace();
         }
         
-       
         
-        //while(true){
+        
+        while(true){
            /*NOTE qua sto in ascolto di messaggi in multicast in cui mi dicono "AOH ME VOGLIO CONNETTE" e poi quando ricevo sto messaggio mando il pacchetto
             quante volte lo mando? Boh, cazzi sua*/
             /*this should be done in another thread that only reads packet and then sends them to a q, the consumer for the q can be tha main thread and it registers 
@@ -69,9 +69,7 @@ public class MulThread extends Thread{
                 if (readObject instanceof MsgHello) {
                     MsgHello hello = (MsgHello) readObject;
                     System.out.println("Message is: " + hello.getType() + hello.getDeviceType() + hello.getMACid());
-                } else {
-                    System.out.println("The received object is not of type MsgHello!");
-                }
+                } else continue;
             } catch (IOException e) {
                 System.err.println("Error while reading the packet from the group");
                 e.printStackTrace();
@@ -86,6 +84,6 @@ public class MulThread extends Thread{
                 System.err.println("Error while sending the packet throught the group");
                 e.printStackTrace();
             }
-        //}
+        }
     }
 }

@@ -14,6 +14,7 @@ public class ClientMain {
     private static final int multicastPort = 8265;
     private static final int bufferSize = 1024 * 4;
     public static void main(String[] args){
+        boolean flagReceivedIp = false;
         MulticastSocket mySocket = null;
         InetSocketAddress group = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -48,17 +49,18 @@ public class ClientMain {
         }
         byte[] buffer = new byte[bufferSize];
         try {
-            System.out.println("Waiting for messages");
-            mySocket.receive(new DatagramPacket(buffer, bufferSize, group));
-            /*once it's received there should just be a q.add(buffer);, but i need to know if this thing works or not*/
-            ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            Object readObject = ois.readObject();
-            if (readObject instanceof MsgHello) {
-                MsgHello hello = (MsgHello) readObject;
-                System.out.println("Message is: " + hello.getType() + hello.getDeviceType() + hello.getMACid());
-            } else {
-                System.out.println("The received object is not of type String!");
+            while(!flagReceivedIp){
+                System.out.println("Waiting for messages");
+                mySocket.receive(new DatagramPacket(buffer, bufferSize, group));
+                /*once it's received there should just be a q.add(buffer);, but i need to know if this thing works or not*/
+                ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+                ObjectInputStream ois = new ObjectInputStream(bais);
+                Object readObject = ois.readObject();
+                if (readObject instanceof MsgHelloBack) {
+                    MsgHelloBack hello = (MsgHelloBack) readObject;
+                    System.out.println("Message is: " + hello.getType() + " " + hello.getIp());
+                    flagReceivedIp = true;
+                } else continue;
             }
         } catch (IOException e) {
             System.err.println("Error while reading the packet from the group");
