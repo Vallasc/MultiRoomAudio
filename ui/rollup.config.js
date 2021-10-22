@@ -4,7 +4,6 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
-import copy from 'rollup-plugin-copy'
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -30,7 +29,7 @@ function serve() {
 }
 
 export default {
-	input: 'src/main.js',
+	input: 'src/app.js',
 	output: {
 		sourcemap: true,
 		format: 'iife',
@@ -69,13 +68,7 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser(),
-		copy({
-			hook: 'writeBundle',
-			targets: [
-				{ src: 'public/*', dest: '../pc/public' },
-			]
-		})
+		production && terser()
 	],
 	watch: {
 		clearScreen: false

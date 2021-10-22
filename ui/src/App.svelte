@@ -1,35 +1,30 @@
 <script>
-	export let name;
+  import { App, View } from 'framework7-svelte'
+  import MusicListPage from './pages/MusicListPage.svelte'
+  import RoomsPage from './pages/RoomsPage.svelte'
+  import CalibrationPage from './pages/CalibrationPage.svelte'
 
-	async function hello(){
-		name = await JSInterface.printHello()
-	}
-	
+  const f7Params = {
+    routes: [
+		{
+			path: '/',
+			component: MusicListPage,
+      main: true
+		},
+    {
+			path: '/rooms',
+			component: RoomsPage,
+      main: true
+		},
+    {
+			path: '/calibration',
+			component: CalibrationPage,
+      main: true
+		}
+		]
+  };
 </script>
 
-<main>
-	<h1>{name}!</h1>
-	<button on:click={hello}>Provami ORA</button>
-</main>
-
-<style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
-</style>
+<App {...f7Params}>
+  <View url="/" class="safe-areas"/>
+</App>
