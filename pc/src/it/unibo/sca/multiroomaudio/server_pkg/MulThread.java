@@ -23,20 +23,12 @@ public class MulThread extends Thread{
     private final int multicastPort = 8265;
     private final int bufferSize = 1024 * 4;
     private MulticastSocket mySocket;
+    private InetSocketAddress group;
+    private byte[] data;
 
-    
-    public void run(){
-        InetSocketAddress group = null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try{
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(new MsgHelloBack(InetAddress.getLocalHost().getHostAddress()));
-        }catch(IOException e){
-            System.err.println("Something went wrong while setting up the message with the ip");
-            e.printStackTrace();
-            return;
-        }
-        byte[] data = baos.toByteArray();
+    public MulThread(){
+        //init multicast group
+        group = null;
         try {
             InetAddress mcastaddr = InetAddress.getByName(multicastIp);
             group = new InetSocketAddress(mcastaddr, multicastPort);
@@ -48,42 +40,46 @@ public class MulThread extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        
-        
+        //init message to send
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try{
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(new MsgHelloBack(InetAddress.getLocalHost().getHostAddress()));
+        }catch(IOException e){
+            System.err.println("Something went wrong while setting up the message with the ip");
+            e.printStackTrace();
+            return;
+        }
+        data = baos.toByteArray(); 
+    }
+    
+    public void run(){
+        Thread datagramAnalyser = new DatagramExecutor();
+        datagramAnalyser.start();
+        byte[] buffer = null;
         while(true){
-           /*NOTE qua sto in ascolto di messaggi in multicast in cui mi dicono "AOH ME VOGLIO CONNETTE" e poi quando ricevo sto messaggio mando il pacchetto
-            quante volte lo mando? Boh, cazzi sua*/
-            /*this should be done in another thread that only reads packet and then sends them to a q, the consumer for the q can be tha main thread and it registers 
-            all the things a client sent in a structure, actually it could be the same thing that then sends the ip over the multicast, like every 3 clients processed or every 
-            time the q becomes empty after having read something*/
-            /*or there's another thread more that is in charge of sending the ip over the multicast every time a client sends a message over the multicast*/
-            byte[] buffer = new byte[bufferSize];
+            buffer = new byte[bufferSize]; 
+            //take the buffer 
             try {
                 System.out.println("Waiting for messages");
                 mySocket.receive(new DatagramPacket(buffer, bufferSize, group));
-                /*once it's received there should just be a q.add(buffer);, but i need to know if this thing works or not*/
-                ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                Object readObject = ois.readObject();
-                if (readObject instanceof MsgHello) {
-                    MsgHello hello = (MsgHello) readObject;
-                    System.out.println("Message is: " + hello.getType() + hello.getDeviceType() + hello.getMACid());
-                } else continue;
+                ((DatagramExecutor) datagramAnalyser).getRequestQ().put(buffer);
+
+                
             } catch (IOException e) {
                 System.err.println("Error while reading the packet from the group");
                 e.printStackTrace();
-            }catch(ClassNotFoundException e){
-                System.err.println("Error while reading the object from the buffer");
+            } catch(InterruptedException e) {
+                e.printStackTrace();
             }
             
-            try {
+            /*try {
                 System.out.println("Sending the ip");
                 mySocket.send(new DatagramPacket(data, data.length, group));
             } catch (IOException e) {
                 System.err.println("Error while sending the packet throught the group");
                 e.printStackTrace();
-            }
+            }*/
         }
     }
 }

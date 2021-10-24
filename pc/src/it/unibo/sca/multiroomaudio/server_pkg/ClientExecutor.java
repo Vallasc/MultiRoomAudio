@@ -6,11 +6,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Executor extends Thread{
+public class ClientExecutor extends Thread{
     private ExecutorService handleConn;
 	private BlockingQueue<ConnThread> requestQ;
 	
-	public Executor() {
+	public ClientExecutor() {
 		requestQ  = new LinkedBlockingQueue<>();
 		this.handleConn = Executors.newCachedThreadPool();
 	}

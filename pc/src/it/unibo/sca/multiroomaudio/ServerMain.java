@@ -9,7 +9,7 @@ public class ServerMain {
 
     private final static int servport = 8497;
     public static void main(String[] args){
-        Thread threadexec = new Executor();
+        Thread threadexec = new ClientExecutor();
         Thread multicastThread = new MulThread();
         multicastThread.start();
         
@@ -20,8 +20,9 @@ public class ServerMain {
             System.out.println("In attesa di connessione...");
             while(true){
                 Socket clientSocket = serverSocket.accept();
+                System.out.println("accepted a connection");
                 try{
-                    ((Executor) threadexec).getRequestQ().put(new ConnThread(clientSocket));
+                    ((ClientExecutor) threadexec).getRequestQ().put(new ConnThread(clientSocket));
                 } catch (InterruptedException e) {
                     System.err.println("cannot insert connThread inside q");
                     e.printStackTrace();

@@ -13,6 +13,8 @@ public class ClientMain {
     private static final String multicastIp = "232.232.232.232";
     private static final int multicastPort = 8265;
     private static final int bufferSize = 1024 * 4;
+    private final static int servport = 8497;
+
     public static void main(String[] args){
         boolean flagReceivedIp = false;
         MulticastSocket mySocket = null;
@@ -48,8 +50,9 @@ public class ClientMain {
             e.printStackTrace();
         }
         byte[] buffer = new byte[bufferSize];
+        MsgHelloBack hello = null;
         try {
-            while(!flagReceivedIp){
+            while(hello == null){
                 System.out.println("Waiting for messages");
                 mySocket.receive(new DatagramPacket(buffer, bufferSize, group));
                 /*once it's received there should just be a q.add(buffer);, but i need to know if this thing works or not*/
@@ -57,9 +60,8 @@ public class ClientMain {
                 ObjectInputStream ois = new ObjectInputStream(bais);
                 Object readObject = ois.readObject();
                 if (readObject instanceof MsgHelloBack) {
-                    MsgHelloBack hello = (MsgHelloBack) readObject;
-                    System.out.println("Message is: " + hello.getType() + " " + hello.getIp());
-                    flagReceivedIp = true;
+                    hello = (MsgHelloBack) readObject;
+                    System.out.println("Message is: " + hello.getType() + " " + hello.getIp());;
                 } else continue;
             }
         } catch (IOException e) {
@@ -68,5 +70,15 @@ public class ClientMain {
         }catch(ClassNotFoundException e){
             System.err.println("Error while reading the object from the buffer");
         }
+        try {
+            Socket socket = new Socket(InetAddress.getByName(hello.getIp()), servport);
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println("in teoria sono connesso");
     }
 }
