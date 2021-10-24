@@ -1,7 +1,10 @@
 #!/bin/bash
 rm -rf out
 mkdir out
-javac -d out -cp "./lib:./lib/*" ./src/it/unibo/sca/multiroomaudio/*.java ./src/it/unibo/sca/multiroomaudio/*/*.java
+javac -d out -cp "./lib:./lib/*" ./src/it/unibo/sca/multiroomaudio/*.java \
+./src/it/unibo/sca/multiroomaudio/*/*.java \
+./src/it/unibo/sca/multiroomaudio/*/*/*.java
+
 cp ./lib/*.jar ./out
 
 # Determine the absolute path to the library directory.

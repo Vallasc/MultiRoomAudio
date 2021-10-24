@@ -4,8 +4,8 @@
     
     let isLoading = false;
 
-    function load(){
-      isLoading = true;
+    async function saveReference(){
+      console.log(await JSInterface.saveReferencePoint());
     }
 </script>
 
@@ -26,7 +26,7 @@
     </List>
     <BlockTitle>Calibration</BlockTitle>
     <Block strong>
-      <Button fill preloader loading={isLoading} onClick={load}>
+      <Button fill preloader loading={isLoading} onClick={saveReference}>
         Save reference
       </Button>
     </Block>

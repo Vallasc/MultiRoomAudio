@@ -1,22 +1,19 @@
 package it.unibo.sca.multiroomaudio.shared;
 
-import it.unibo.sca.multiroomaudio.ui.JavascriptInterface;
+import android.webkit.JavascriptInterface;
+
+import it.unibo.sca.multiroomaudio.WifiHandler;
 
 public class JavascriptBindings {
     // Javascript non supporta overloading => NON FARE metodi con lo stesso nome 
 
+    public JavascriptBindings(WifiHandler wifiHandler){
+
+    }
     @JavascriptInterface
-    public String printHello(){
-        return "Ciao da Java";
+    public boolean saveReferencePoint(){
+        System.out.println("Save ref");
+        return true;
     }
 
-    @JavascriptInterface
-    public String print2(String text1, int prova){
-        return text1 + " " + prova;
-    }
-
-    @JavascriptInterface
-    public int print3(int a, int b){
-        return a + b;
-    }
 }

@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     WifiHandler wifiHandler;
     WebView webView;
+    OfflinePhaseManager calibrationManager;
     boolean wifiOk;
 
     @Override
@@ -75,12 +76,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void initWifi() {
         wifiHandler = new WifiHandler();
-        JavaScriptInterface jsInterface = new JavaScriptInterface(this, wifiHandler, webView);
-        wifiHandler.setJsInterface(jsInterface);
+        JavascriptBindings jsInterface = new JavascriptBindings(this, wifiHandler);
+        wifiHandler.setJsInterface(JavascriptBindings);
 
-        webView.addJavascriptInterface(jsInterface, "JSInterface");
+        webView.addJavascriptInterface(JavascriptBindings, "JSInterface");
         webView.reload();
 
         wifiOk = true;
+        calibrationManager = new OfflinePhaseManager(wifiHandler);
     }
 }
