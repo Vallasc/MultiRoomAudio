@@ -35,8 +35,8 @@ public class ClientMain {
             NetworkInterface netIf = NetworkInterface.getByInetAddress(InetAddress.getByName("localhost"));
             MulticastSocket m_socket = new MulticastSocket(multicastPort);
             mySocket = m_socket;
-            mySocket.setLoopbackMode(false);
             mySocket.joinGroup(group, netIf);
+            mySocket.setLoopbackMode(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
