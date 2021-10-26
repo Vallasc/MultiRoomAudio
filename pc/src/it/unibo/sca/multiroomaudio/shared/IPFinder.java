@@ -7,7 +7,6 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.channels.SocketChannel;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -44,5 +43,37 @@ public class IPFinder {
             e.printStackTrace();
         }
         return broadcast;       
+    }
+
+    public static InetAddress getIp(){
+        Enumeration<NetworkInterface> ni = null;
+        boolean flagFound = false;
+        InetAddress inetAddr = null;
+        try {
+            ni = NetworkInterface.getNetworkInterfaces();
+            while (ni.hasMoreElements() && !flagFound) {
+                NetworkInterface n = ni.nextElement();
+                if(n.isUp() && !n.isLoopback() && !n.isVirtual()){
+                    List<InterfaceAddress> addresses = n.getInterfaceAddresses();
+                    for(InterfaceAddress addr : addresses){
+                        inetAddr = addr.getAddress();
+                        if (inetAddr instanceof Inet6Address) continue;
+                        Socket socket = new Socket();
+                        try {
+                            socket.bind(new InetSocketAddress(inetAddr, 9080));
+                            socket.connect(new InetSocketAddress("google.com", 80), 1000);
+                            socket.close();
+                            return inetAddr;
+                          } catch (IOException ex) {
+                            continue;
+                          }
+                    }
+                }
+                   
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return inetAddr;       
     }
 }

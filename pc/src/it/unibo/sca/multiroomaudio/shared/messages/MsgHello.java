@@ -4,10 +4,10 @@ public class MsgHello extends Msg {
     private int deviceType; // 0 client, 1 speaker
     private String MACid;
 
-    public MsgHello(int deviceType, String MACid) {
+    public MsgHello(/*int deviceType, String MACid*/) {
         super(MsgTypes.HELLO);
-        this.deviceType = deviceType;
-        this.MACid = MACid;
+        /*this.deviceType = deviceType;
+        this.MACid = MACid;*/
     }
 
     public String getMACid() {
