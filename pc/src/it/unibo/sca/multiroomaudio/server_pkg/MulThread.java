@@ -11,16 +11,13 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.channels.IllegalBlockingModeException;
 
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class MulThread extends Thread{
 
-    private final String multicastIp = "232.232.232.232";
-    private final int multicastPort = 8265;
+    private final String multicastIp = "224.0.0.2";
+    private final int multicastPort = 8262;
     private final int bufferSize = 1024 * 4;
     private MulticastSocket mySocket;
     private InetSocketAddress group;
@@ -35,8 +32,8 @@ public class MulThread extends Thread{
             NetworkInterface netIf = NetworkInterface.getByInetAddress(InetAddress.getByName("localhost"));
             MulticastSocket m_socket = new MulticastSocket(multicastPort);
             mySocket = m_socket;
-            mySocket.setLoopbackMode(false);
             mySocket.joinGroup(group, netIf);
+            mySocket.setLoopbackMode(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,13 +70,13 @@ public class MulThread extends Thread{
                 e.printStackTrace();
             }
             
-            /*try {
+            try {
                 System.out.println("Sending the ip");
                 mySocket.send(new DatagramPacket(data, data.length, group));
             } catch (IOException e) {
                 System.err.println("Error while sending the packet throught the group");
                 e.printStackTrace();
-            }*/
+            }
         }
     }
 }

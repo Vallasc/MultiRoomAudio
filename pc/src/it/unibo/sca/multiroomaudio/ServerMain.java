@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import it.unibo.sca.multiroomaudio.server_pkg.*;
+import it.unibo.sca.multiroomaudio.shared.IPFinder;
 
 public class ServerMain {
 
     private final static int servport = 8497;
     public static void main(String[] args){
         Thread threadexec = new ClientExecutor();
-        Thread multicastThread = new MulThread();
+        Thread multicastThread = new BroadcastThread();
+        
         multicastThread.start();
         
-
+        
         threadexec.start();
         try{
             ServerSocket serverSocket = new ServerSocket(servport);
