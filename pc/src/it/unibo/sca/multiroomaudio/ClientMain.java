@@ -7,16 +7,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.*;
 
+import it.unibo.sca.multiroomaudio.shared.IPFinder;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class ClientMain {
-    private static final String multicastIp = "232.232.232.232";
-    private static final int multicastPort = 8265;
+    private static final String multicastIp = "224.0.0.2";
+    private static final int multicastPort = 8262;
     private static final int bufferSize = 1024 * 4;
     private final static int servport = 8497;
 
     public static void main(String[] args){
-        boolean flagReceivedIp = false;
+        /*boolean flagReceivedIp = false;
         MulticastSocket mySocket = null;
         InetSocketAddress group = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -35,8 +36,8 @@ public class ClientMain {
             NetworkInterface netIf = NetworkInterface.getByInetAddress(InetAddress.getByName("localhost"));
             MulticastSocket m_socket = new MulticastSocket(multicastPort);
             mySocket = m_socket;
-            mySocket.setLoopbackMode(false);
             mySocket.joinGroup(group, netIf);
+            mySocket.setLoopbackMode(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,7 +56,7 @@ public class ClientMain {
             while(hello == null){
                 System.out.println("Waiting for messages");
                 mySocket.receive(new DatagramPacket(buffer, bufferSize, group));
-                /*once it's received there should just be a q.add(buffer);, but i need to know if this thing works or not*/
+                /*once it's received there should just be a q.add(buffer);, but i need to know if this thing works or not
                 ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
                 ObjectInputStream ois = new ObjectInputStream(bais);
                 Object readObject = ois.readObject();
@@ -79,6 +80,75 @@ public class ClientMain {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("in teoria sono connesso");
+        System.out.println("in teoria sono connesso");*/
+        //IPFinder.getBroadcast();
+        byte[] data;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try{
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(new MsgHello());
+        }catch(IOException e){
+            System.err.println("Something went wrong while setting up the message with the ip");
+            e.printStackTrace();
+            return;
+        }
+        data = baos.toByteArray(); 
+        DatagramSocket socket = null;
+        try {
+            socket = new DatagramSocket(6263);
+        } catch (SocketException e) {
+            System.err.println("SocketException");
+            e.printStackTrace();
+        }  
+        InetAddress address = null;
+        try {
+            address = InetAddress.getByName("localhost");
+        } catch (UnknownHostException e) {
+            System.err.println("Uknwonk host");
+        }  
+        
+        try {
+            socket.send(new DatagramPacket(data, data.length, InetAddress.getByName("192.168.1.255"), 6262));
+        } catch (UnknownHostException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }  
+        
+        // calling send() method  
+    catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        byte[] byteBuffer1 = new byte[1024];  
+        DatagramPacket packetReceive = new DatagramPacket(byteBuffer1, 1024);  
+        System.out.println("The packets are sent successfully");  
+        try {
+            socket.receive(packetReceive);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }  
+        System.out.println("packets received");
+        byte[] answer = packetReceive.getData();  
+        ByteArrayInputStream bais = new ByteArrayInputStream(answer);
+        ObjectInputStream ois;
+        try {
+            ois = new ObjectInputStream(bais);
+       
+        Object readObject;
+            readObject = ois.readObject();
+            if (readObject instanceof MsgHelloBack) {
+                MsgHelloBack helloBack = (MsgHelloBack) readObject;
+                System.out.println("Message is: " + helloBack.getType());
+            } 
+        }catch (IOException e){
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        socket.close();
+        //System.out.println(packet.getData());
+        
     }
 }
