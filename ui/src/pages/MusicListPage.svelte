@@ -2,7 +2,8 @@
     import { Page, Navbar, Toolbar, 
     Link, Block, BlockTitle, 
     Row, Col, Button, NavRight, Toggle,
-    ListItem, List, Card, CardContent, CardHeader } from 'framework7-svelte';
+    ListItem, List,  } from 'framework7-svelte';
+    import { text } from '../stores.js';
 </script>
 
 <Page>
@@ -29,6 +30,7 @@
       <div class="item"></div>
     </div>
     <BlockTitle>SLAC song list</BlockTitle>
+    <Block>{$text}</Block>
     <List medial-list>
       <ListItem
         title="Yellow Submarine"
