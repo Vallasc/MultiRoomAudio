@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.step_count;
+package it.unibo.sca.multiroomaudio;
 
 import static android.content.Context.SENSOR_SERVICE;
 
@@ -12,9 +12,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-
-import it.unibo.sca.multiroomaudio.JavascriptBindings;
-import it.unibo.sca.multiroomaudio.WifiHandler;
 
 public class OfflinePhaseManagerOld extends BroadcastReceiver implements SensorEventListener {
 

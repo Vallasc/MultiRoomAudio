@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.step_count;
+package it.unibo.sca.multiroomaudio;
 
 import static android.content.Context.SENSOR_SERVICE;
 
@@ -13,8 +13,12 @@ import android.hardware.SensorManager;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import it.unibo.sca.multiroomaudio.JavascriptBindings;
-import it.unibo.sca.multiroomaudio.WifiHandler;
+import java.util.ArrayList;
+import java.util.List;
+
+import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
+import it.unibo.sca.multiroomaudio.step_count.StepDetector;
+import it.unibo.sca.multiroomaudio.step_count.StepListener;
 
 public class OfflinePhaseManager extends BroadcastReceiver implements SensorEventListener, StepListener {
 
@@ -29,6 +33,9 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
 
     private int stepCount;
 
+    private String roomName;
+    private List<Fingerprint> fingerprints;
+
 
     public OfflinePhaseManager(Context context){
 
@@ -42,26 +49,32 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
 
         // listen to these sensors
         sensorManager.registerListener(this, sensorGravity, SensorManager.SENSOR_DELAY_FASTEST);
-        stepCount = 0;
 
         stepDetector = new StepDetector();
         stepDetector.registerListener(this);
+        clear();
     }
 
 
     public void setRoomName(String name){
-
+        this.roomName = name;
     }
 
-    private void setReferencePoint(){ //TODO
-
+    public void setReferencePoint(){
+        wifiHandler.startScan(context);
     }
 
-    public void sendToSLAC(){
-
+    public void saveRoom(){
+        if(roomName != null){
+            //TODO
+        }
+        clear();
     }
 
     public void clear(){
+        stepCount = 0;
+        roomName = null;
+        fingerprints = new ArrayList<>();
     }
 
 
@@ -69,7 +82,9 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
     public void onReceive(Context context, Intent intent) {
         // Walk detected
         if(intent.getAction() == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
-            setReferencePoint(); //TODO
+            Fingerprint fingerprint = wifiHandler.getFingerprint(context);
+            fingerprint.setId(String.valueOf(fingerprints.size()));
+            fingerprints.add(fingerprint);
         }
     }
 
@@ -96,8 +111,8 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
         if(sensorGravity != null) {
             sensorManager.registerListener(this, sensorGravity, SensorManager.SENSOR_DELAY_FASTEST);
         } else {
-            Log.d(TAG, "No sensor gravity found");
-            // TODO implmentare con intervalli di tempo
+            Log.d(TAG, "No accelerometer found");
+            // TODO implementare con intervalli di tempo
         }
     }
 
