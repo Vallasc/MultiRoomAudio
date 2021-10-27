@@ -16,36 +16,29 @@ import android.util.Log;
 import it.unibo.sca.multiroomaudio.JavascriptBindings;
 import it.unibo.sca.multiroomaudio.WifiHandler;
 
-public class OfflinePhaseManager extends BroadcastReceiver implements SensorEventListener, StepListener {
+public class OfflinePhaseManagerOld extends BroadcastReceiver implements SensorEventListener {
 
-    private static final String TAG = OfflinePhaseManager.class.getCanonicalName();
+    private static final String TAG = OfflinePhaseManagerOld.class.getCanonicalName();
+    private static final int STEPS_THRESHOLD = 2;
 
     private final WifiHandler wifiHandler;
     private final Context context;
-    private final StepDetector stepDetector;
 
-    private final SensorManager sensorManager;
-    private final Sensor sensorGravity;
+    private SensorManager sensorManager;
+    private Sensor stepDetectorSensor;
 
-    private int stepCount;
+    private StringBuilder sb = new StringBuilder();
+
+    private int currentStepsDetected;
 
 
-    public OfflinePhaseManager(Context context){
-
+    public OfflinePhaseManagerOld(Context context){
         this.context = context;
         this.wifiHandler = new WifiHandler();
 
         sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
-        sensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        //TODO controllare  sensorGravity == null
-
-        // listen to these sensors
-        sensorManager.registerListener(this, sensorGravity, SensorManager.SENSOR_DELAY_FASTEST);
-        stepCount = 0;
-
-        stepDetector = new StepDetector();
-        stepDetector.registerListener(this);
+        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        currentStepsDetected = 0;
     }
 
 
@@ -74,16 +67,19 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            stepDetector.updateAccel(event.timestamp, event.values[0], event.values[1], event.values[2]);
-        }
-    }
+    public void onSensorChanged(SensorEvent sensorEvent) {
 
-    @Override
-    public void step(long timeNs) {
-        stepCount++;
-        JavascriptBindings.getInstance().setText("Steps: " + stepCount);
+        // Step detector sensor
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+            int detectSteps = (int) sensorEvent.values[0];
+            currentStepsDetected += detectSteps;
+            //if( currentStepsDetected % STEPS_THRESHOLD == 0) {
+                Log.d(TAG, "Num passi " + currentStepsDetected);
+                sb.append("Num passi " + currentStepsDetected + "<br>");
+                JavascriptBindings.getInstance().setText(sb.toString());
+                //wifiHandler.startScan(context);
+            //}
+        }
     }
 
     public void onResume(){
@@ -93,17 +89,17 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
         context.registerReceiver(this, filter);
 
         // Register listener for step detector
-        if(sensorGravity != null) {
-            sensorManager.registerListener(this, sensorGravity, SensorManager.SENSOR_DELAY_FASTEST);
+        if(stepDetectorSensor != null) {
+            sensorManager.registerListener(this, stepDetectorSensor, 0);
         } else {
-            Log.d(TAG, "No sensor gravity found");
-            // TODO implmentare con intervalli di tempo
+            Log.d(TAG, "No step detector found");
+            // TODO implementare con intervalli di tempo
         }
     }
 
     public void onPause() {
         context.unregisterReceiver(this);
-        if(sensorGravity != null) {
+        if(stepDetectorSensor != null) {
             sensorManager.unregisterListener(this);
         }
     }
@@ -111,5 +107,4 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
     }
-
 }
