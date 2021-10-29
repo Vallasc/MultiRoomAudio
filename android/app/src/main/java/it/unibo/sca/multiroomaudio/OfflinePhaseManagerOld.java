@@ -31,7 +31,7 @@ public class OfflinePhaseManagerOld extends BroadcastReceiver implements SensorE
 
     public OfflinePhaseManagerOld(Context context){
         this.context = context;
-        this.wifiHandler = new WifiHandler();
+        this.wifiHandler = new WifiHandler(context);
 
         sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
         stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);

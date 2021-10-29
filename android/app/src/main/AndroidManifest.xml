@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="it.unibo.sca.multiroomaudio">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -23,7 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<service android:enabled="true" android:name=".step_count.StepCountingService" />-->
+        <service android:enabled="true" android:name=".services.FingerprintService" />
     </application>
 
 </manifest>

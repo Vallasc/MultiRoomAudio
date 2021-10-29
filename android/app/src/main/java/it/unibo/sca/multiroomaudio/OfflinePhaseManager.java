@@ -40,7 +40,7 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
     public OfflinePhaseManager(Context context){
 
         this.context = context;
-        this.wifiHandler = new WifiHandler();
+        this.wifiHandler = new WifiHandler(context);
 
         sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
         sensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -61,7 +61,7 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
     }
 
     public void setReferencePoint(){
-        wifiHandler.startScan(context);
+        wifiHandler.startScan();
     }
 
     public void saveRoom(){
@@ -82,7 +82,7 @@ public class OfflinePhaseManager extends BroadcastReceiver implements SensorEven
     public void onReceive(Context context, Intent intent) {
         // Walk detected
         if(intent.getAction() == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
-            Fingerprint fingerprint = wifiHandler.getFingerprint(context);
+            Fingerprint fingerprint = wifiHandler.getFingerprint();
             fingerprint.setId(String.valueOf(fingerprints.size()));
             fingerprints.add(fingerprint);
         }

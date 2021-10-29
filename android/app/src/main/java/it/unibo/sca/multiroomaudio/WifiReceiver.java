@@ -1,2 +1,12 @@
-package it.unibo.sca.multiroomaudio;public class WifiReceiver {
+package it.unibo.sca.multiroomaudio;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+public class WifiReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
+    }
 }

@@ -12,18 +12,21 @@ import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
 
 public class WifiHandler {
     private final String tag = WifiHandler.class.getCanonicalName();
+    private final Context context;
+    private final WifiManager wifiManager;
 
-
-    public WifiHandler(){}
-
-    public void startScan(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        boolean result = wifiManager.startScan();
-        Log.d(tag,"Wifi start scan: " + result);
+    public WifiHandler(Context context){
+        this.context = context;
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
-    public Fingerprint getFingerprint(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    public boolean startScan() {
+        boolean result = wifiManager.startScan();
+        Log.d(tag,"Wifi start scan: " + result);
+        return result;
+    }
+
+    public Fingerprint getFingerprint() {
         List<ScanResult> results = wifiManager.getScanResults();
         Log.d(tag,"Wifi Details " + wifiManager.getScanResults().size());
         Fingerprint fingerprint = new Fingerprint();

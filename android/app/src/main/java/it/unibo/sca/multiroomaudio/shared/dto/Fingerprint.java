@@ -1,5 +1,7 @@
 package it.unibo.sca.multiroomaudio.shared.dto;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 
 public class Fingerprint {
@@ -31,6 +33,18 @@ public class Fingerprint {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Fingerprint{" +
+                "id='" + id + '\'' +
+                ", map=" + map +
+                '}';
+    }
+
+    public String toJson(Gson serializer) {
+        return serializer.toJson(this);
     }
 
     public static class ScanResult {
