@@ -5,19 +5,17 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-public class BroadcastThread extends Thread{
-    private final int bufferSize = 1024 * 4;
-    
+import it.unibo.sca.multiroomaudio.shared.Couple;
 
-    public BroadcastThread(){
-        
-    }
+public class DatagramThread extends Thread{
+    private final int bufferSize = 1024 * 4;
 
     public void run(){
+        System.out.println("Broadcast receiver started");
         Thread datagramAnalyser = new DatagramExecutor();
         DatagramSocket datagramSocket = null;
         datagramAnalyser.start();
-        try {
+        try{
             datagramSocket = new DatagramSocket(6262);
         } catch (SocketException e) {
             e.printStackTrace();
@@ -27,12 +25,13 @@ public class BroadcastThread extends Thread{
         while(true){
             try {
                 datagramSocket.receive(datagramPacket);
-                ((DatagramExecutor) datagramAnalyser).getRequestQ().put(new CoupleHello(datagramPacket.getData(), datagramPacket.getAddress()));
+                ((DatagramExecutor) datagramAnalyser).getRequestQ().put(new Couple(datagramPacket.getData(), datagramPacket.getAddress()));
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }  
         }
+        //datagramSocket.close();
     }
 }
