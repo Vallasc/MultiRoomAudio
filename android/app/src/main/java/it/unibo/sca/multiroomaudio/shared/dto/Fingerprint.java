@@ -1,16 +1,24 @@
 package it.unibo.sca.multiroomaudio.shared.dto;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 
 public class Fingerprint {
-    
+
+    private String id;
     // Key = BSSID
-    final HashMap<String, ScanResult> map;
+    private final HashMap<String, ScanResult> map;
+
+    public Fingerprint(String id) {
+        map = new HashMap<String, ScanResult>();
+        this.id = id;
+    }
 
     public Fingerprint() {
         map = new HashMap<String, ScanResult>();
+        this.id = "fingerprint";
     }
-
     public void add(ScanResult result){
         map.put(result.getBSSID(), result);
     }
@@ -19,7 +27,27 @@ public class Fingerprint {
         return map;
     }
 
-    public class ScanResult {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Fingerprint{" +
+                "id='" + id + '\'' +
+                ", map=" + map +
+                '}';
+    }
+
+    public String toJson(Gson serializer) {
+        return serializer.toJson(this);
+    }
+
+    public static class ScanResult {
         private final String BSSID;
         private final String SSID;
         private final int signal;

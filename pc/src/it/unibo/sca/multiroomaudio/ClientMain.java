@@ -95,7 +95,7 @@ public class ClientMain {
         data = baos.toByteArray(); 
         DatagramSocket socket = null;
         try {
-            socket = new DatagramSocket(6262);
+            socket = new DatagramSocket(6263);
         } catch (SocketException e) {
             System.err.println("SocketException");
             e.printStackTrace();
@@ -147,6 +147,7 @@ public class ClientMain {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        socket.close();
         //System.out.println(packet.getData());
         
     }

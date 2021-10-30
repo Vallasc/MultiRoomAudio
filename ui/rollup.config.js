@@ -73,7 +73,7 @@ export default {
 		copy({
 			targets: [
 			  { src: './public/', dest: '../pc/' },
-			  { src: './public/', dest: '../android/app/assets/' }
+			  { src: './public/', dest: '../android/app/src/main/assets/' }
 			],
 			hook: 'writeBundle'
 		  })

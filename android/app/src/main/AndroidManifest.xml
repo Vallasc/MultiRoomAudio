@@ -3,9 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="it.unibo.sca.multiroomaudio">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!--<uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>-->
 
     <application
         android:allowBackup="true"
@@ -19,11 +22,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".WifiBroadcastReceiver" tools:ignore="Instantiatable" />
+        <service android:enabled="true" android:name=".services.FingerprintService" />
     </application>
 
 </manifest>

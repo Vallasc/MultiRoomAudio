@@ -37,7 +37,7 @@ public class DatagramExecutor extends Thread{
         DatagramSocket socket;
         try {
             socket = new DatagramSocket();
-            socket.send(new DatagramPacket(data, data.length, receiver, 6262));
+            socket.send(new DatagramPacket(data, data.length, receiver, 6263));
             socket.close();
         } catch (SocketException e) {
             e.printStackTrace();
@@ -62,7 +62,6 @@ public class DatagramExecutor extends Thread{
                 if (readObject instanceof MsgHello) {
                     hello = (MsgHello) readObject;
                     System.out.println("Message is: " + hello.getType());
-					sleep(2000);
 					sendBroadcast(sender);
                 } else continue;
 			} catch (InterruptedException e) {

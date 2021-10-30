@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Repos/MultiRoomAudio/android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.12760416666666666" />
+        <entry key="..\:/Repos/MultiRoomAudio/android/app/src/main/res/layout/activity_main.xml" value="0.22327898550724637" />
+        <entry key="..\:/Repos/MultiRoomAudio/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.12760416666666666" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectKey">
     <option name="state" value="project://e2804f05-5315-4fc6-a121-c522a6c26470" />
   </component>

@@ -8,45 +8,32 @@ import android.util.Log;
 
 import java.util.List;
 
+import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
+
 public class WifiHandler {
     private final String tag = WifiHandler.class.getCanonicalName();
+    private final Context context;
+    private final WifiManager wifiManager;
 
-    private WifiBroadcastReceiver wifiBroadcastReceiver;
-    private JavaScriptInterface jsInterface;
-
-    public WifiHandler(){
-        wifiBroadcastReceiver = new WifiBroadcastReceiver(this);
+    public WifiHandler(Context context){
+        this.context = context;
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
-    public void setJsInterface(JavaScriptInterface jsInterface) {
-        this.jsInterface = jsInterface;
-    }
-
-    public void registerReceiver(Context context) {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        context.registerReceiver(new WifiBroadcastReceiver(this),filter);
-    }
-
-    public void unregisterReceiver(Context context) {
-        context.unregisterReceiver(wifiBroadcastReceiver);
-    }
-
-    public void startScan(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    public boolean startScan() {
         boolean result = wifiManager.startScan();
         Log.d(tag,"Wifi start scan: " + result);
+        return result;
     }
 
-    public void sendListOfAP(Context context) {
-        StringBuilder sb = new StringBuilder();
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    public Fingerprint getFingerprint() {
         List<ScanResult> results = wifiManager.getScanResults();
         Log.d(tag,"Wifi Details " + wifiManager.getScanResults().size());
+        Fingerprint fingerprint = new Fingerprint();
         for (ScanResult result : results) {
-            //Log.d(tag, result.BSSID + result.SSID + result.level);
-            sb.append(result.BSSID + ' ' + result.SSID + ' ' + result.level + '\n');
+            fingerprint.add(
+                    new Fingerprint.ScanResult(result.BSSID, result.SSID, result.level, result.frequency, result.timestamp));
         }
-        jsInterface.callJs("setList(\"" + sb.toString().replaceAll("\n","<br>") + "\")");
+        return fingerprint;
     }
 }
