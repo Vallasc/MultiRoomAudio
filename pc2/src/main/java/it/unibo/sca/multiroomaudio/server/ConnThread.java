@@ -19,6 +19,7 @@ public class ConnThread extends Thread {
         MsgSpecs specs = null;
         try {
             specs =(MsgSpecs) msgHandler.tcpInMsg(client);
+            client.close();
         } catch (ClassNotFoundException e) {
             System.err.println("Error while trying to find the class");
             try {
@@ -33,14 +34,7 @@ public class ConnThread extends Thread {
             System.err.println("something fucked up the socket");
             return;
         }
-        System.out.println("System type: " + specs.getDeviceType() + "System MAC address: " + specs.getMACid());
-        
-
-        try {
-            client.close();
-        } catch (IOException e) {
-            System.err.println("Error in closing the socket");
-            e.printStackTrace();
-        }
+        //This should be saved inside the data structure
+        System.out.println("System type: " + specs.getDeviceType() + "System MAC address: " + specs.getMACid());   
     }
 }
