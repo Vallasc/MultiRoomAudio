@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import it.unibo.sca.multiroomaudio.server.http_server.HttpServer;
 import it.unibo.sca.multiroomaudio.server.http_server.MusicHttpServer;
+import it.unibo.sca.multiroomaudio.server.http_server.ServerWebSocket;
 
 public class ServerMain {
 
@@ -13,13 +14,13 @@ public class ServerMain {
     public static void main(String[] args){
         // Music http server
         if(args.length == 2) {
-            (new MusicHttpServer(8080, args[1])).start();
+            new MusicHttpServer(8080, args[1]).start();
         } else {
-            (new MusicHttpServer(8080, "C:\\Users\\giaco\\Music")).start(); //TODO
+            new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").start(); //TODO
         }
 
         // WebApp http server
-        (new HttpServer(80)).start();
+        new HttpServer(80).setWebSocket(ServerWebSocket.class).start();
 
 
         Thread tcpHandler = new ClientExecutor();
