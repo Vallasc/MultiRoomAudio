@@ -13,25 +13,21 @@ public class DatagramThread extends Thread{
     public void run(){
         System.out.println("Broadcast receiver started");
         Thread datagramAnalyser = new DatagramExecutor();
-        DatagramSocket datagramSocket = null;
         datagramAnalyser.start();
-        try{
-            datagramSocket = new DatagramSocket(6262); // TODO close datagram socket
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }  
         byte buf[] = new byte[bufferSize];
         DatagramPacket datagramPacket = new DatagramPacket(buf, bufferSize);  
-        while(true){
-            try {
+        try(DatagramSocket datagramSocket = new DatagramSocket(6262)){
+            while(true){
                 datagramSocket.receive(datagramPacket);
                 ((DatagramExecutor) datagramAnalyser).getRequestQ().put(new Couple(datagramPacket.getData(), datagramPacket.getAddress()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }  
-        }
-        //datagramSocket.close();
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.err.println("That's an error in thread");
+            e.printStackTrace();
+        } 
     }
 }

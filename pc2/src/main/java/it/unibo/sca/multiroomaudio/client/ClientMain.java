@@ -31,6 +31,7 @@ public class ClientMain {
         } catch (SocketException e) {
             System.err.println("SocketException");
             e.printStackTrace();
+            return false;
         }
 
         specs = IPFinder.getSpecs();
@@ -41,6 +42,7 @@ public class ClientMain {
             try {
                 socket.send(new DatagramPacket(data, data.length, broadcastAddr, 6262));
             } catch (UnknownHostException e) {
+                System.err.println("Cannot send the packet, host uknown");
                 socket.close();
                 e.printStackTrace();
                 return false;
@@ -49,7 +51,7 @@ public class ClientMain {
                 e.printStackTrace();
                 return false;
             }
-            System.out.println("The packets are sent successfully");  
+            System.out.println("The packet is sent successfully");  
             try {
                 socket.receive(packetReceive);
                 flagResend = false;
@@ -57,17 +59,19 @@ public class ClientMain {
             } catch (SocketTimeoutException e) {
                 continue;
             } catch (IOException e) {
-                e.printStackTrace();          
+                System.err.println("Error while trying to read the answer from the server");
+                e.printStackTrace();       
+                socket.close();
+                return false;   
             } 
         }
         //ok got the message
         try {
             Object readObject = msgHandler.dtgmInMsg(packetReceive.getData());
-            if (readObject instanceof MsgHelloBack) {
-                MsgHelloBack helloBack = (MsgHelloBack) readObject;
-                serverAddress = packetReceive.getAddress();
-                System.out.println("Message is: " + helloBack.getType());
-            } 
+            if (readObject instanceof MsgHelloBack) 
+                serverAddress = packetReceive.getAddress();    
+                //MsgHelloBack helloBack = (MsgHelloBack) readObject;
+                //System.out.println("Message is: " + helloBack.getType());
         }catch (IOException e){
             System.err.println("Error while reading from the socket");
             socket.close();

@@ -25,8 +25,7 @@ public class ServerMain {
         
         udpHandler.start();        
         tcpHandler.start();
-        try{
-            ServerSocket serverSocket = new ServerSocket(servport);
+        try(ServerSocket serverSocket = new ServerSocket(servport)){
             System.out.println("In attesa di connessione...");
             while(true){
                 Socket clientSocket = serverSocket.accept();
