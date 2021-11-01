@@ -6,25 +6,43 @@
 
   const f7Params = {
     routes: [
-		{
-			path: '/',
-			component: MusicListPage,
-      main: true
-		},
-    {
-			path: '/rooms',
-			component: RoomsPage,
-      main: true
-		},
-    {
-			path: '/calibration',
-			component: CalibrationPage,
-      main: true
-		}
+      {
+        path: '/musiclist',
+        component: MusicListPage,
+      },
+      {
+        path: '/rooms',
+        component: RoomsPage,
+      },
+      {
+        path: '/calibration',
+        component: CalibrationPage,
+      },
+      {
+        path: '/speaker',
+        component: CalibrationPage,
+      }
 		]
-  };
+  }
+
+  const urlParams = new URLSearchParams(window.location.search)
+  let isClient = false
+  let isSpeaker = false
+
+  if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
+    isClient = true;
+  } else if(urlParams.get('type') != null && urlParams.get('type') === 'speaker'){
+    isSpeaker = true;
+  } 
+
 </script>
 
 <App {...f7Params}>
-  <View url="/" class="safe-areas"/>
+  {#if isClient}
+    <View url="/musiclist" />
+  {:else if isSpeaker}
+    <View url="/speaker" />
+  {:else}
+    <h1>Open Multiroom Audio on your pc</h1>
+  {/if}
 </App>
