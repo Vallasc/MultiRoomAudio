@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import it.unibo.sca.multiroomaudio.server.http_server.HttpServer;
+import it.unibo.sca.multiroomaudio.server.http_server.MusicHttpServer;
+
 public class ServerMain {
 
     private final static int servport = 8497;
     public static void main(String[] args){
-
         // Music http server
         if(args.length == 2) {
-            (new HttpServer(8080, args[1])).start();
+            (new MusicHttpServer(8080, args[1])).start();
         } else {
-            (new HttpServer(8080, "C:\\Users\\giaco\\Music")).start(); //TODO
+            (new MusicHttpServer(8080, "C:\\Users\\giaco\\Music")).start(); //TODO
         }
 
         // WebApp http server
