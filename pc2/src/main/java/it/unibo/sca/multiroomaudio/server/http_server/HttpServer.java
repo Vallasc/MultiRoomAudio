@@ -28,5 +28,10 @@ public class HttpServer extends Thread {
             service.staticFiles.location("/public");
         service.init();
     }
+
+    public HttpServer setWebSocket(Class<?> webSocketClass){
+        service.webSocket("/", webSocketClass);
+        return this;
+    }
     
 }
