@@ -1,5 +1,5 @@
 <script>
-    import { Page, Navbar, Fab, Icon, Link, ListItem, List, } from 'framework7-svelte';
+    import { Page, Navbar, Fab, Icon, Link, ListItem, List, } from 'framework7-svelte'
 </script>
 
 <Page>

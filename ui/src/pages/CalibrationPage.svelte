@@ -1,6 +1,6 @@
 <script>
     import { Page, Navbar, Fab, Icon, List, ListInput, 
-              BlockTitle, Block, Button } from 'framework7-svelte';
+              BlockTitle, Block, Button, ListItem } from 'framework7-svelte';
     
     let isLoading = false;
 
@@ -30,6 +30,24 @@
         Save reference
       </Button>
     </Block>
+    <List mediaList>
+      <ListItem
+        title="Yellow Submarine"
+        subtitle="Beatles">
+        <img slot="media" src="https://cdn.framework7.io/placeholder/fashion-88x88-1.jpg" width="44" />
+      </ListItem>
+      <ListItem
+        link="#"
+        title="Don't Stop Me Now"
+        subtitle="Queen">
+        <img slot="media" src="https://cdn.framework7.io/placeholder/fashion-88x88-2.jpg" width="44" />
+      </ListItem>
+      <ListItem
+        title="Billie Jean"
+        subtitle="Michael Jackson">
+        <img slot="media" src="https://cdn.framework7.io/placeholder/fashion-88x88-3.jpg" width="44" />
+      </ListItem>
+    </List>
 </Page>
 
 <style>

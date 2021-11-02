@@ -13,10 +13,14 @@ public class ServerMain {
     private final static int servport = 8497;
     public static void main(String[] args){
         // Music http server
-        if(args.length == 2) {
-            new MusicHttpServer(8080, args[1]).start();
-        } else {
-            new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").start(); //TODO
+        try {
+            if(args.length == 2) {
+                new MusicHttpServer(8080, args[1]).listMusic().start();
+            } else {
+                new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").listMusic().start(); //TODO
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         // WebApp http server

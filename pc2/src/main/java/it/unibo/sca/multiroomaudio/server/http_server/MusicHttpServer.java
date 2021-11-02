@@ -10,6 +10,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
@@ -19,7 +20,7 @@ import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 public class MusicHttpServer extends HttpServer {
     private File dir;
     private List<Song> songList;
-
+    private Gson gson = new Gson();
 
     public MusicHttpServer(int port, String dirUri){
         super(port, dirUri);
@@ -30,11 +31,6 @@ public class MusicHttpServer extends HttpServer {
     public void run(){
         super.run();
         setRoutes();
-        try {
-            listMusic();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void setRoutes(){
@@ -42,11 +38,24 @@ public class MusicHttpServer extends HttpServer {
             service.put("/play", (req, res) -> "Hello World");
             service.put("/pause", (req, res) -> "Hello World");
             service.put("/stop", (req, res) -> "Hello World");
-            service.get("/list", (req, res) -> "Hello World");
+            service.get("/list", (req, res) -> songList, gson::toJson);
         });
+        // Enable CORS
+        service.options("/*", (request, response) -> {
+            String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+            if (accessControlRequestHeaders != null) {
+                response.header("Access-Control-Allow-Headers",accessControlRequestHeaders);
+            }
+            String accessControlRequestMethod = request .headers("Access-Control-Request-Method");
+            if (accessControlRequestMethod != null) {
+                response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+            }
+            return "OK";
+        });
+        service.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
     }
 
-    public void listMusic() throws IOException{
+    public MusicHttpServer listMusic() throws IOException{
         songList.clear();
         System.out.println("Songs:");
         Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
@@ -54,12 +63,13 @@ public class MusicHttpServer extends HttpServer {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 try {
                     songList.add(Song.fromMp3File(file, dir));
-                    System.out.println(" - " + file);
+                    System.out.println("_" + file);
                 } catch (UnsupportedTagException | InvalidDataException | IOException e) {
                     //e.printStackTrace();
                 }
                 return FileVisitResult.CONTINUE;
             }
         });
+        return this;
     }
 }

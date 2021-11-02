@@ -12,6 +12,18 @@ public class ClientMain {
     private static InetAddress serverAddress;
     private static Couple specs;
 
+    public static void main(String[] args){     
+        if(!discovery()){
+            System.err.println("Something went wrong during the discovery phase");
+            return;
+        }
+        if(!specs()){
+            System.err.println("Something went wrong during the specs sending phase");
+            return;
+        }
+
+    }
+    
     //maybe is better to throw an exception in case of failure but i don't care
     private static boolean discovery(){
         byte[] data = null;
@@ -101,15 +113,4 @@ public class ClientMain {
         return true;
     }
 
-    public static void main(String[] args){     
-        if(!discovery()){
-            System.err.println("Something went wrong during the discovery phase");
-            return;
-        }
-        if(!specs()){
-            System.err.println("Something went wrong during the specs sending phase");
-            return;
-        }
-
-    }
 }
