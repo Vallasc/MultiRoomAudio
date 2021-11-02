@@ -11,6 +11,8 @@ import java.util.Enumeration;
 import java.util.List;
 
 
+
+
 public class IPFinder {
     //return the address of the network interface
 
@@ -22,7 +24,7 @@ public class IPFinder {
 		return sb.toString();
     }
 
-    public static Couple getSpecs(){
+    public static Pair<byte[], InetAddress> getSpecs(){
         Enumeration<NetworkInterface> ni = null;
         boolean flagFound = false;
         try {
@@ -36,12 +38,11 @@ public class IPFinder {
                         if (inetAddr instanceof Inet6Address) continue;
                         Socket socket = new Socket();
                         try {
-                            socket.bind(new InetSocketAddress(inetAddr, 9080));
+                            socket.bind(new InetSocketAddress(inetAddr, 12351));
                             socket.connect(new InetSocketAddress("google.com", 80), 1000);
                             socket.close();
-                            return new Couple(n.getHardwareAddress(), addr.getBroadcast());
+                            return new Pair<byte[], InetAddress>(n.getHardwareAddress(), addr.getBroadcast());
                           } catch (IOException ex) {
-                            System.out.println(socket.isBound() + inetAddr.toString());
                             continue;
                           }
                     }

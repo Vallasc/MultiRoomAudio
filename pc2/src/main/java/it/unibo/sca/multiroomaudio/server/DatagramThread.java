@@ -3,9 +3,10 @@ package it.unibo.sca.multiroomaudio.server;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 
-import it.unibo.sca.multiroomaudio.shared.Couple;
+import it.unibo.sca.multiroomaudio.shared.Pair;
 
 public class DatagramThread extends Thread{
     private final int bufferSize = 1024 * 4;
@@ -19,7 +20,7 @@ public class DatagramThread extends Thread{
         try(DatagramSocket datagramSocket = new DatagramSocket(6262)){
             while(true){
                 datagramSocket.receive(datagramPacket);
-                ((DatagramExecutor) datagramAnalyser).getRequestQ().put(new Couple(datagramPacket.getData(), datagramPacket.getAddress()));
+                ((DatagramExecutor) datagramAnalyser).getRequestQ().put(new Pair<byte[], InetAddress>(datagramPacket.getData(), datagramPacket.getAddress()));
             }
         } catch (SocketException e) {
             e.printStackTrace();

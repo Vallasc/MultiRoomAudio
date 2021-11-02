@@ -17,8 +17,8 @@ public class msgHandler {
         return baos.toByteArray();
     }
 
-    public static Object dtgmInMsg(byte[] received) throws IOException, ClassNotFoundException{
-        ByteArrayInputStream bais = new ByteArrayInputStream(received);
+    public static Object dtgmInMsg(Object object) throws IOException, ClassNotFoundException{
+        ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) object);
         ObjectInputStream ois = new ObjectInputStream(bais);
         return ois.readObject();
     }

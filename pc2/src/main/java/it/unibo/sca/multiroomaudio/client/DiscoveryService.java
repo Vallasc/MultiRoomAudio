@@ -6,14 +6,14 @@ import java.net.*;
 import it.unibo.sca.multiroomaudio.shared.*;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
-public class ClientMain {
+public class DiscoveryService {
     private static final int bufferSize = 1024;
-    private final static int servport = 8497;
-    private static InetAddress serverAddress;
-    private static Couple specs;
+    
+    //private static Couple specs;
 
     //maybe is better to throw an exception in case of failure but i don't care
-    private static boolean discovery(){
+    public static Pair<Integer, InetAddress> discover(){
+        InetAddress serverAddress = null;
         byte[] data = null;
         byte[] byteBuffer1 = new byte[bufferSize];  
         DatagramPacket packetReceive = new DatagramPacket(byteBuffer1, bufferSize);
@@ -21,7 +21,7 @@ public class ClientMain {
             data = msgHandler.dtgmOutMsg(new MsgHello());
         }catch(IOException e){
             System.err.println("Error while sending the message");
-            return false;
+            return null;
         }
         //---------------------------------------------------------
         DatagramSocket socket = null;
@@ -31,11 +31,11 @@ public class ClientMain {
         } catch (SocketException e) {
             System.err.println("SocketException");
             e.printStackTrace();
-            return false;
+            return null;
         }
 
-        specs = IPFinder.getSpecs();
-        InetAddress broadcastAddr = specs.getInetAddr();      
+        Pair<byte[], InetAddress> specs = IPFinder.getSpecs();
+        InetAddress broadcastAddr = specs.getV();      
         
         boolean flagResend = true;
         while(flagResend){
@@ -45,11 +45,11 @@ public class ClientMain {
                 System.err.println("Cannot send the packet, host uknown");
                 socket.close();
                 e.printStackTrace();
-                return false;
+                return null;
             } catch (IOException e) {
                 socket.close();
                 e.printStackTrace();
-                return false;
+                return null;
             }
             System.out.println("The packet is sent successfully");  
             try {
@@ -62,30 +62,31 @@ public class ClientMain {
                 System.err.println("Error while trying to read the answer from the server");
                 e.printStackTrace();       
                 socket.close();
-                return false;   
+                return null;   
             } 
         }
         //ok got the message
+        Integer msg = null;
         try {
             Object readObject = msgHandler.dtgmInMsg(packetReceive.getData());
             if (readObject instanceof MsgHelloBack) 
                 serverAddress = packetReceive.getAddress();    
-                //MsgHelloBack helloBack = (MsgHelloBack) readObject;
-                //System.out.println("Message is: " + helloBack.getType());
+                MsgHelloBack helloBack = (MsgHelloBack) readObject;
+                msg = helloBack.getPort();
         }catch (IOException e){
             System.err.println("Error while reading from the socket");
             socket.close();
-            return false;
+            return null;
         } catch (ClassNotFoundException e) {
             System.err.println("Error in casting the class");
             socket.close();
-            return false;
+            return null;
         }
         socket.close();
-        return true;
+        return new Pair<Integer, InetAddress>(msg, serverAddress);
     }
 
-    private static boolean specs(){
+    /*private static boolean specs(){
         Socket socket = null;
         try {
             socket = new Socket(serverAddress, servport);
@@ -96,20 +97,9 @@ public class ClientMain {
         } catch (IOException e) {
             System.err.println("Errore while setting up the tcp socket");
             e.printStackTrace();
-            return false;
+            return null;
         }
         return true;
-    }
+    }*/
 
-    public static void main(String[] args){     
-        if(!discovery()){
-            System.err.println("Something went wrong during the discovery phase");
-            return;
-        }
-        if(!specs()){
-            System.err.println("Something went wrong during the specs sending phase");
-            return;
-        }
-
-    }
 }
