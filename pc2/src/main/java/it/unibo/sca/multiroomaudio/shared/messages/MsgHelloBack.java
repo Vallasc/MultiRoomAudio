@@ -1,18 +1,18 @@
 package it.unibo.sca.multiroomaudio.shared.messages;
 
 public class MsgHelloBack extends Msg{
-    private String ip;
+    private int port;
 
-    public MsgHelloBack() {
+    public MsgHelloBack(int port) {
         super(MsgTypes.HELLO_BACK);
-        //this.ip = ip;
+        this.port = port;
     }
 
-    public void setIP(String ip){
-        this.ip = ip;
+    public void setPort(int port){
+        this.port = port;
     }
 
-    public String getIp(){
-        return this.ip;
+    public int getPort(){
+        return this.port;
     }
 }

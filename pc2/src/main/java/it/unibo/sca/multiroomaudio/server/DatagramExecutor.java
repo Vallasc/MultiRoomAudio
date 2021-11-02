@@ -7,18 +7,18 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.*;
 
-import it.unibo.sca.multiroomaudio.shared.Couple;
+import it.unibo.sca.multiroomaudio.shared.Pair;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class DatagramExecutor extends Thread {
-	private BlockingQueue<Couple> requestQ;
+	private BlockingQueue<Pair<byte[], InetAddress>> requestQ;
 	private static byte[] data;
 	
 	public DatagramExecutor() {
 		//should pass the data structure in which client parameters should be saved
 		requestQ  = new LinkedBlockingQueue<>();
         try {
-			data = msgHandler.dtgmOutMsg(new MsgHelloBack());
+			data = msgHandler.dtgmOutMsg(new MsgHelloBack(8085));
 		} catch (IOException e) {
 			System.err.println("error while creating the message");
 			e.printStackTrace();
@@ -45,9 +45,9 @@ public class DatagramExecutor extends Thread {
 			MsgHello hello = null;
 			
 			try {
-				Couple couple = requestQ.take();
-				InetAddress sender = couple.getInetAddr();
-                Object readObject = msgHandler.dtgmInMsg(couple.getBytes());
+				Pair<byte[], InetAddress> pair = requestQ.take();
+				InetAddress sender = (InetAddress) pair.getV();
+                Object readObject = msgHandler.dtgmInMsg((Object) pair.getU());
 				//System.out.println(packet.getData());
                 if (readObject instanceof MsgHello) {
                     hello = (MsgHello) readObject;
@@ -64,7 +64,7 @@ public class DatagramExecutor extends Thread {
 		}
 	} 
 	
-	public BlockingQueue<Couple> getRequestQ() {
+	public BlockingQueue<Pair<byte[], InetAddress>> getRequestQ() {
 		return this.requestQ;
 	}
 

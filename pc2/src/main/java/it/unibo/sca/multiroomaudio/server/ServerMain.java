@@ -26,12 +26,11 @@ public class ServerMain {
         // WebApp http server
         new HttpServer(80).setWebSocket(ServerWebSocket.class).start();
 
-
-        Thread tcpHandler = new ClientExecutor();
+        //Thread tcpHandler = new ClientExecutor();
         Thread udpHandler = new DatagramThread();
         
         udpHandler.start();        
-        tcpHandler.start();
+        /*tcpHandler.start();
         try(ServerSocket serverSocket = new ServerSocket(servport)){
             System.out.println("In attesa di connessione...");
             while(true){
@@ -48,7 +47,7 @@ public class ServerMain {
 		}catch(IOException e){
 			e.printStackTrace();
 			return;
-		}
+		}*/
         
     }
    
