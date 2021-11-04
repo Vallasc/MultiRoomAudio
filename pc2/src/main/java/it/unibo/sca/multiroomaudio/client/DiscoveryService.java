@@ -4,27 +4,14 @@ import java.io.IOException;
 import java.net.*;
 
 import it.unibo.sca.multiroomaudio.shared.*;
+import it.unibo.sca.multiroomaudio.shared.exceptions.UknowknBroadcastException;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class DiscoveryService {
     private static final int bufferSize = 1024;
     
     //private static Couple specs;
-
-    public static void main(String[] args){     
-        if(!discovery()){
-            System.err.println("Something went wrong during the discovery phase");
-            return;
-        }
-        if(!specs()){
-            System.err.println("Something went wrong during the specs sending phase");
-            return;
-        }
-
-    }
-    
-    //maybe is better to throw an exception in case of failure but i don't care
-    public static Pair<Integer, InetAddress> discover(){
+    public static Pair<Integer, InetAddress> discover() throws UknowknBroadcastException{
         InetAddress serverAddress = null;
         byte[] data = null;
         byte[] byteBuffer1 = new byte[bufferSize];  
@@ -33,7 +20,7 @@ public class DiscoveryService {
             data = msgHandler.dtgmOutMsg(new MsgHello());
         }catch(IOException e){
             System.err.println("Error while sending the message");
-            return null;
+            throw new UknowknBroadcastException("");
         }
         //---------------------------------------------------------
         DatagramSocket socket = null;
@@ -41,9 +28,8 @@ public class DiscoveryService {
             socket = new DatagramSocket(6263);
             socket.setSoTimeout(10000);
         } catch (SocketException e) {
-            System.err.println("SocketException");
             e.printStackTrace();
-            return null;
+            throw new UknowknBroadcastException("SocketException in creating the socket");
         }
 
         Pair<byte[], InetAddress> specs = IPFinder.getSpecs();
@@ -54,14 +40,13 @@ public class DiscoveryService {
             try {
                 socket.send(new DatagramPacket(data, data.length, broadcastAddr, 6262));
             } catch (UnknownHostException e) {
-                System.err.println("Cannot send the packet, host uknown");
                 socket.close();
                 e.printStackTrace();
-                return null;
+                throw new UknowknBroadcastException("Cannot send the packet, host uknown");
             } catch (IOException e) {
                 socket.close();
                 e.printStackTrace();
-                return null;
+                throw new UknowknBroadcastException("");
             }
             System.out.println("The packet is sent successfully");  
             try {
@@ -71,10 +56,9 @@ public class DiscoveryService {
             } catch (SocketTimeoutException e) {
                 continue;
             } catch (IOException e) {
-                System.err.println("Error while trying to read the answer from the server");
                 e.printStackTrace();       
                 socket.close();
-                return null;   
+                throw new UknowknBroadcastException("Error while trying to read the answer from the server");  
             } 
         }
         //ok got the message
@@ -82,36 +66,17 @@ public class DiscoveryService {
         try {
             Object readObject = msgHandler.dtgmInMsg(packetReceive.getData());
             if (readObject instanceof MsgHelloBack) 
-                serverAddress = packetReceive.getAddress();    
+                serverAddress = packetReceive.getAddress();  
                 MsgHelloBack helloBack = (MsgHelloBack) readObject;
                 msg = helloBack.getPort();
         }catch (IOException e){
-            System.err.println("Error while reading from the socket");
             socket.close();
-            return null;
+            throw new UknowknBroadcastException("Error while reading from the socket");
         } catch (ClassNotFoundException e) {
-            System.err.println("Error in casting the class");
             socket.close();
-            return null;
+            throw new UknowknBroadcastException("Error in casting the class");
         }
         socket.close();
         return new Pair<Integer, InetAddress>(msg, serverAddress);
     }
-
-    /*private static boolean specs(){
-        Socket socket = null;
-        try {
-            socket = new Socket(serverAddress, servport);
-            System.out.println("Connected");
-            //do stuff here
-            msgHandler.tcpOutMsg(socket, new MsgSpecs(0, IPFinder.buildMac(specs.getBytes())));
-            socket.close();
-        } catch (IOException e) {
-            System.err.println("Errore while setting up the tcp socket");
-            e.printStackTrace();
-            return null;
-        }
-        return true;
-    }*/
-
 }

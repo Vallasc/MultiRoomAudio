@@ -21,11 +21,6 @@ public class ConnectionWebSocket {
     @OnWebSocketConnect
     public void connected(Session session) {
         sessions.add(session);
-		/*try {
-			session.getRemote().sendString("Hello");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
         System.out.println("New connection"); 
     }
 
@@ -37,7 +32,7 @@ public class ConnectionWebSocket {
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
         System.out.println("Got: " + message);   // Print message
-        //session.getRemote().sendString(message); // and send it back
+        session.getRemote().sendString(message); // and send it back
     }
 
 }

@@ -1,5 +1,6 @@
 package it.unibo.sca.multiroomaudio.shared;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -38,11 +39,17 @@ public class IPFinder {
                         if (inetAddr instanceof Inet6Address) continue;
                         Socket socket = new Socket();
                         try {
-                            socket.bind(new InetSocketAddress(inetAddr, 12351));
-                            socket.connect(new InetSocketAddress("google.com", 80), 1000);
+                            socket.bind(new InetSocketAddress(inetAddr, 15000));
+                            try{
+                                socket.connect(new InetSocketAddress("google.com", 80), 1000);
+                            }catch(BindException e){
+                                //address already in use
+                                socket.close();
+                                return new Pair<byte[], InetAddress>(n.getHardwareAddress(), addr.getBroadcast());
+                            }
                             socket.close();
                             return new Pair<byte[], InetAddress>(n.getHardwareAddress(), addr.getBroadcast());
-                          } catch (IOException ex) {
+                          }catch(IOException e) {
                             continue;
                           }
                     }
