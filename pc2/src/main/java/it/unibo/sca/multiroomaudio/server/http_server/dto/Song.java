@@ -11,6 +11,8 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
+import it.unibo.sca.multiroomaudio.server.http_server.EncodingUtil;
+
 public class Song {
     private String artist = null;
     private String title = null;
@@ -66,7 +68,12 @@ public class Song {
         File songFile = filePath.toFile();
         Mp3File mp3file = new Mp3File(filePath);
         Song song = new Song();
-        song.songUrl = songFile.toURI().toString().replace(musicDir.toURI().toString(), "./");
+        song.songUrl = songFile.toString()
+                                .replace(musicDir.toString(), "")
+                                .replace("\\", "/");
+        //System.out.println("song url " + song.songUrl);
+        song.songUrl = "./" + EncodingUtil.encodeURIComponent(song.songUrl);
+        //System.out.println("song url2 " + song.songUrl);
 
         if (mp3file.hasId3v2Tag()) {
             ID3v2 id3v2Tag = mp3file.getId3v2Tag();
@@ -77,7 +84,7 @@ public class Song {
 
             byte[] imageData = id3v2Tag.getAlbumImage();
             if (imageData != null) {
-                File coverDir = new File(musicDir.getPath() + File.separator + "MRA_tmp");
+                File coverDir = new File(musicDir.getPath() + File.separator + "mra_tmp");
                 coverDir.mkdir();
                 File cover = new File(coverDir.getPath() + File.separator + 
                                         song.getAlbum() + "_"  + song.getArtist() + ".jpeg" );
@@ -86,7 +93,10 @@ public class Song {
                     file = new RandomAccessFile(cover, "rw");
                     file.write(imageData);
                     file.close();
-                    song.albumImageUrl = cover.toURI().toString().replace(musicDir.toURI().toString(), "./");
+                    song.albumImageUrl = cover.toString()
+                                                .replace(musicDir.toString(), "")
+                                                .replace("\\", "/");
+                    song.albumImageUrl = "./" + EncodingUtil.encodeURIComponent(song.albumImageUrl);
                 } catch ( IOException e) {
                     //e.printStackTrace();
                 }

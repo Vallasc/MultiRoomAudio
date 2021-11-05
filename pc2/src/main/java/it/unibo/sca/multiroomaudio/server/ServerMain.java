@@ -17,7 +17,7 @@ public class ServerMain {
             if(args.length == 2) {
                 new MusicHttpServer(8080, args[1]).listMusic().start();
             } else {
-                new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").listMusic().start(); //TODO
+                new MusicHttpServer(8080, "/home/vallasc/Musica").listMusic().start(); //TODO
             }
         } catch (IOException e) {
             e.printStackTrace();

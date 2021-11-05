@@ -9,6 +9,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.mpatric.mp3agic.InvalidDataException;
@@ -62,14 +63,24 @@ public class MusicHttpServer extends HttpServer {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 try {
-                    songList.add(Song.fromMp3File(file, dir));
-                    System.out.println("_" + file);
+                    Optional<String> ext = getExtension(file.toString());
+                    //(ext.get() == ".mp3" || ext.get() == ".MP3")
+                    if(ext.isPresent() && (ext.get().equals("mp3") || ext.get().equals("MP3"))) {
+                        songList.add(Song.fromMp3File(file, dir));
+                        System.out.println("- " + file);
+                    }
                 } catch (UnsupportedTagException | InvalidDataException | IOException e) {
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 }
                 return FileVisitResult.CONTINUE;
             }
         });
         return this;
+    }
+
+    public Optional<String> getExtension(String filename) {
+        return Optional.ofNullable(filename)
+          .filter(f -> f.contains("."))
+          .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 }
