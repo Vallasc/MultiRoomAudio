@@ -35,9 +35,10 @@
     isSpeaker = true;
   } 
 
+  let themeDark = false
 </script>
 
-<App {...f7Params}>
+<App {...f7Params} themeDark={themeDark}>
   {#if isClient}
     <View url="/musiclist" />
   {:else if isSpeaker}
