@@ -42,16 +42,13 @@ public class DatagramExecutor extends Thread {
 	public void run() {
 		System.out.println("Datagram handler started");
 		while(true) {
-			MsgHello hello = null;
-			
 			try {
 				Pair<byte[], InetAddress> pair = requestQ.take();
 				InetAddress sender = (InetAddress) pair.getV();
                 Object readObject = msgHandler.dtgmInMsg((Object) pair.getU());
 				//System.out.println(packet.getData());
                 if (readObject instanceof MsgHello) {
-                    hello = (MsgHello) readObject;
-                    System.out.println("Message is: " + hello.getType());
+					System.out.println("Read an HELLO msg");
 					sendDatagram(sender);
                 } else continue;
 			} catch (InterruptedException e) {

@@ -29,8 +29,8 @@ public class MusicHttpServer extends HttpServer {
         songList = new LinkedList<>();
     }
     
-    public void run(){
-        super.run();
+    public void run(){    
+        super.run(); 
         setRoutes();
     }
 
@@ -40,6 +40,7 @@ public class MusicHttpServer extends HttpServer {
             service.put("/pause", (req, res) -> "Hello World");
             service.put("/stop", (req, res) -> "Hello World");
             service.get("/list", (req, res) -> songList, gson::toJson);
+            service.get("/debug", (req, res) -> "Hello World");
         });
         // Enable CORS
         service.options("/*", (request, response) -> {

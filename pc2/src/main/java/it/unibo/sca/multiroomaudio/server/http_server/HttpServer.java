@@ -22,8 +22,9 @@ public class HttpServer extends Thread {
     }
 
     public void run(){
-        if(dirUri != null)
+        if(dirUri != null){
             service.staticFiles.externalLocation(dirUri);
+        }
         else
             service.staticFiles.location("/public");
         service.init();

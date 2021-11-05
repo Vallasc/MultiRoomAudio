@@ -1,8 +1,6 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 import it.unibo.sca.multiroomaudio.server.http_server.HttpServer;
 import it.unibo.sca.multiroomaudio.server.http_server.MusicHttpServer;
