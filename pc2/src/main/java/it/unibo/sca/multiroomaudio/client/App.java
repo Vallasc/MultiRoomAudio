@@ -8,6 +8,8 @@ import java.net.URISyntaxException;
 
 import it.unibo.sca.multiroomaudio.shared.Pair;
 
+import static spark.Spark.*;
+
 public class App {
     public static void main(String[] args) {
         // Find ip and port with broadcast
