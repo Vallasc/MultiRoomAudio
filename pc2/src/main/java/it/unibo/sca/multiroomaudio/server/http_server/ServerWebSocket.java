@@ -2,15 +2,19 @@ package it.unibo.sca.multiroomaudio.server.http_server;
 
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
+
+import it.unibo.sca.multiroomaudio.shared.messages.Msg;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import com.google.gson.Gson;
+
 @WebSocket
 public class ServerWebSocket {
-
-    // Store sessions if you want to, for example, broadcast a message to all users
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
+    private static final Gson gson = new Gson();
 
     @OnWebSocketConnect
     public void connected(Session session) {
@@ -26,6 +30,16 @@ public class ServerWebSocket {
     public void message(Session session, String message) throws IOException {
         System.out.println("Got: " + message);   // Print message
         session.getRemote().sendString(message); // and send it back
+    }
+
+    synchronized public static void sendAll(Msg message){
+        sessions.forEach((session) -> {
+            try {
+                session.getRemote().sendString( gson.toJson(message) );
+            } catch (IOException e) {
+                System.err.println(e.toString());
+            }
+        });
     }
 
 }
