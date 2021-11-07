@@ -152,7 +152,7 @@
   onPopupClosed={() => (popupOpened = false)}
   swipeToClose
   >
-  <NowPlaying></NowPlaying>
+    <NowPlaying></NowPlaying>
 </Popup>
 
 <style>
