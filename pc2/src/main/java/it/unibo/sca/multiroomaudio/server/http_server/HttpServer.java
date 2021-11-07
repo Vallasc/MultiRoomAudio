@@ -31,7 +31,8 @@ public class HttpServer extends Thread {
     }
 
     public HttpServer setWebSocket(Class<?> webSocketClass){
-        service.webSocket("/", webSocketClass);
+        service.webSocket("/websocket", webSocketClass);
+        service.webSocketIdleTimeoutMillis(Integer.MAX_VALUE);
         return this;
     }
     
