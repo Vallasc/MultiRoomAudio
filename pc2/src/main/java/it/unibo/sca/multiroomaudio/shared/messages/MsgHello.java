@@ -5,7 +5,7 @@ public class MsgHello extends Msg {
     private String MACid;
 
     public MsgHello(/*int deviceType, String MACid*/) {
-        super(MsgTypes.HELLO);
+        super("HELLO");
         /*this.deviceType = deviceType;
         this.MACid = MACid;*/
     }

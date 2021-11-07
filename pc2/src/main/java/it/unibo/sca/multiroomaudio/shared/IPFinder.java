@@ -11,9 +11,6 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.List;
 
-
-
-
 public class IPFinder {
     //return the address of the network interface
 
