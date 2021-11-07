@@ -14,6 +14,7 @@ import com.mpatric.mp3agic.UnsupportedTagException;
 import it.unibo.sca.multiroomaudio.server.http_server.EncodingUtil;
 
 public class Song {
+    private int id;
     private String artist = null;
     private String title = null;
     private String album = null;
@@ -22,6 +23,11 @@ public class Song {
     private String albumImageUrl = null;
 
     public Song(){}
+
+    public Song setId(int id){
+        this.id = id;
+        return this;
+    }
 
     public Song setArtist(String artist){
         this.artist = artist;
@@ -41,6 +47,10 @@ public class Song {
     public Song setYear(String year){
         this.year = year;
         return this;
+    }
+
+    public int getId(){
+        return this.id;
     }
 
     public String getArtist(){
@@ -63,11 +73,12 @@ public class Song {
         return songUrl;
     }
 
-    public static Song fromMp3File(Path filePath, File musicDir) 
+    public static Song fromMp3File(int id, Path filePath, File musicDir) 
                                         throws UnsupportedTagException, InvalidDataException, IOException{
         File songFile = filePath.toFile();
         Mp3File mp3file = new Mp3File(filePath);
         Song song = new Song();
+        song.id = id;
         song.songUrl = songFile.toString()
                                 .replace(musicDir.toString(), "")
                                 .replace("\\", "/");
