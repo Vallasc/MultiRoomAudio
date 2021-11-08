@@ -79,15 +79,6 @@
                                 </i>
                             </a>
                         </div>
-                    {:else}
-                        <div class="fab">
-                            <!-- svelte-ignore a11y-missing-attribute -->
-                            <a class="fab-play">
-                                <i class="icon material-icons" style=""
-                                    >volume_up
-                                </i>
-                            </a>
-                        </div>
                     {/if}
                 </div>
             </div>

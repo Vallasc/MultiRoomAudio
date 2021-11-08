@@ -29,7 +29,7 @@ public class ServerWebSocket {
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
         System.out.println("Got: " + message);   // Print message
-        session.getRemote().sendString(message); // and send it back
+        //session.getRemote().sendString(message); // and send it back
     }
 
     synchronized public static void sendAll(Msg message){
