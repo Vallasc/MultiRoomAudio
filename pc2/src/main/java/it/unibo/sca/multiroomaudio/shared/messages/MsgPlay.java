@@ -7,13 +7,13 @@ import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 public class MsgPlay extends Msg {
     private List<Song> songList;
     private int songId;
-    private int fromTimeMs;
+    private float fromTimeSec;
 
     
-    public MsgPlay(List<Song> songList, int songId, int fromMs) {
+    public MsgPlay(List<Song> songList, int songId, float fromSec) {
         super("PLAY");
         this.songList = songList;
-        this.fromTimeMs = fromMs;
+        this.fromTimeSec = fromSec;
         this.songId = songId;
     }
 
@@ -22,29 +22,12 @@ public class MsgPlay extends Msg {
         return songId;
     }
 
-
-    public void setSongId(int songId) {
-        this.songId = songId;
-    }
-
-
     public List<Song> getSongList() {
         return songList;
     }
 
-
-    public void setSongList(List<Song> songList) {
-        this.songList = songList;
-    }
-
-
-    public int getFromTimeMs() {
-        return fromTimeMs;
-    }
-
-
-    public void setFromTimeMs(int fromTimeMs) {
-        this.fromTimeMs = fromTimeMs;
+    public float getFromTimeSec() {
+        return fromTimeSec;
     }
 
 }

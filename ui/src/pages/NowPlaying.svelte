@@ -1,15 +1,34 @@
 <script>
     import { Page, Range } from "framework7-svelte";
 
-    export let imageUrl;
-    export let title;
-    export let artist;
-    export let sliderValue; // 0 - 100
-    export let songDurationMs;
-
+    export let imageUrl
+    export let title
+    export let artist
+    export let currentValue
+    export let songDuration
     export let isSpeaker = false;
 
+    let leftTime;
+    let rightTime;
 
+    $: leftTime = getMinutesSecondsLeft(currentValue)
+    $: rightTime = getMinutesSecondsRight(currentValue, songDuration)
+
+    function n(n){
+        return n > 9 ? "" + n: "0" + n;
+    }
+
+    function getMinutesSecondsLeft(currentValue){
+        let minutes = n(Math.floor(currentValue/60))
+        let seconds = n(Math.floor(currentValue % 60))
+        return minutes + ":" + seconds;
+    }
+
+    function getMinutesSecondsRight(currentValue, songDuration){
+        let minutes = n(Math.floor((songDuration- currentValue)/60))
+        let seconds = n(Math.floor((songDuration - currentValue) % 60))
+        return "-" + minutes + ":" + seconds
+    }
 </script>
 
 <Page>
@@ -18,6 +37,7 @@
         <div class="navbar-inner sliding">
             {#if !isSpeaker}
                 <div class="left">
+                    <!-- svelte-ignore a11y-invalid-attribute -->
                     <a
                         class="link icon-only popup-close"
                         href="#"
@@ -47,11 +67,11 @@
                     <div class="song-subtitle">{artist}</div>
                 </div>
                 <div class="row-flex music-slider">
-                    <Range min={0} max={100} step={0.1} value={sliderValue} />
+                    <Range min={0} max={100} step={0.1} value={currentValue*100/songDuration} />
                 </div>
                 <div class="row-flex row-time">
-                    <div style="margin-left: 17%;">00:05</div>
-                    <div style="margin-right: 17%;">00:05</div>
+                    <div style="margin-left: 17%;">{leftTime}</div>
+                    <div style="margin-right: 17%;">{rightTime}</div>
                 </div>
                 <div class="row-flex">
                     {#if !isSpeaker}

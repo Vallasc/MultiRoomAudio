@@ -1,6 +1,6 @@
 package it.unibo.sca.multiroomaudio.shared.messages;
 
-public class MsgHelloBack extends Msg{
+public class MsgHelloBack extends Msg {
     private int port;
 
     public MsgHelloBack(int port) {

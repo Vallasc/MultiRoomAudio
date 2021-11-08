@@ -12,12 +12,16 @@
 
     let songList = []
     let songId = -1;
+    let currentTimeSec = 0;
+    let songDurationSec = 0;
 
     let imageUrl = "http://" + location.hostname + ":80/imgs/blank_album.png"
     let title = "Waiting for music..."
     let artist = ""
 
     let speakerId;
+    let speakerName = "Sandro"
+
     onMount(() => {
         f7ready(() => {
             loadId()
@@ -32,6 +36,7 @@
         if(speakerId == null){
             speakerId = Math.random().toString(36).substring(2, 15) + 
                         Math.random().toString(36).substring(2, 15) + 
+                        Math.random().toString(36).substring(2, 15) + 
                         Math.random().toString(36).substring(2, 15)
             localStorage.setItem("id", speakerId)
         }
@@ -41,24 +46,12 @@
         socket = new WebSocket("ws://" + location.hostname + "/websocket")
 
         socket.onopen = () => {
+            sendInitMessage()
             f7.dialog.alert('Speaker connected')
         }
 
         socket.onmessage = (event) => {
-            let message = JSON.parse(event.data)
-            console.log(message)
-
-            songList = message.songList
-            songId = message.songId
-
-            let song = songList[songId]
-            imageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
-            title = song.title
-            artist = song.artist
-
-            audio.src = "http://" + location.hostname + ":8080/" + song.songUrl.replace("./", "")
-            audio.play()
-            sendCurrentTime()
+            processMessage(JSON.parse(event.data))
         }
 
         socket.onclose = (event) => {
@@ -72,11 +65,41 @@
         socket.send(JSON.stringify({
             type : "HELLO",
             deviceType : 1, // speaker type
-            id: speakerId
+            id: speakerId,
+            name: speakerName
         }))
     }
 
+    function processMessage(message) {
+        console.log(message)
+        switch(message.type){
+            case "PLAY":
+                playSong(message)
+                break;
+            case "CURRENT_PLAYING":
+                currentTimeSec = message.currentTimeSec
+                break;
+        }    }
 
+    function playSong(message) {
+        songList = message.songList
+        songId = message.songId
+
+        let song = songList[songId]
+        imageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
+        title = song.title
+        artist = song.artist
+
+        audio.src = "http://" + location.hostname + ":8080/" + song.songUrl.replace("./", "")
+        console.log(song)
+        audio.currentTime = message.fromTimeSec
+        audio.load()
+        audio.onloadeddata = () => {
+            songDurationSec = audio.duration
+            audio.play()
+        }
+        sendCurrentTime()
+    }
 
     audio.onplay = () => {
 
@@ -91,8 +114,9 @@
     function sendCurrentTime() {
         intervalResponse = window.setInterval(() => {
             socket.send(JSON.stringify({
+                type: "CURRENT_PLAYING",
                 songId : songId,
-                fromTimeMs : audio.currentTime
+                currentTimeSec : audio.currentTime
             }));
         }, 1000); 
     }
@@ -110,8 +134,8 @@
         imageUrl = {imageUrl} 
         title = {title} 
         artist = {artist}
-        sliderValue = {0} 
-        songDurationMs = {100}
+        currentValue = {currentTimeSec} 
+        songDuration = {songDurationSec}
         isSpeaker = {true} />
 </Page>
 

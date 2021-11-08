@@ -17,7 +17,7 @@ public class DiscoveryService {
         byte[] byteBuffer1 = new byte[bufferSize];  
         DatagramPacket packetReceive = new DatagramPacket(byteBuffer1, bufferSize);
         try{
-            data = msgHandler.dtgmOutMsg(new MsgHello());
+            data = msgHandler.dtgmOutMsg(new MsgHello(0,""));
         }catch(IOException e){
             System.err.println("Error while sending the message");
             throw new UknowknBroadcastException("");
