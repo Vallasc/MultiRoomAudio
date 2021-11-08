@@ -55,7 +55,6 @@ public class FingerprintService extends Thread {
                     String json = gson.toJson(AP);
                     dOut.writeUTF(json);
                 }
-                System.out.println();
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;
