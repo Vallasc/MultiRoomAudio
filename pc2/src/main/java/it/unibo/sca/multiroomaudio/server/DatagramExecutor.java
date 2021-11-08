@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.*;
 
+import it.unibo.sca.multiroomaudio.discovery.MsgDiscoveredServer;
+import it.unibo.sca.multiroomaudio.discovery.MsgDiscovery;
 import it.unibo.sca.multiroomaudio.shared.Pair;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
@@ -18,7 +20,7 @@ public class DatagramExecutor extends Thread {
 		//should pass the data structure in which client parameters should be saved
 		requestQ  = new LinkedBlockingQueue<>();
         try {
-			data = msgHandler.dtgmOutMsg(new MsgHelloBack(8497));
+			data = msgHandler.dtgmOutMsg(new MsgDiscoveredServer(8497));
 		} catch (IOException e) {
 			System.err.println("error while creating the message");
 			e.printStackTrace();
@@ -47,14 +49,15 @@ public class DatagramExecutor extends Thread {
 				InetAddress sender = (InetAddress) pair.getV();
                 Object readObject = msgHandler.dtgmInMsg((Object) pair.getU());
 				//System.out.println(packet.getData());
-                if (readObject instanceof MsgHello) {
-					System.out.println("Read an HELLO msg");
+                if (readObject instanceof MsgDiscovery) {
+					System.out.println("Read a discovery msg");
 					sendDatagram(sender);
                 } else continue;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				System.err.println("Problem using the buffer");
+				e.printStackTrace();
 			} catch(ClassNotFoundException e){
 				System.err.println("Cannot read the object");
 			}

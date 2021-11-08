@@ -1,5 +1,4 @@
 package it.unibo.sca.multiroomaudio.client;
-import static spark.Spark.*;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -8,6 +7,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.Pair;
 import it.unibo.sca.multiroomaudio.shared.exceptions.UknowknBroadcastException;
 

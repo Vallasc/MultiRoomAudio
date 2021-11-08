@@ -51,7 +51,6 @@ public class FingerprintService extends Thread {
             try {
                 APInfo[] APs = scanner.scanNetworks();
                 for(APInfo AP : APs){
-                    System.out.println(AP);
                     String json = gson.toJson(AP);
                     dOut.writeUTF(json);
                 }

@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.client;
+package it.unibo.sca.multiroomaudio.discovery;
 
 import java.io.IOException;
 import java.net.*;
@@ -17,7 +17,7 @@ public class DiscoveryService {
         byte[] byteBuffer1 = new byte[bufferSize];  
         DatagramPacket packetReceive = new DatagramPacket(byteBuffer1, bufferSize);
         try{
-            data = msgHandler.dtgmOutMsg(new MsgHello());
+            data = msgHandler.dtgmOutMsg(new MsgDiscovery());
         }catch(IOException e){
             System.err.println("Error while sending the message");
             throw new UknowknBroadcastException("");
@@ -65,10 +65,10 @@ public class DiscoveryService {
         Integer msg = null;
         try {
             Object readObject = msgHandler.dtgmInMsg(packetReceive.getData());
-            if (readObject instanceof MsgHelloBack) 
+            if (readObject instanceof MsgDiscoveredServer) 
                 serverAddress = packetReceive.getAddress();  
-                MsgHelloBack helloBack = (MsgHelloBack) readObject;
-                msg = helloBack.getPort();
+                MsgDiscoveredServer discovered = (MsgDiscoveredServer) readObject;
+                msg = discovered.getPort();
         }catch (IOException e){
             socket.close();
             throw new UknowknBroadcastException("Error while reading from the socket");
