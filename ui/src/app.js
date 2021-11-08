@@ -5,7 +5,11 @@ import App from './App.svelte';
 import 'framework7/framework7-bundle.min.css';
 import './css/app.css';
 
-Framework7.use(Framework7Svelte);
+import Dialog from 'framework7/components/dialog/';
+
+
+Framework7.use([Dialog, Framework7Svelte]);
+
 
 // Init Svelte App
 const app = new App({

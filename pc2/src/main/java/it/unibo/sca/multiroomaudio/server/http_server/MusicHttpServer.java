@@ -7,8 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import com.google.gson.Gson;
@@ -16,32 +15,42 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
+import it.unibo.sca.multiroomaudio.shared.messages.MsgPlay;
 
 // Only mp3 format supported
 public class MusicHttpServer extends HttpServer {
     private File dir;
-    private List<Song> songList;
+    private ArrayList<Song> songs;
     private Gson gson = new Gson();
 
     public MusicHttpServer(int port, String dirUri){
         super(port, dirUri);
         dir = new File(dirUri);
-        songList = new LinkedList<>();
+        songs = new ArrayList<>();
     }
     
-    public void run(){    
-        super.run(); 
+    @Override
+    public void run() {
+        super.run();
         setRoutes();
     }
 
     public void setRoutes(){
         service.path("/player", () -> {
-            service.put("/play", (req, res) -> "Hello World");
-            service.put("/pause", (req, res) -> "Hello World");
-            service.put("/stop", (req, res) -> "Hello World");
-            service.get("/list", (req, res) -> songList, gson::toJson);
-            service.get("/debug", (req, res) -> "Hello World");
+            service.get("/play/:id", (req, res) -> {
+                System.out.println("PLAY id: " + req.params(":id"));
+                try{
+                    ServerWebSocket.sendAll(new MsgPlay(songs, Integer.parseInt(req.params(":id")), 0));
+                    return "{\"status\": \"OK\"}";
+                } catch (NumberFormatException e){
+                    return "{\"status\": \"KO\"}";
+                }
+            });
+            service.put("/pause", (req, res) -> "{\"status\": \"OK\"}");
+            service.put("/stop", (req, res) -> "{\"status\": \"OK\"}");
+            service.get("/list", (req, res) -> songs, gson::toJson);
         });
+
         // Enable CORS
         service.options("/*", (request, response) -> {
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -58,16 +67,18 @@ public class MusicHttpServer extends HttpServer {
     }
 
     public MusicHttpServer listMusic() throws IOException{
-        songList.clear();
+        songs.clear();
         System.out.println("Songs:");
         Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
+            private int index = 0;
+
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 try {
                     Optional<String> ext = getExtension(file.toString());
                     //(ext.get() == ".mp3" || ext.get() == ".MP3")
                     if(ext.isPresent() && (ext.get().equals("mp3") || ext.get().equals("MP3"))) {
-                        songList.add(Song.fromMp3File(file, dir));
+                        songs.add(Song.fromMp3File(index++, file, dir));
                         System.out.println("- " + file);
                     }
                 } catch (UnsupportedTagException | InvalidDataException | IOException e) {

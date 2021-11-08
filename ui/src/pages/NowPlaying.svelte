@@ -1,68 +1,85 @@
 <script>
     import { Page, Range } from "framework7-svelte";
+
+    export let imageUrl;
+    export let title;
+    export let artist;
+    export let sliderValue; // 0 - 100
+    export let songDurationMs;
+
+    export let isSpeaker = false;
+
+
 </script>
 
 <Page>
     <div class="navbar" data-f7-slot="fixed">
         <div class="navbar-bg" />
         <div class="navbar-inner sliding">
-            <div class="left">
-                <a
-                    class="link icon-only popup-close"
-                    href="#"
-                    iconmd="material:expand_more"
-                    ><i class="icon material-icons" style="">expand_more </i>
-                </a>
-            </div>
+            {#if !isSpeaker}
+                <div class="left">
+                    <a
+                        class="link icon-only popup-close"
+                        href="#"
+                        iconmd="material:expand_more"
+                        ><i class="icon material-icons" style="">expand_more </i>
+                    </a>
+                </div>
+            {/if}
         </div>
     </div>
     <div class="player">
+        {#if isSpeaker}
+            <div style="flex: 4"></div>
+        {/if}
         <div class="player-img">
             <img
-                alt=""
-                src="https://www.nuovecanzoni.com/wp-content/uploads/2021/07/Una-Direzione-Giusta-supreme.jpg"
+                alt="Album"
+                src={imageUrl}
             />
         </div>
         <div class="player-buttons">
             <div class="column-flex">
                 <div class="row-flex">
-                    <div class="song-title">Sei la mia città</div>
+                    <div class="song-title">{title}</div>
                 </div>
                 <div class="row-flex">
-                    <div class="song-subtitle">Cosmo</div>
+                    <div class="song-subtitle">{artist}</div>
                 </div>
                 <div class="row-flex music-slider">
-                    <Range min={0} max={100} step={1} value={50} />
+                    <Range min={0} max={100} step={0.1} value={sliderValue} />
                 </div>
                 <div class="row-flex row-time">
-                    <div style="margin-left: 13%;">00:05</div>
-                    <div style="margin-right: 13%;">00:05</div>
+                    <div style="margin-left: 17%;">00:05</div>
+                    <div style="margin-right: 17%;">00:05</div>
                 </div>
                 <div class="row-flex">
-                    <div class="fab">
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <a>
-                            <i class="icon material-icons" style=""
-                                >skip_previous
-                            </i>
-                        </a>
-                    </div>
-                    <div class="fab">
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <a class="fab-play">
-                            <i class="icon material-icons" style=""
-                                >play_arrow
-                            </i>
-                        </a>
-                    </div>
-                    <div class="fab">
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <a>
-                            <i class="icon material-icons" style=""
-                                >skip_next
-                            </i>
-                        </a>
-                    </div>
+                    {#if !isSpeaker}
+                        <div class="fab">
+                            <!-- svelte-ignore a11y-missing-attribute -->
+                            <a>
+                                <i class="icon material-icons" style=""
+                                    >skip_previous
+                                </i>
+                            </a>
+                        </div>
+                        <div class="fab">
+                            <!-- svelte-ignore a11y-missing-attribute -->
+                            <a class="fab-play">
+                                <i class="icon material-icons" style=""
+                                    >play_arrow
+                                </i>
+                            </a>
+                        </div>
+                        <div class="fab">
+                            <!-- svelte-ignore a11y-missing-attribute -->
+                            <a>
+                                <i class="icon material-icons" style=""
+                                    >skip_next
+                                </i>
+                            </a>
+                        </div>
+                    {/if}
                 </div>
             </div>
         </div>
@@ -71,10 +88,6 @@
 </Page>
 
 <style>
-    img {
-        border-radius: 5px;
-    }
-
     :global(.bottomPlayer) {
         height: 80px !important;
     }
@@ -89,8 +102,9 @@
 
     .player-img img {
         width: 60%;
-
+        max-width: 50vh;
         margin: 10px;
+        border-radius: 20px;
     }
 
     .player-buttons {
@@ -107,6 +121,7 @@
         display: flex;
         flex-direction: column;
         height: 100%;
+        max-height: 100px;
     }
 
     .fab {
@@ -155,6 +170,8 @@
         font-size: 25px;
         margin-top: 20px;
         margin-bottom: 5px;
+        text-overflow: ellipsis;
+        max-width: 50vh;
     }
 
     .song-subtitle {
@@ -170,7 +187,7 @@
     .music-slider {
         margin-top: 20px;
         margin-bottom: 6px;
-        width: 75%;
+        width: 65%;
     }
 
     .navbar-bg {

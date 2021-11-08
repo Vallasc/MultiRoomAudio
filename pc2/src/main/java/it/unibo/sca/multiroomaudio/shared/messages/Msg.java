@@ -3,13 +3,13 @@ package it.unibo.sca.multiroomaudio.shared.messages;
 import java.io.Serializable;
 
 public abstract class Msg implements Serializable {
-	private MsgTypes type;
-
-	public Msg(MsgTypes type) {
+	protected String type;
+	
+	public Msg(String type) {
 		this.type = type;
 	}
 
-	public MsgTypes getType() {
+	public String getType() {
 		return this.type;
 	}
 

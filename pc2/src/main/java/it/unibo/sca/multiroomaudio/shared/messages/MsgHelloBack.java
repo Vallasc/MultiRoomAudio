@@ -4,7 +4,7 @@ public class MsgHelloBack extends Msg{
     private int port;
 
     public MsgHelloBack(int port) {
-        super(MsgTypes.HELLO_BACK);
+        super("HELLO_BACK");
         this.port = port;
     }
 

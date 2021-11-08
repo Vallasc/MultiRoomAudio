@@ -2,6 +2,7 @@
   import { App, View } from 'framework7-svelte'
   import MusicListPage from './pages/MusicListPage.svelte'
   import RoomsPage from './pages/RoomsPage.svelte'
+  import SpeakerPage from './pages/SpeakerPage.svelte'
   import CalibrationPage from './pages/CalibrationPage.svelte'
 
   const f7Params = {
@@ -20,7 +21,7 @@
       },
       {
         path: '/speaker',
-        component: CalibrationPage,
+        component: SpeakerPage,
       }
 		]
   }

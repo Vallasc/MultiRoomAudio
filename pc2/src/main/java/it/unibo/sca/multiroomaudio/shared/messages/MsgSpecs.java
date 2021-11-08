@@ -5,7 +5,7 @@ public class MsgSpecs extends Msg {
     private String MACid;
 
     public MsgSpecs(int deviceType, String MACid) {
-        super(MsgTypes.SPECS);
+        super("SPECS");
         this.deviceType = deviceType;
         this.MACid = MACid;
     }
