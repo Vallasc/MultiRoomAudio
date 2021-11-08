@@ -1,13 +1,12 @@
 package it.unibo.sca.multiroomaudio.discovery;
 
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgTypes;
 
 public class MsgDiscoveredServer extends Msg{
     private int port;
 
     public MsgDiscoveredServer(int port) {
-        super(MsgTypes.DISCOVEREDSERVER);
+        super("DISCOVERED_SERVER");
         this.port = port;
     }
 
