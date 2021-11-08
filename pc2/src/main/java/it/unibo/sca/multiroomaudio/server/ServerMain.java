@@ -1,6 +1,8 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 import it.unibo.sca.multiroomaudio.server.http_server.HttpServer;
 import it.unibo.sca.multiroomaudio.server.http_server.MusicHttpServer;
@@ -15,7 +17,7 @@ public class ServerMain {
             if(args.length == 2) {
                 new MusicHttpServer(8080, args[1]).listMusic().start();
             } else {
-                new MusicHttpServer(8080, "/home/vallasc/Musica").listMusic().start(); //TODO
+                new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").listMusic().start(); //TODO
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -29,23 +31,19 @@ public class ServerMain {
         
         udpHandler.start();        
         /*tcpHandler.start();
-        try(ServerSocket serverSocket = new ServerSocket(servport)){
-            System.out.println("In attesa di connessione...");
+        */try(ServerSocket serverSocket = new ServerSocket(servport)){
+            //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
+            System.out.println("Waiting for connection...");
             while(true){
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("accepted a connection");
-                try{
-                    ((ClientExecutor) tcpHandler).getRequestQ().put(new ConnThread(clientSocket));
-                } catch (InterruptedException e) {
-                    System.err.println("cannot insert connThread inside q");
-                    e.printStackTrace();
-                }
+                (new SocketHandler(clientSocket)).run();
             }
             //serverSocket.close();
 		}catch(IOException e){
 			e.printStackTrace();
 			return;
-		}*/
+		}
         
     }
    

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public abstract class Msg implements Serializable {
 	private MsgTypes type;
-	
+
 	public Msg(MsgTypes type) {
 		this.type = type;
 	}

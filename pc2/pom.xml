@@ -30,6 +30,11 @@
       <version>2.9.3</version>
     </dependency>
     <dependency>
+      <groupId>org.java-websocket</groupId>
+      <artifactId>Java-WebSocket</artifactId>
+      <version>1.5.2</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <version>1.7.21</version>
@@ -37,7 +42,7 @@
     <dependency>
       <groupId>com.github.vallasc</groupId>
       <artifactId>WlanScanJava</artifactId>
-      <version>main</version>
+      <version>125bf14</version>
     </dependency>
     <dependency>
       <groupId>com.mpatric</groupId>

@@ -18,7 +18,7 @@ public class DatagramExecutor extends Thread {
 		//should pass the data structure in which client parameters should be saved
 		requestQ  = new LinkedBlockingQueue<>();
         try {
-			data = msgHandler.dtgmOutMsg(new MsgHelloBack(8085));
+			data = msgHandler.dtgmOutMsg(new MsgHelloBack(8497));
 		} catch (IOException e) {
 			System.err.println("error while creating the message");
 			e.printStackTrace();
