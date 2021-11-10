@@ -4,23 +4,22 @@ import java.io.IOException;
 import java.net.*;
 
 import it.unibo.sca.multiroomaudio.shared.*;
-import it.unibo.sca.multiroomaudio.shared.exceptions.UknowknBroadcastException;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class DiscoveryService {
     private static final int bufferSize = 1024;
     
     //private static Couple specs;
-    public static Pair<Integer, InetAddress> discover() throws UknowknBroadcastException{
+    public static Pair<Integer, InetAddress> discover(){
         InetAddress serverAddress = null;
         byte[] data = null;
         byte[] byteBuffer1 = new byte[bufferSize];  
         DatagramPacket packetReceive = new DatagramPacket(byteBuffer1, bufferSize);
         try{
-            data = msgHandler.dtgmOutMsg(new MsgHello(0,""));
+            data = msgHandler.dtgmOutMsg(new MsgDiscovery());
         }catch(IOException e){
             System.err.println("Error while sending the message");
-            throw new UknowknBroadcastException("");
+            return new Pair<Integer, InetAddress>(-1, serverAddress);
         }
         //---------------------------------------------------------
         DatagramSocket socket = null;
@@ -29,7 +28,7 @@ public class DiscoveryService {
             socket.setSoTimeout(10000);
         } catch (SocketException e) {
             e.printStackTrace();
-            throw new UknowknBroadcastException("SocketException in creating the socket");
+            return new Pair<Integer, InetAddress>(-1, serverAddress);
         }
 
         Pair<byte[], InetAddress> specs = IPFinder.getSpecs();
@@ -39,15 +38,11 @@ public class DiscoveryService {
         while(flagResend){
             try {
                 socket.send(new DatagramPacket(data, data.length, broadcastAddr, 6262));
-            } catch (UnknownHostException e) {
-                socket.close();
-                e.printStackTrace();
-                throw new UknowknBroadcastException("Cannot send the packet, host uknown");
             } catch (IOException e) {
                 socket.close();
                 e.printStackTrace();
-                throw new UknowknBroadcastException("");
-            }
+                return new Pair<Integer, InetAddress>(-1, serverAddress);
+            } 
             System.out.println("The packet is sent successfully");  
             try {
                 socket.receive(packetReceive);
@@ -57,8 +52,8 @@ public class DiscoveryService {
                 continue;
             } catch (IOException e) {
                 e.printStackTrace();       
-                socket.close();
-                throw new UknowknBroadcastException("Error while trying to read the answer from the server");  
+                socket.close(); 
+                return new Pair<Integer, InetAddress>(-1, serverAddress);
             } 
         }
         //ok got the message
@@ -69,12 +64,9 @@ public class DiscoveryService {
                 serverAddress = packetReceive.getAddress();  
                 MsgDiscoveredServer discovered = (MsgDiscoveredServer) readObject;
                 msg = discovered.getPort();
-        }catch (IOException e){
+        }catch (ClassNotFoundException | IOException e){
             socket.close();
-            throw new UknowknBroadcastException("Error while reading from the socket");
-        } catch (ClassNotFoundException e) {
-            socket.close();
-            throw new UknowknBroadcastException("Error in casting the class");
+            return new Pair<Integer, InetAddress>(-1, null);
         }
         socket.close();
         return new Pair<Integer, InetAddress>(msg, serverAddress);

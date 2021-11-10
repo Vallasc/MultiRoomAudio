@@ -2,6 +2,8 @@ package it.unibo.sca.multiroomaudio.shared.messages;
 
 import java.io.Serializable;
 
+import com.google.gson.Gson;
+
 public abstract class Msg implements Serializable {
 	protected String type;
 	
@@ -12,6 +14,10 @@ public abstract class Msg implements Serializable {
 	public String getType() {
 		return this.type;
 	}
+
+	public String toJson(Gson serializer) {
+        return serializer.toJson(this);
+    }
 
 }
 

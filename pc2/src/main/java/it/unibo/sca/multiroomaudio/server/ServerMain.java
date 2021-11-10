@@ -28,10 +28,9 @@ public class ServerMain {
 
         //Thread tcpHandler = new ClientExecutor();
         Thread udpHandler = new DatagramThread();
-        
+
         udpHandler.start();        
-        /*tcpHandler.start();
-        */try(ServerSocket serverSocket = new ServerSocket(servport)){
+        try(ServerSocket serverSocket = new ServerSocket(servport)){
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
             System.out.println("Waiting for connection...");
             while(true){
@@ -39,7 +38,6 @@ public class ServerMain {
                 System.out.println("accepted a connection");
                 (new SocketHandler(clientSocket)).run();
             }
-            //serverSocket.close();
 		}catch(IOException e){
 			e.printStackTrace();
 			return;

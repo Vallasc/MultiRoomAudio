@@ -4,6 +4,7 @@ import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
+import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 
 import java.io.*;
 import java.util.*;
@@ -18,18 +19,20 @@ public class ServerWebSocket {
 
     @OnWebSocketConnect
     public void connected(Session session) {
+        System.out.println("connected");
         sessions.add(session);
     }
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
+        System.out.println("closed");
         sessions.remove(session);
     }
 
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
         System.out.println("Got: " + message);   // Print message
-        session.getRemote().sendString(message); // and send it back
+        
     }
 
     synchronized public static void sendAll(Msg message){
