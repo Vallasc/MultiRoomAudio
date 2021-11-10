@@ -19,5 +19,8 @@ public abstract class Msg implements Serializable {
         return serializer.toJson(this);
     }
 
+	public int getDeviceType() {
+        return -1;
+    }
 }
 

@@ -9,8 +9,10 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class msgHandler {
-    public static byte[] dtgmOutMsg(Msg msg) throws IOException{
+
+public class MyMsgHandler{
+    
+    public static byte[] dtgmOutMsg(Msg msg) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(msg);
@@ -35,5 +37,6 @@ public class msgHandler {
         // create a DataInputStream so we can read data from it.
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         return (Msg) objectInputStream.readObject();
-    }
+    } 
+    
 }

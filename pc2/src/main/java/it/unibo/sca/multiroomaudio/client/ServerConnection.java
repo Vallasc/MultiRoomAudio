@@ -11,8 +11,10 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 
+
 public class ServerConnection extends WebSocketClient {
     Gson gson = new Gson();
+    
     public ServerConnection(URI serverUri, Draft draft) {
         super(serverUri, draft);
     }
@@ -23,7 +25,8 @@ public class ServerConnection extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        send((new MsgHello(0, "ciao")).toJson(gson));
+        System.out.println("Connection opened");
+        send(new MsgHello(0, "ciao").toJson(gson));
     }
     
     @Override

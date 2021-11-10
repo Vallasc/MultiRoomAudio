@@ -33,7 +33,6 @@ public class SocketHandler extends Thread{
             try {
                 String json = dIn.readUTF();
                 APInfo ap = gson.fromJson(json, APInfo.class);
-                //System.out.println(ap + "\n");
             } catch (SocketException e) {
                 System.out.println("Connection closed");
                 isRunning = false;

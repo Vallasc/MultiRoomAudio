@@ -13,13 +13,14 @@ import org.java_websocket.client.WebSocketClient;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.Pair;
+import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 
 
 
 public class App {
     public static void main(String[] args) {
         // Find ip and port with broadcast
-        
+        Gson gson = new Gson();
         Pair<Integer, InetAddress> pair = null;
         
         pair = DiscoveryService.discover();
@@ -53,9 +54,8 @@ public class App {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println(sc.isOpen());
         
-        /*System.out.println("connecting to the server through a socket");
+        System.out.println("connecting to the server through a socket");
         Socket socket = null;
         try{            
             socket = new Socket(serverAddr, port);    
@@ -64,7 +64,7 @@ public class App {
             e.printStackTrace();
         }
         //this is the online fingerprint that runs non stop
-        (new FingerprintService(socket)).start();*/
+        (new FingerprintService(socket)).start();
         
         
     }

@@ -31,7 +31,7 @@ public class ServerMain {
 
         udpHandler.start();        
         try(ServerSocket serverSocket = new ServerSocket(servport)){
-            //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
+            //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets exclusively
             System.out.println("Waiting for connection...");
             while(true){
                 Socket clientSocket = serverSocket.accept();

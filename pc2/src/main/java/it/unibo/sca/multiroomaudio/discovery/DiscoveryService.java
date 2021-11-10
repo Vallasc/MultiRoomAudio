@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.*;
 
 import it.unibo.sca.multiroomaudio.shared.*;
-import it.unibo.sca.multiroomaudio.shared.messages.*;
+import it.unibo.sca.multiroomaudio.shared.messages.MyMsgHandler;
 
 public class DiscoveryService {
     private static final int bufferSize = 1024;
@@ -16,7 +16,7 @@ public class DiscoveryService {
         byte[] byteBuffer1 = new byte[bufferSize];  
         DatagramPacket packetReceive = new DatagramPacket(byteBuffer1, bufferSize);
         try{
-            data = msgHandler.dtgmOutMsg(new MsgDiscovery());
+            data = MyMsgHandler.dtgmOutMsg(new MsgDiscovery());
         }catch(IOException e){
             System.err.println("Error while sending the message");
             return new Pair<Integer, InetAddress>(-1, serverAddress);
@@ -59,7 +59,7 @@ public class DiscoveryService {
         //ok got the message
         Integer msg = null;
         try {
-            Object readObject = msgHandler.dtgmInMsg(packetReceive.getData());
+            Object readObject = MyMsgHandler.dtgmInMsg(packetReceive.getData());
             if (readObject instanceof MsgDiscoveredServer) 
                 serverAddress = packetReceive.getAddress();  
                 MsgDiscoveredServer discovered = (MsgDiscoveredServer) readObject;
