@@ -39,7 +39,6 @@ public class ServerWebSocket {
         System.out.println("Got: " + message);   // Print message
         handleMessage(session, message, gson.fromJson(message, JsonObject.class).get("type").getAsString());
         
-        
     }
 
     public static void handleMessage(Session session, String message, String type){

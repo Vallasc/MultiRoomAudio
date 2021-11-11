@@ -27,6 +27,7 @@ public class ServerConnection extends WebSocketClient {
     public void onOpen(ServerHandshake handshakedata) {
         System.out.println("Connection opened");
         send(new MsgHello(0, "ciao").toJson(gson));
+        
     }
     
     @Override

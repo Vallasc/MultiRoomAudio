@@ -1,6 +1,5 @@
 package it.unibo.sca.multiroomaudio.server;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 

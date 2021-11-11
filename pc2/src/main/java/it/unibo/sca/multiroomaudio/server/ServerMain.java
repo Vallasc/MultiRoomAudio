@@ -12,6 +12,7 @@ public class ServerMain {
 
     private final static int servport = 8497;
     public static void main(String[] args){
+        DatabaseManager dbm = new DatabaseManager();
         // Music http server
         try {
             if(args.length == 2) {
@@ -24,7 +25,7 @@ public class ServerMain {
         }
 
         // WebApp http server
-        new HttpServer(80).setWebSocket(ServerWebSocket.class).start();
+        new HttpServer(80, dbm).setWebSocket(ServerWebSocket.class).start();
 
         //Thread tcpHandler = new ClientExecutor();
         Thread udpHandler = new DatagramThread();
