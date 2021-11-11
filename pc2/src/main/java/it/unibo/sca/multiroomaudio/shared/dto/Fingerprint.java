@@ -2,6 +2,8 @@ package it.unibo.sca.multiroomaudio.shared.dto;
 
 import java.util.HashMap;
 
+import io.github.vallasc.APInfo;
+
 public class Fingerprint {
     
     // Key = BSSID
@@ -9,6 +11,11 @@ public class Fingerprint {
 
     public Fingerprint() {
         map = new HashMap<String, ScanResult>();
+    }
+
+    public Fingerprint(APInfo ap){
+        map = new HashMap<String, ScanResult>();
+        map.put(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
     }
 
     public void add(ScanResult result){
@@ -22,11 +29,11 @@ public class Fingerprint {
     public class ScanResult {
         private final String BSSID;
         private final String SSID;
-        private final int signal;
-        private final int frequency;
+        private final double signal;
+        private final double frequency;
         private final long timestamp;
 
-        public ScanResult(String BSSID, String SSID, int signal, int frequency, long timestamp) {
+        public ScanResult(String BSSID, String SSID, double signal, double frequency, long timestamp) {
             this.BSSID = BSSID;
             this.SSID = SSID;
             this.signal = signal;
@@ -38,11 +45,11 @@ public class Fingerprint {
             return timestamp;
         }
 
-        public int getFrequency() {
+        public double getFrequency() {
             return frequency;
         }
 
-        public int getSignal() {
+        public double getSignal() {
             return signal;
         }
 

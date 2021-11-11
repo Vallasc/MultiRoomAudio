@@ -38,5 +38,5 @@ public class MyMsgHandler{
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         return (Msg) objectInputStream.readObject();
     } 
-    
+
 }

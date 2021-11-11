@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import io.github.vallasc.APInfo;
 import io.github.vallasc.WlanScanner;
 import io.github.vallasc.WlanScanner.OperatingSystemNotDefinedException;
+import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
 public class FingerprintService extends Thread {
     static final int SECONDS_BETWEEN_SCANS = 2;
@@ -48,10 +49,12 @@ public class FingerprintService extends Thread {
         while (isRunning) {
             try {
                 APInfo[] APs = scanner.scanNetworks();
-                for(APInfo AP : APs){
+                /*for(APInfo AP : APs){
                     String json = gson.toJson(AP);
                     dOut.writeUTF(json);
-                }
+                }*/
+                String json = gson.toJson(APs);
+                dOut.writeUTF(json);
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;

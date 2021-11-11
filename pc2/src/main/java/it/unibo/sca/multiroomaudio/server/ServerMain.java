@@ -13,6 +13,8 @@ public class ServerMain {
     private final static int servport = 8497;
     public static void main(String[] args){
         DatabaseManager dbm = new DatabaseManager();
+        
+        
         // Music http server
         try {
             if(args.length == 2) {
@@ -25,8 +27,7 @@ public class ServerMain {
         }
 
         // WebApp http server
-        new HttpServer(80, dbm).setWebSocket(ServerWebSocket.class).start();
-
+        new HttpServer(80).setWebSocket(ServerWebSocket.class, dbm).start();
         //Thread tcpHandler = new ClientExecutor();
         Thread udpHandler = new DatagramThread();
 
@@ -35,9 +36,10 @@ public class ServerMain {
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets exclusively
             System.out.println("Waiting for connection...");
             while(true){
+                dbm.printConnected();
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("accepted a connection");
-                (new SocketHandler(clientSocket)).run();
+                (new SocketHandler(clientSocket, dbm)).run();
             }
 		}catch(IOException e){
 			e.printStackTrace();
