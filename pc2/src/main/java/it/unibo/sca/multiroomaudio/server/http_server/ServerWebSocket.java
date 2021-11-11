@@ -41,16 +41,19 @@ public class ServerWebSocket {
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
         sessions.remove(session);
-        
+        if(dbm.removeConnected(session))
+            System.out.println("removed");
+        else
+            System.out.println("not removed");
         System.out.println("closed");
         
     }
 
     @OnWebSocketMessage
     public void message(Session session, String message) {
-        dbm.printConnected();
         System.out.println("Got: " + message);   // Print message
         try{
+            System.out.println(gson.fromJson(message, JsonObject.class).get("type").getAsString());
             handleMessage(session, message, gson.fromJson(message, JsonObject.class).get("type").getAsString());
         }catch(IOException e){
             System.err.println("Error handling message: " + message); 

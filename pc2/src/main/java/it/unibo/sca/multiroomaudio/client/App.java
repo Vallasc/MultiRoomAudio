@@ -71,7 +71,7 @@ public class App {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        sc.closeConnection(200, new MsgClose(id).toJson(gson));
+        sc.close();
         
     }
 

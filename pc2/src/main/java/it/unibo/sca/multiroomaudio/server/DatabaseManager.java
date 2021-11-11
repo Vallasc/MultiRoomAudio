@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.jetty.websocket.api.Session;
+
 import it.unibo.sca.multiroomaudio.shared.dto.Device;
 import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
 
@@ -33,6 +35,16 @@ public class DatabaseManager {
         if(connectedDevices.remove(id)==null)
             return false;
         return true;
+    }
+
+    public boolean removeConnected(Session session){
+        for(String key : connectedDevices.keySet()){
+            if(connectedDevices.get(key).getSession().equals(session)){
+                connectedDevices.remove(key);
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isClientConnected(){
