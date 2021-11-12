@@ -18,20 +18,27 @@ import it.unibo.sca.multiroomaudio.shared.messages.*;
 public class ServerConnection extends WebSocketClient {
 
     static final Gson gson = new Gson();
-    
+    final String macAddr;
+
     public ServerConnection(URI serverUri, Draft draft) {
         super(serverUri, draft);
+        this.macAddr = null;
     }
 
     public ServerConnection(URI serverURI) {
         super(serverURI);
+        this.macAddr = null;
+    }
+
+    public ServerConnection(URI serverURI, String macAddr) {
+        super(serverURI);
+        this.macAddr = macAddr;
     }
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         System.out.println("Connection opened");
-        //this should be done with the thingy things
-        
+        send(new MsgHello(0, macAddr).toJson(gson));
         
     }
     
@@ -42,12 +49,9 @@ public class ServerConnection extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        System.out.println("received message: " + message);
         //this should be alike the one with the server but with the message from the client (w/o session)
         try {
-            int ret = handleMessage(message, gson.fromJson(message, JsonObject.class).get("type").getAsString());
-            if(ret != 200)
-                close(ret);
+            handleMessage(message, gson.fromJson(message, JsonObject.class).get("type").getAsString());
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -67,32 +71,38 @@ public class ServerConnection extends WebSocketClient {
     }
 
     //returns the code of the results (http like)
-    private static int handleMessage(String message, String type) throws IOException {
+    private void handleMessage(String message, String type) throws IOException {
         switch (type) {
             case "HELLO_BACK":
                 System.out.println("received an helloBack");
                 MsgHelloBack helloBack = gson.fromJson(message, MsgHelloBack.class);
                 //dovrei salvare cose nell'hashmap
                 handleHelloBack(helloBack);
-                return 200;
+                break;
             case "REJECTED":
                 System.out.println("received a reject");
                 MsgReject reject = gson.fromJson(message, MsgReject.class);
                 handleReject(reject);
-                return 503;
+                break;
             default:
-                System.out.println("MESSAGE UNKNOWN ");
-                return 500;
+                System.out.println("MESSAGE UNKNOWN: " + message);
+                break;
+
         }
     }
 
-    private static void handleHelloBack(MsgHelloBack hello) throws IOException{
-        //to accept a connection check the type, if a client is already connected and we're receiving a client (not listening) we 
-        //abort the connection, if it's a speaker we accept it(?)   
+    private void handleHelloBack(MsgHelloBack hello) throws IOException{
+        System.out.println("Connection established");
     }
 
-    private static void handleReject(MsgReject reject) throws IOException{
+    /*true if disconnect, false otherwise*/
+    private void handleReject(MsgReject reject) throws IOException{
         System.out.println("Server refused connection; reason: " + reject.getReason());
+        if(reject.getDuplicate()){
+            System.out.println("retrying connection");//tbh we are connected but we are saving ourselves as a new id (?)
+            //and then maybe check if it's true or not
+            //this.id = reject.getNewId();
+        }
     }
 
 }

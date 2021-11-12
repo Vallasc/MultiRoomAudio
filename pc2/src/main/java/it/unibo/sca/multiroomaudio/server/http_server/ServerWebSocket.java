@@ -34,17 +34,16 @@ public class ServerWebSocket {
         /*for(String key : dbm.getConnectedDevices().keySet()){
             System.out.println(key);
         }*/
-        sessions.add(session);
+        
     }
 
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
+        //invalid sessions aren't actually added
         sessions.remove(session);
-        if(dbm.removeConnected(session))
-            System.out.println("removed");
-        else
-            System.out.println("not removed");
+        dbm.removeConnected(session);
+            
         System.out.println("closed");
         
     }
@@ -62,7 +61,7 @@ public class ServerWebSocket {
         
     }
 
-    private static void handleMessage(Session session, String message, String type) throws IOException {
+    private void handleMessage(Session session, String message, String type) throws IOException {
         switch (type) {
             case "HELLO":
                 System.out.println("received an hello");
@@ -83,16 +82,24 @@ public class ServerWebSocket {
         }
     }
 
-    private static void handleHello(Session session, MsgHello hello) throws IOException{
+    private void handleHello(Session session, MsgHello hello) throws IOException{
         //to accept a connection check the type, if a client is already connected and we're receiving a client (not listening) we 
         //abort the connection, if it's a speaker we accept it(?)
+        //if the client has the same id as another one we send him a new id to make it connect
+        //alternative is to abort the connection cause of duplicate MAC_ADDR, we need a hashmap id mac maybe idk
         if(hello.getDeviceType() == 0){
-            if(dbm.isClientConnected())
-                session.getRemote().sendString(gson.toJson(new MsgReject("there's already another client connected")));
+            if(dbm.isClientConnected()){
+                session.getRemote().sendString(gson.toJson(new MsgReject("there is already another client connected")));
+                session.close();
+            }
+            else if(dbm.alreadyConnected(hello.getMac())){
+                session.getRemote().sendString(gson.toJson(new MsgReject("this device is already connected")));
+                session.close();
+            }
             else{
-                //add the connected device to the map
-                dbm.putConnected(hello.getId(), new Device(hello.getDeviceType(), session, "name", hello.getId()));
+                dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), session, "name", hello.getMac()));
                 session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
+                sessions.add(session);
             }
             dbm.printConnected();
         }else{
@@ -100,7 +107,7 @@ public class ServerWebSocket {
         }   
     }
 
-    private static void handleClose(Session session, MsgClose close) throws IOException{
+    private void handleClose(Session session, MsgClose close) throws IOException{
         dbm.removeConnected(close.getId());
     }
 

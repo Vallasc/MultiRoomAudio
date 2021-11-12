@@ -2,16 +2,96 @@ package it.unibo.sca.multiroomaudio.discovery;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Enumeration;
+import java.util.List;
 
-import it.unibo.sca.multiroomaudio.shared.*;
 import it.unibo.sca.multiroomaudio.shared.messages.MyMsgHandler;
 
 public class DiscoveryService {
     private static final int bufferSize = 1024;
-    
+    String mac;
+    InetAddress broadcast;
+    InetAddress serverAddress;
+    int port;
+    boolean failed = true;
+    int id;
+
+    public DiscoveryService() {
+        getSpecs();
+        discover();
+    }
+
+    public String getMac(){
+        return mac;
+    }
+
+    public InetAddress getBroadcast(){
+        return broadcast;
+    }
+
+    public boolean getFailed(){
+        return failed;
+    }
+
+    public InetAddress getServerAddress(){
+        return serverAddress;
+    }
+
+    public int getPort(){
+        return port;
+    }
+
+    public int getId(){
+        return id;
+    }
+
+    public static String buildMac(byte[] mac){
+        StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < mac.length; i++) {
+			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
+		}
+		return sb.toString();
+    }
+
+    private void getSpecs(){
+        Enumeration<NetworkInterface> ni = null;
+        boolean flagFound = false;
+        try {
+            ni = NetworkInterface.getNetworkInterfaces();
+            while (ni.hasMoreElements() && !flagFound) {
+                NetworkInterface n = ni.nextElement();
+                if(n.isUp() && !n.isLoopback() && !n.isVirtual()){
+                    List<InterfaceAddress> addresses = n.getInterfaceAddresses();
+                    for(InterfaceAddress addr : addresses){
+                        InetAddress inetAddr = addr.getAddress();
+                        if (inetAddr instanceof Inet6Address) continue;
+                        Socket socket = new Socket();
+                        try {
+                            socket.bind(new InetSocketAddress(inetAddr, 15000));
+                            try{
+                                socket.connect(new InetSocketAddress("google.com", 80), 1000);
+                            }catch(BindException e){
+                                //address already in use
+                                socket.close();
+                                this.mac = buildMac(n.getHardwareAddress());
+                                this.broadcast = addr.getBroadcast();
+                            }
+                            socket.close();
+                            this.mac = buildMac(n.getHardwareAddress());
+                            this.broadcast = addr.getBroadcast();
+                          }catch(IOException e) {
+                            continue;
+                          }
+                    }
+                }
+                   
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+    }
     //private static Couple specs;
-    public static Pair<Integer, InetAddress> discover(){
-        InetAddress serverAddress = null;
+    public void discover(){
         byte[] data = null;
         byte[] byteBuffer1 = new byte[bufferSize];  
         DatagramPacket packetReceive = new DatagramPacket(byteBuffer1, bufferSize);
@@ -19,7 +99,8 @@ public class DiscoveryService {
             data = MyMsgHandler.dtgmOutMsg(new MsgDiscovery());
         }catch(IOException e){
             System.err.println("Error while sending the message");
-            return new Pair<Integer, InetAddress>(-1, serverAddress);
+            return;
+
         }
         //---------------------------------------------------------
         DatagramSocket socket = null;
@@ -28,20 +109,16 @@ public class DiscoveryService {
             socket.setSoTimeout(10000);
         } catch (SocketException e) {
             e.printStackTrace();
-            return new Pair<Integer, InetAddress>(-1, serverAddress);
+            return;
         }
-
-        Pair<byte[], InetAddress> specs = IPFinder.getSpecs();
-        InetAddress broadcastAddr = specs.getV();      
-        
         boolean flagResend = true;
         while(flagResend){
             try {
-                socket.send(new DatagramPacket(data, data.length, broadcastAddr, 6262));
+                socket.send(new DatagramPacket(data, data.length, broadcast, 6262));
             } catch (IOException e) {
                 socket.close();
                 e.printStackTrace();
-                return new Pair<Integer, InetAddress>(-1, serverAddress);
+                return;
             } 
             System.out.println("The packet is sent successfully");  
             try {
@@ -53,22 +130,20 @@ public class DiscoveryService {
             } catch (IOException e) {
                 e.printStackTrace();       
                 socket.close(); 
-                return new Pair<Integer, InetAddress>(-1, serverAddress);
+                return;
             } 
         }
-        //ok got the message
-        Integer msg = null;
         try {
             Object readObject = MyMsgHandler.dtgmInMsg(packetReceive.getData());
             if (readObject instanceof MsgDiscoveredServer) 
                 serverAddress = packetReceive.getAddress();  
                 MsgDiscoveredServer discovered = (MsgDiscoveredServer) readObject;
-                msg = discovered.getPort();
+                port = discovered.getPort();
         }catch (ClassNotFoundException | IOException e){
             socket.close();
-            return new Pair<Integer, InetAddress>(-1, null);
+            return;
         }
         socket.close();
-        return new Pair<Integer, InetAddress>(msg, serverAddress);
+        failed = false;
     }
 }

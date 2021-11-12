@@ -13,18 +13,28 @@ import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
 public class DatabaseManager {
     /*id, device*/
     public static ConcurrentHashMap<String, Device> connectedDevices = new ConcurrentHashMap<String, Device>();
-    /*id, same as above, related fingerprint for the client<roomId, fingerprintlist>*/
+    /*id (MAC), same as above, related fingerprint for the client<roomId, fingerprintlist>*/
     public static ConcurrentHashMap<String, HashMap<String, List<Fingerprint>>> fingerprints = new ConcurrentHashMap<>();
+    /*<mac, id>*/
+    public static ConcurrentHashMap<String, String> ids = new ConcurrentHashMap<>();
 
+    public static volatile String id = "0000";
     /*utils*/
     public void printConnected(){
         for(String key: connectedDevices.keySet())
             System.out.println(key);
     }
 
+    public synchronized String getId(){
+        return id;
+    }
+    /*ids*/
+    public void putIds(String mac){
+        ids.put(mac, id);
+    }
     /*connected devices*/
     public void putConnected(String id){
-        connectedDevices.put(id, new Device()); //TODO
+        connectedDevices.put(id, new Device()); 
     }
 
     public void putConnected(String id, Device d){
@@ -53,6 +63,10 @@ public class DatabaseManager {
                 return true;
         }
         return false;
+    }
+
+    public boolean alreadyConnected(String mac){
+        return connectedDevices.containsKey(mac);
     }
 
     /*offline fingerprints*/
