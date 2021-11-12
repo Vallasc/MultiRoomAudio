@@ -1,5 +1,6 @@
 package it.unibo.sca.multiroomaudio.server.http_server;
 
+import org.eclipse.jetty.io.EofException;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
@@ -41,6 +42,7 @@ public class ServerWebSocket {
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
         //invalid sessions aren't actually added
+        dbm.printConnected();
         sessions.remove(session);
         dbm.removeConnected(session);
             
@@ -60,6 +62,18 @@ public class ServerWebSocket {
         }
         
     }
+    //Doesn't seem like needed
+    @OnWebSocketError
+    public void onError(Session session, Throwable cause) {
+        
+        if(cause instanceof EofException){
+            dbm.removeConnected(session);
+            sessions.remove(session);
+        }
+        
+            
+    }
+
 
     private void handleMessage(Session session, String message, String type) throws IOException {
         switch (type) {
@@ -87,28 +101,23 @@ public class ServerWebSocket {
         //abort the connection, if it's a speaker we accept it(?)
         //if the client has the same id as another one we send him a new id to make it connect
         //alternative is to abort the connection cause of duplicate MAC_ADDR, we need a hashmap id mac maybe idk
-        if(hello.getDeviceType() == 0){
-            if(dbm.isClientConnected()){
-                session.getRemote().sendString(gson.toJson(new MsgReject("there is already another client connected")));
-                session.close();
-            }
-            else if(dbm.alreadyConnected(hello.getMac())){
-                session.getRemote().sendString(gson.toJson(new MsgReject("this device is already connected")));
-                session.close();
-            }
-            else{
-                dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), session, "name", hello.getMac()));
-                session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
-                sessions.add(session);
-            }
-            dbm.printConnected();
-        }else{
-
-        }   
+        if(hello.getDeviceType() == 0 && dbm.isClientConnected()){
+            session.getRemote().sendString(gson.toJson(new MsgReject("there is already another client connected")));
+            session.close();
+        }
+        else if(dbm.alreadyConnected(hello.getMac())){
+            session.getRemote().sendString(gson.toJson(new MsgReject("this device is already connected")));
+            session.close();
+        }
+        else{
+            dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), session, "name", hello.getMac()));
+            session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
+            sessions.add(session);
+        }
     }
 
     private void handleClose(Session session, MsgClose close) throws IOException{
-        dbm.removeConnected(close.getId());
+        dbm.removeConnected(session);
     }
 
     /*
