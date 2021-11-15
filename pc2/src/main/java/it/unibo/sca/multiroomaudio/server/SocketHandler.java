@@ -40,14 +40,19 @@ public class SocketHandler extends Thread{
             String json = dIn.readUTF();
             System.out.println("read the first hello");
             MsgHello hello = gson.fromJson(json, MsgHello.class);
-            if(hello.getDeviceType() == 0){
+            if(hello.getDeviceType() == 0 && !dbm.alreadyConnected(hello.getMac()) && !dbm.isClientConnected()){
                 if(dbm.alreadyConnected(hello.getMac())){
                     dOut.writeUTF(gson.toJson(new MsgReject("you are somehow already connected"))); 
                 }else{
                     dOut.writeUTF(gson.toJson(new MsgHelloBack()));
                     dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), hello.getMac()));
                 }
-            }
+            }else if(hello.getDeviceType() != 0)
+                dOut.writeUTF(gson.toJson(new MsgReject("Not a client, what are you doing here")));
+            else if(dbm.alreadyConnected(hello.getMac()))
+                dOut.writeUTF(gson.toJson(new MsgReject("You are already connected")));
+            else if(dbm.isClientConnected())
+                dOut.writeUTF(gson.toJson(new MsgReject("There's already a client")));
         }catch(IOException e){
             System.err.println("Error in writing on the socket");
         }

@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
+import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 
 
@@ -59,7 +59,8 @@ public class App {
             String msg = dIn.readUTF();
             if(gson.fromJson(msg, JsonObject.class).get("type").getAsString().equals("REJECTED")){
                 socket.close();
-                System.out.println("??");
+                MsgReject reject = gson.fromJson(msg, MsgReject.class);
+                System.out.println(reject.getReason());
                 return;
             }
         }catch(IOException e){
