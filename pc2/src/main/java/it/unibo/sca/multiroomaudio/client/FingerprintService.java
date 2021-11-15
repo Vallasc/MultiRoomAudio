@@ -3,6 +3,7 @@ package it.unibo.sca.multiroomaudio.client;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import com.google.gson.Gson;
 
@@ -24,6 +25,7 @@ public class FingerprintService extends Thread {
     public FingerprintService(Socket socket){
         scanner = new WlanScanner();
         this.socket = socket;
+        
     }
 
     @Override
@@ -54,7 +56,10 @@ public class FingerprintService extends Thread {
                 }*/
                 String json = gson.toJson(APs);
                 dOut.writeUTF(json);
-            } catch (OperatingSystemNotDefinedException | IOException e) {
+            }catch(SocketException e){
+                System.out.println(e.getMessage());
+            }
+            catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;
             }

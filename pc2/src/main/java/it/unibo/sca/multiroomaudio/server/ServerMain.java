@@ -36,10 +36,11 @@ public class ServerMain {
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets exclusively
             System.out.println("Waiting for connection...");
             while(true){
-                dbm.printConnected();
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("accepted a connection");
-                (new SocketHandler(clientSocket, dbm)).run();
+                SocketHandler sh = new SocketHandler(clientSocket, dbm);
+                sh.readConnection();
+                sh.readFingerprints();
             }
 		}catch(IOException e){
 			e.printStackTrace();

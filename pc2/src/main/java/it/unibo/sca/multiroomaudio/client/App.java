@@ -1,15 +1,14 @@
 package it.unibo.sca.multiroomaudio.client;
 
-import java.awt.Desktop;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import com.google.gson.Gson;
-
+import com.google.gson.JsonObject;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
@@ -17,10 +16,11 @@ import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 
 
 public class App {
+    
     public static void main(String[] args) {
-        // Find ip and port with broadcast
-        Gson gson = new Gson();
         
+        Gson gson = new Gson();
+        // Find ip and port with broadcast      
         DiscoveryService discovered = new DiscoveryService();
         
         if(discovered.getFailed()){
@@ -45,28 +45,45 @@ public class App {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        ServerConnection sc = new ServerConnection(uri, discovered.getMac(), type);
-        try {
-            sc.connectBlocking();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("connecting to the server through a socket");
         Socket socket = null;
         try{            
             socket = new Socket(discovered.getServerAddress(), discovered.getPort());    
-            DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-            dOut.writeUTF(new MsgHello(type, discovered.getMac(), true).toJson(gson));
-
         }catch(IOException e){
             System.err.println("Error in creating the socket");
             e.printStackTrace();
         }
+        try{
+            DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dIn = new DataInputStream(socket.getInputStream());
+            dOut.writeUTF(new MsgHello(type, discovered.getMac(), true).toJson(gson));
+            String msg = dIn.readUTF();
+            if(gson.fromJson(msg, JsonObject.class).get("type").getAsString().equals("REJECTED")){
+                socket.close();
+                System.out.println("??");
+                return;
+            }
+        }catch(IOException e){
+            System.err.println("Error during the socket handshake phase");
+            e.printStackTrace();
+        }
+        ServerConnection sc = new ServerConnection(uri, discovered.getMac(), type);
+        try {
+            sc.connectBlocking();
+        } catch (InterruptedException e) {
+            sc.close();
+            try{
+                socket.close();
+            }catch(IOException e1){}
+            e.printStackTrace();
+        }
         //this is the online fingerprint that runs non stop
-        //(new FingerprintService(socket)).start();
+        (new FingerprintService(socket)).start();
        
         //sc.close();
         
     }
+
+
+    
 
 }

@@ -1,23 +1,20 @@
 package it.unibo.sca.multiroomaudio.server;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jetty.websocket.api.Session;
 
 import it.unibo.sca.multiroomaudio.shared.dto.Device;
-import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
 
 public class DatabaseManager {
     /*id, device*/
-    public static ConcurrentHashMap<String, Device> connectedDevices = new ConcurrentHashMap<String, Device>();
-    /*id (MAC), same as above, related fingerprint for the client<roomId, fingerprintlist>*/
-    public static ConcurrentHashMap<String, HashMap<String, List<Fingerprint>>> fingerprints = new ConcurrentHashMap<>();
-    /*<mac, id>, these two are used only if the server uses different ids from the mac, for translation, otherwise is useless*/
-    public static ConcurrentHashMap<String, String> ids = new ConcurrentHashMap<>();
-    public static volatile String id = "0000";
+    private ConcurrentHashMap<String, Device> connectedDevices = new ConcurrentHashMap<String, Device>();
+    /*
+    THIS SHOULD GO IN ANOTHER OBJECT IF I WANT TO USE SYNCHRONIZED
+    id (MAC), same as above, related fingerprint for the client<roomId, fingerprintlist>*/
+    //private ConcurrentHashMap<String, HashMap<String, List<Fingerprint>>> fingerprints = new ConcurrentHashMap<>();
+    /*it's like an async implementation idk*/
 
     /*utils*/
     /**
@@ -27,16 +24,7 @@ public class DatabaseManager {
         for(String key: connectedDevices.keySet())
             System.out.println(key);
     }
-    /*ids*/
-    
-    public synchronized String getId(){
-        return id;
-    }
-
-    public void putIds(String mac){
-        ids.put(mac, id);
-    }
-
+   
     /*connected devices*/
     /**
      * @method putConnected: puts the given id into the connectedDevices hashmap, building a new empty device
@@ -61,16 +49,14 @@ public class DatabaseManager {
      * @return true if the device was removed, false otherwise
      */
     public boolean removeConnected(String id){
-        if(connectedDevices.remove(id)==null)
-            return false;
-        return true;
+        return connectedDevices.remove(id)==null;
     }
     /**
      * @method removeConnected: removes the id that corresponds to the session from the connectedDevices hashmap
      * @param session the session that corresponds to the mac (id)
      * @return true if the device was removed, false otherwise
      */
-    public boolean removeConnected(Session session){
+    public synchronized boolean removeConnected(Session session){
         for(String key : connectedDevices.keySet()){
             if(connectedDevices.get(key).getSession().equals(session)){
                 connectedDevices.remove(key);
@@ -78,6 +64,10 @@ public class DatabaseManager {
             }
         }
         return false;
+    }
+
+    public void setSession(String id, Session session){
+        connectedDevices.get(id).setSession(session);
     }
 
     /**
@@ -100,17 +90,14 @@ public class DatabaseManager {
     public boolean alreadyConnected(String mac){
         return connectedDevices.containsKey(mac);
     }
+    
 
-    /*offline fingerprints*/
-    /**
-     * @method putFingerprints puts the fingerprint list for each device for each room inside firngerprintlist
-     * @param id the id of the device
-     * @param fingerprintlist fingerprintlist for a given room
-     */
+
+    /*
     public void putFingerprints(String id, ArrayList<Fingerprint> fingerprintlist){
         
         fingerprints.put(id, new HashMap<String, List<Fingerprint>>());
 
-    }
+    }*/
 
 }

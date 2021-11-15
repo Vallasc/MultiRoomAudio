@@ -52,9 +52,8 @@ public class ServerWebSocket {
 
     @OnWebSocketMessage
     public void message(Session session, String message) {
-        System.out.println("Got: " + message);   // Print message
+        //System.out.println("Got: " + message);   // Print message
         try{
-            System.out.println(gson.fromJson(message, JsonObject.class).get("type").getAsString());
             handleMessage(session, message, gson.fromJson(message, JsonObject.class).get("type").getAsString());
         }catch(IOException e){
             System.err.println("Error handling message: " + message); 
@@ -79,7 +78,7 @@ public class ServerWebSocket {
     private void handleMessage(Session session, String message, String type) throws IOException {
         switch (type) {
             case "HELLO":
-                System.out.println("received an hello");
+                System.out.println("received the second hello");
                 MsgHello hello = gson.fromJson(message, MsgHello.class);
                 //dovrei salvare cose nell'hashmap
             
@@ -102,33 +101,31 @@ public class ServerWebSocket {
         //abort the connection, if it's a speaker we accept it(?)
         //if the client has the same id as another one we send him a new id to make it connect
         //alternative is to abort the connection cause of duplicate MAC_ADDR, we need a hashmap id mac maybe idk
-        if(!hello.getIsSocket()){
-            //the client connecting is establishing the websocket connection
-            if(hello.getDeviceType() == 0 && dbm.isClientConnected()){
-                session.getRemote().sendString(gson.toJson(new MsgReject("there is already another client connected")));
-                session.close();
-            }
-            else if(dbm.alreadyConnected(hello.getMac())){
-                session.getRemote().sendString(gson.toJson(new MsgReject("this device is already connected")));
-                session.close();
-            }
-            else{
+        
+        //the client connecting is establishing the websocket connection
+        if(hello.getDeviceType() == 0){
+        //handle clients
+            if(dbm.alreadyConnected(hello.getMac())){
                 dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), session, "name", hello.getMac()));
+                dbm.setSession(hello.getMac(), session);
                 session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
                 sessions.add(session);
+            }else{
+                if(dbm.isClientConnected())
+                    session.getRemote().sendString(gson.toJson(new MsgReject("there is already another client connected")));
+                else
+                    //this should never happen
+                    session.getRemote().sendString(gson.toJson(new MsgReject("trying to establish ws before socket")));
+                session.close();
             }
+        } else if(hello.getDeviceType() == 1){            
+        //handle speakers
+
+        }else if(hello.getDeviceType() == 2){
+        //handle client but just listening
+            
         }
-        else{
-            //the client connecting is establishing the socket connection for online fingerprints
-            //not a client
-            if(hello.getDeviceType() != 0)
-                session.getRemote().sendString(gson.toJson(new MsgReject("you are not allowed to connect like that")));
-            //client
-            else 
-                if(dbm.alreadyConnected(hello.getMac())){
-                    session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
-                }
-        }
+        
     }
 
     private void handleClose(Session session, MsgClose close) throws IOException{

@@ -106,7 +106,7 @@ public class DiscoveryService {
         DatagramSocket socket = null;
         try {
             socket = new DatagramSocket(6263);
-            socket.setSoTimeout(10000);
+            socket.setSoTimeout(5000);
         } catch (SocketException e) {
             e.printStackTrace();
             return;
@@ -117,6 +117,7 @@ public class DiscoveryService {
                 socket.send(new DatagramPacket(data, data.length, broadcast, 6262));
             } catch (IOException e) {
                 socket.close();
+                flagResend = false;
                 e.printStackTrace();
                 return;
             } 
@@ -130,6 +131,7 @@ public class DiscoveryService {
             } catch (IOException e) {
                 e.printStackTrace();       
                 socket.close(); 
+                flagResend = false;
                 return;
             } 
         }

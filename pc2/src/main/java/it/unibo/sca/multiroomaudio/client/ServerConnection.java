@@ -16,10 +16,11 @@ import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 
 public class ServerConnection extends WebSocketClient {
-
+    
     static final Gson gson = new Gson();
     final String macAddr;
-    final int type; 
+    final int type;  
+    
     public ServerConnection(URI serverUri, Draft draft) {
         super(serverUri, draft);
         this.macAddr = null;
@@ -77,13 +78,12 @@ public class ServerConnection extends WebSocketClient {
     private void handleMessage(String message, String type) throws IOException {
         switch (type) {
             case "HELLO_BACK":
-                System.out.println("received an helloBack");
                 MsgHelloBack helloBack = gson.fromJson(message, MsgHelloBack.class);
                 //dovrei salvare cose nell'hashmap
                 handleHelloBack(helloBack);
+                
                 break;
             case "REJECTED":
-                System.out.println("received a reject");
                 MsgReject reject = gson.fromJson(message, MsgReject.class);
                 handleReject(reject);
                 break;
@@ -94,8 +94,9 @@ public class ServerConnection extends WebSocketClient {
         }
     }
 
+
     private void handleHelloBack(MsgHelloBack hello) throws IOException{
-        System.out.println("Connection established");
+        System.out.println("WS connection established");
     }
 
     private void handleReject(MsgReject reject) throws IOException{

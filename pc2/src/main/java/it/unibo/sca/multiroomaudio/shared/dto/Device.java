@@ -5,7 +5,7 @@ import org.eclipse.jetty.websocket.api.Session;
 public class Device {
     
     private final int type; // 0 client, 1 speaker, 2 listening client
-    private final Session session;
+    private Session session;
     private final String name;
     //private final String id;
     private final String macAddr;
@@ -17,7 +17,11 @@ public class Device {
         //id = null;
         macAddr = null;
     }
-
+    public Device(int type, String macAddr){
+        this.type = type;
+        this.macAddr = macAddr;
+        this.name = null;
+    }
     public Device(int type, Session session, String name, /*String id, */String macAddr) {
         this.type = type;
         this.session = session;
@@ -34,6 +38,9 @@ public class Device {
         return type;
     }
 
+    public void setSession(Session session){
+        this.session = session;
+    }
 
     public Session getSession() {
         return session;
