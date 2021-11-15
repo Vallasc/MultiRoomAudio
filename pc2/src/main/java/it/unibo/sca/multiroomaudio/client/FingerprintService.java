@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 import io.github.vallasc.APInfo;
 import io.github.vallasc.WlanScanner;
 import io.github.vallasc.WlanScanner.OperatingSystemNotDefinedException;
-import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
 public class FingerprintService extends Thread {
     static final int SECONDS_BETWEEN_SCANS = 2;

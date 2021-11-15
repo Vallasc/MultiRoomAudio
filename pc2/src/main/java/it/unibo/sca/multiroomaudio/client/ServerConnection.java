@@ -19,26 +19,29 @@ public class ServerConnection extends WebSocketClient {
 
     static final Gson gson = new Gson();
     final String macAddr;
-
+    final int type; 
     public ServerConnection(URI serverUri, Draft draft) {
         super(serverUri, draft);
         this.macAddr = null;
+        this.type = -1;
     }
 
     public ServerConnection(URI serverURI) {
         super(serverURI);
         this.macAddr = null;
+        this.type = -1;
     }
 
-    public ServerConnection(URI serverURI, String macAddr) {
+    public ServerConnection(URI serverURI, String macAddr, int type) {
         super(serverURI);
         this.macAddr = macAddr;
+        this.type = type;
     }
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         System.out.println("Connection opened");
-        send(new MsgHello(0, macAddr).toJson(gson));
+        send(new MsgHello(type, macAddr).toJson(gson));
         
     }
     
@@ -95,14 +98,9 @@ public class ServerConnection extends WebSocketClient {
         System.out.println("Connection established");
     }
 
-    /*true if disconnect, false otherwise*/
     private void handleReject(MsgReject reject) throws IOException{
         System.out.println("Server refused connection; reason: " + reject.getReason());
-        if(reject.getDuplicate()){
-            System.out.println("retrying connection");//tbh we are connected but we are saving ourselves as a new id (?)
-            //and then maybe check if it's true or not
-            //this.id = reject.getNewId();
-        }
+        
     }
 
 }

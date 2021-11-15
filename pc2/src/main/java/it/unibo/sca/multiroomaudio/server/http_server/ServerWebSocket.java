@@ -65,8 +65,9 @@ public class ServerWebSocket {
     //Doesn't seem like needed
     @OnWebSocketError
     public void onError(Session session, Throwable cause) {
-        
+        //seems like it's not needed
         if(cause instanceof EofException){
+            System.out.println("client crashed");
             dbm.removeConnected(session);
             sessions.remove(session);
         }
@@ -101,18 +102,32 @@ public class ServerWebSocket {
         //abort the connection, if it's a speaker we accept it(?)
         //if the client has the same id as another one we send him a new id to make it connect
         //alternative is to abort the connection cause of duplicate MAC_ADDR, we need a hashmap id mac maybe idk
-        if(hello.getDeviceType() == 0 && dbm.isClientConnected()){
-            session.getRemote().sendString(gson.toJson(new MsgReject("there is already another client connected")));
-            session.close();
-        }
-        else if(dbm.alreadyConnected(hello.getMac())){
-            session.getRemote().sendString(gson.toJson(new MsgReject("this device is already connected")));
-            session.close();
+        if(!hello.getIsSocket()){
+            //the client connecting is establishing the websocket connection
+            if(hello.getDeviceType() == 0 && dbm.isClientConnected()){
+                session.getRemote().sendString(gson.toJson(new MsgReject("there is already another client connected")));
+                session.close();
+            }
+            else if(dbm.alreadyConnected(hello.getMac())){
+                session.getRemote().sendString(gson.toJson(new MsgReject("this device is already connected")));
+                session.close();
+            }
+            else{
+                dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), session, "name", hello.getMac()));
+                session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
+                sessions.add(session);
+            }
         }
         else{
-            dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), session, "name", hello.getMac()));
-            session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
-            sessions.add(session);
+            //the client connecting is establishing the socket connection for online fingerprints
+            //not a client
+            if(hello.getDeviceType() != 0)
+                session.getRemote().sendString(gson.toJson(new MsgReject("you are not allowed to connect like that")));
+            //client
+            else 
+                if(dbm.alreadyConnected(hello.getMac())){
+                    session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
+                }
         }
     }
 
