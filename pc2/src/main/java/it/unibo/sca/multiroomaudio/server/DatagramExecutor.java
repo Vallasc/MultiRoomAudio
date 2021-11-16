@@ -20,7 +20,7 @@ public class DatagramExecutor extends Thread {
 		//should pass the data structure in which client parameters should be saved
 		requestQ  = new LinkedBlockingQueue<>();
         try {
-			data = msgHandler.dtgmOutMsg(new MsgDiscoveredServer(8497));
+			data = MyMsgHandler.dtgmOutMsg(new MsgDiscoveredServer(8497));
 		} catch (IOException e) {
 			System.err.println("error while creating the message");
 			e.printStackTrace();
@@ -47,7 +47,7 @@ public class DatagramExecutor extends Thread {
 			try {
 				Pair<byte[], InetAddress> pair = requestQ.take();
 				InetAddress sender = (InetAddress) pair.getV();
-                Object readObject = msgHandler.dtgmInMsg((Object) pair.getU());
+                Object readObject = MyMsgHandler.dtgmInMsg((Object) pair.getU());
 				//System.out.println(packet.getData());
                 if (readObject instanceof MsgDiscovery) {
 					System.out.println("Read a discovery msg");
