@@ -48,10 +48,7 @@ public class FingerprintService extends Thread {
         while (isRunning) {
             try {
                 APInfo[] APs = scanner.scanNetworks();
-                for(APInfo AP : APs){
-                    String json = gson.toJson(AP);
-                    dOut.writeUTF(json);
-                }
+                dOut.writeUTF(gson.toJson(APs));
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;

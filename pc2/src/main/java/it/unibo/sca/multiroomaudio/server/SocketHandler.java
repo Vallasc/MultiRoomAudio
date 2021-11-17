@@ -5,8 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Iterator;
-
 import com.google.gson.Gson;
 
 import io.github.vallasc.APInfo;
@@ -31,31 +29,35 @@ public class SocketHandler extends Thread{
             return;
 
         String json;
+        
+        String clientId;
         try {
             dOut = new DataOutputStream(clientSocket.getOutputStream());
             dIn = new DataInputStream(clientSocket.getInputStream());
             json = dIn.readUTF();
             MsgHello hello = gson.fromJson(json, MsgHello.class);
-            Boolean res = dbm.connectedDevices.putIfAbsent(hello.getId(), true);
+            clientId = hello.getId();
+            Boolean res = dbm.connectedDevices.putIfAbsent(clientId, true);
             if(res != null){//already connected
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("REJECTED")));
                 return;
             }
-            if(dbm.devices.containsKey(hello.getId()))
+            if(dbm.devices.containsKey(clientId))
                 dOut.writeUTF(gson.toJson(new MsgHelloBack(5000, "type=client")));
-            else
+            else{
                 dOut.writeUTF(gson.toJson(new MsgHelloBack(5000, "type=newclient")));
+                dbm.devices.put(clientId, new Device(hello.getDeviceType(), clientId, clientId));
+            }
             
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
-      
+        Device myDevice = dbm.devices.get(clientId);
         while(isRunning){
             try {
                 json = dIn.readUTF();
-                APInfo ap = gson.fromJson(json, APInfo.class);
-                //System.out.println(ap + "\n");
+                myDevice.setFingerprints(gson.fromJson(json, APInfo[].class));
             } catch (SocketException e) {
                 System.out.println("Connection closed");
                 isRunning = false;

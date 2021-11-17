@@ -7,8 +7,6 @@ import java.net.Socket;
 import it.unibo.sca.multiroomaudio.server.http_server.HttpServer;
 import it.unibo.sca.multiroomaudio.server.http_server.MusicHttpServer;
 import it.unibo.sca.multiroomaudio.server.http_server.ServerWebSocket;
-import it.unibo.sca.multiroomaudio.shared.dto.Device;
-
 public class ServerMain {
 
     private final static int servport = 8497;
@@ -32,8 +30,8 @@ public class ServerMain {
         Thread udpHandler = new DatagramThread();
         
         udpHandler.start();        
-        /*tcpHandler.start();
-        */try(ServerSocket serverSocket = new ServerSocket(servport)){
+        //(new FingerprintAnalyzer(dbm)).start();
+        try(ServerSocket serverSocket = new ServerSocket(servport)){
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
             System.out.println("Waiting for connection...");
             while(true){
