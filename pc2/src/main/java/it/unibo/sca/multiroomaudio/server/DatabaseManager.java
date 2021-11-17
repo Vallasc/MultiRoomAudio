@@ -1,7 +1,6 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import it.unibo.sca.multiroomaudio.shared.dto.*;
 /*HashMap<id, Device> (tutti i device)
@@ -14,7 +13,7 @@ MusicOrchestrationManager -> (list<speaker>, minutaggio, canzone)*/
 
 public class DatabaseManager {
 
-    public static ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
-    public static LinkedBlockingQueue<Device> connectedDevices = new LinkedBlockingQueue<>(); 
-    public static ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
+    public ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
+    public ConcurrentHashMap<String, Boolean> connectedDevices = new ConcurrentHashMap<>(); // 
+    public ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
 }

@@ -7,12 +7,14 @@ import java.net.Socket;
 import it.unibo.sca.multiroomaudio.server.http_server.HttpServer;
 import it.unibo.sca.multiroomaudio.server.http_server.MusicHttpServer;
 import it.unibo.sca.multiroomaudio.server.http_server.ServerWebSocket;
+import it.unibo.sca.multiroomaudio.shared.dto.Device;
 
 public class ServerMain {
 
     private final static int servport = 8497;
     public static void main(String[] args){
         // Music http server
+        DatabaseManager dbm = new DatabaseManager();
         try {
             if(args.length == 2) {
                 new MusicHttpServer(8080, args[1]).listMusic().start();
@@ -37,7 +39,7 @@ public class ServerMain {
             while(true){
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("accepted a connection");
-                (new SocketHandler(clientSocket)).run();
+                (new SocketHandler(clientSocket, dbm)).start();
             }
             //serverSocket.close();
 		}catch(IOException e){

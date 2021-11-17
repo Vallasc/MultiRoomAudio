@@ -8,6 +8,7 @@ public class HttpServer extends Thread {
     private final int port;
     private final int poolSize = 8;
 
+
     public HttpServer(int port, String dirUri){
         this.dirUri = dirUri;
         this.port = port;
@@ -35,5 +36,4 @@ public class HttpServer extends Thread {
         service.webSocketIdleTimeoutMillis(Integer.MAX_VALUE);
         return this;
     }
-    
 }

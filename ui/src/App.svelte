@@ -29,10 +29,13 @@
   const urlParams = new URLSearchParams(window.location.search)
   let isClient = false
   let isSpeaker = false
+  let isNewClient = false
 
   if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
     isClient = true;
-  } else if(urlParams.get('type') != null && urlParams.get('type') === 'speaker'){
+  }else if(urlParams.get('type') != null && urlParams.get('type') === 'newclient'){
+     isNewClient = true;
+  }else if(urlParams.get('type') != null && urlParams.get('type') === 'speaker'){
     isSpeaker = true;
   } 
 
@@ -42,6 +45,8 @@
 <App {...f7Params} themeDark={themeDark}>
   {#if isClient}
     <View url="/musiclist" />
+  {:else if isNewClient}
+    <View url="/calibration" />
   {:else if isSpeaker}
     <View url="/speaker" />
   {:else}
