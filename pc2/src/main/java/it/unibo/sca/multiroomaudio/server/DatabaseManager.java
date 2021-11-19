@@ -16,4 +16,11 @@ public class DatabaseManager {
     public ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
     public ConcurrentHashMap<String, Boolean> connectedDevices = new ConcurrentHashMap<>(); // 
     public ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
+
+    public String getKeyDevice(String ip){
+        for(String key : devices.keySet())
+            if(devices.get(key).getIp().equals(ip))
+                return key;
+        return null;
+    }
 }

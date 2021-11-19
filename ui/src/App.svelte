@@ -30,8 +30,10 @@
   let isClient = false
   let isSpeaker = false
   let isNewClient = false
-
-  if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
+  let clientConnection = false
+  if(urlParams.get('type') != null && urlParams.get('type') === 'hello'){
+    clientConnection = true;
+  }else if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
     isClient = true;
   }else if(urlParams.get('type') != null && urlParams.get('type') === 'newclient'){
      isNewClient = true;
@@ -43,7 +45,9 @@
 </script>
 
 <App {...f7Params} themeDark={themeDark}>
-  {#if isClient}
+  {#if clientConnection}
+    <View url="/hello" />
+  {:else if isClient}
     <View url="/musiclist" />
   {:else if isNewClient}
     <View url="/calibration" />

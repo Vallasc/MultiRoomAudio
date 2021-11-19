@@ -36,17 +36,19 @@ public class SocketHandler extends Thread{
             dIn = new DataInputStream(clientSocket.getInputStream());
             json = dIn.readUTF();
             MsgHello hello = gson.fromJson(json, MsgHello.class);
-            clientId = hello.getId();
+            clientId = hello.getIp();
+            
             Boolean res = dbm.connectedDevices.putIfAbsent(clientId, true);
             if(res != null){//already connected
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("REJECTED")));
                 return;
             }
-            if(dbm.devices.containsKey(clientId))
-                dOut.writeUTF(gson.toJson(new MsgHelloBack(5000, "type=client")));
-            else{
-                dOut.writeUTF(gson.toJson(new MsgHelloBack(5000, "type=newclient")));
-                dbm.devices.put(clientId, new Device(hello.getDeviceType(), clientId, clientId));
+            if(dbm.devices.containsKey(clientId)){
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
+                System.out.println("Contains");
+            }else{
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=newclient", clientId)));
+                dbm.devices.put(clientId, new Device(hello.getDeviceType(), hello.getMac(), clientId));
             }
             
         } catch (IOException e) {
@@ -66,6 +68,13 @@ public class SocketHandler extends Thread{
                 e.printStackTrace();
                 isRunning = false;
             }
+            if(!dbm.connectedDevices.containsKey(clientId))
+                isRunning = false;
+        }
+        try {
+            clientSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

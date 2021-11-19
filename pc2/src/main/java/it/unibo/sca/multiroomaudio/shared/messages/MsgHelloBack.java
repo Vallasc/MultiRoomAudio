@@ -1,27 +1,24 @@
 package it.unibo.sca.multiroomaudio.shared.messages;
 
 public class MsgHelloBack extends Msg {
-    private int port;
     private String path;
+    String id;
+
+    public MsgHelloBack() {
+        super("HELLO_BACK");
+    }
 
     public MsgHelloBack(String type){
         super(type);
     }
-    public MsgHelloBack(int port, String path) {
+
+    public MsgHelloBack(String path, String id) {
         super("HELLO_BACK");
-        this.port = port;
         this.path = path;
+        this.id = id;
     }
 
-    public void setPort(int port){
-        this.port = port;
-    }
-
-    public int getPort(){
-        return this.port;
-    }
-
-    public String getPath(){
-        return this.path;
+    public String getCompletePath(){
+        return this.path+"&&clientId="+this.id;
     }
 }

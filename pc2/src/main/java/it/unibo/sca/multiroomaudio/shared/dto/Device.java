@@ -1,25 +1,28 @@
 package it.unibo.sca.multiroomaudio.shared.dto;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import io.github.vallasc.APInfo;
 
 public class Device {
     
     private final int type; // 0 client, 1 speaker, 2 listeing client
-    private final String id;
-    private String name;
+    private final String ip;
+    private String mac;
     private APInfo[] fingerprints;
 
-    public Device(int type, String name, String id) {
+    public Device(int type, String mac, String ip) {
         this.type = type;
-        this.name = name;
-        this.id = id;
+        this.mac = mac;
+        this.ip = ip;
+    }
+
+    public Device(int type, String ip) {
+        this.type = type;
+        this.ip = ip;
     }
     
-    public String getId() {
-        return id;
+    public String getIp() {
+        return ip;
     }
 
     public int getType() {
@@ -34,11 +37,16 @@ public class Device {
         return fingerprints;
     }
 
-    public void setName(String name){
-        this.name = name;
+    public void setMac(String mac){
+        this.mac = mac;
     }
 
-    public String getName() {
-        return name;
+    public String getMac() {
+        return mac;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return ((String) o).equals(this.ip);
     }
 }

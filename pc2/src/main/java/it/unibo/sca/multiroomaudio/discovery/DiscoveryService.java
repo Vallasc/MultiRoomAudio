@@ -12,7 +12,9 @@ public class DiscoveryService {
     String mac;
     InetAddress broadcast;
     InetAddress serverAddress;
-    int port;
+    String ip;
+    int serverPort;
+    int fingerprintPort;
     boolean failed = true;
     int id;
 
@@ -37,12 +39,20 @@ public class DiscoveryService {
         return serverAddress;
     }
 
-    public int getPort(){
-        return port;
+    public int getFingerprintPort(){
+        return fingerprintPort;
+    }
+
+    public int getServerPort(){
+        return serverPort;
     }
 
     public int getId(){
         return id;
+    }
+
+    public String getIp(){
+        return ip;
     }
 
     public static String buildMac(byte[] mac){
@@ -75,10 +85,12 @@ public class DiscoveryService {
                                 socket.close();
                                 this.mac = buildMac(n.getHardwareAddress());
                                 this.broadcast = addr.getBroadcast();
+                                this.ip=addr.getAddress().getHostAddress();
                             }
                             socket.close();
                             this.mac = buildMac(n.getHardwareAddress());
                             this.broadcast = addr.getBroadcast();
+                            this.ip=addr.getAddress().getHostAddress();
                           }catch(IOException e) {
                             continue;
                           }
@@ -140,7 +152,8 @@ public class DiscoveryService {
             if (readObject instanceof MsgDiscoveredServer) 
                 serverAddress = packetReceive.getAddress();  
                 MsgDiscoveredServer discovered = (MsgDiscoveredServer) readObject;
-                port = discovered.getPort();
+                fingerprintPort = discovered.getFingerprintPort();
+                serverPort = discovered.getServerPort();
         }catch (ClassNotFoundException | IOException e){
             socket.close();
             return;

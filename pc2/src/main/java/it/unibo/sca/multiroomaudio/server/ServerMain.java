@@ -13,30 +13,26 @@ public class ServerMain {
     public static void main(String[] args){
         // Music http server
         DatabaseManager dbm = new DatabaseManager();
+        Thread udpHandler = new DatagramThread();
+        
+        udpHandler.start();  
         try {
             if(args.length == 2) {
                 new MusicHttpServer(8080, args[1]).listMusic().start();
             } else {
-                new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").listMusic().start(); //TODO
+                new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").listMusic().start(); 
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // WebApp http server
-        new HttpServer(80).setWebSocket(ServerWebSocket.class).start();
-
-        //Thread tcpHandler = new ClientExecutor();
-        Thread udpHandler = new DatagramThread();
-        
-        udpHandler.start();        
+        new HttpServer(80).setWebSocket(new ServerWebSocket(dbm)).start();      
         //(new FingerprintAnalyzer(dbm)).start();
         try(ServerSocket serverSocket = new ServerSocket(servport)){
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
-            System.out.println("Waiting for connection...");
             while(true){
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("accepted a connection");
                 (new SocketHandler(clientSocket, dbm)).start();
             }
             //serverSocket.close();

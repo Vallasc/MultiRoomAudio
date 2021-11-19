@@ -2,19 +2,74 @@
     import { Page, Navbar, Fab, Icon, List, ListInput, 
               BlockTitle, Block, Button, ListItem, Row, Col } from 'framework7-svelte';
 
-    let isLoading = false;
-
+	import { f7 } from "framework7-svelte";
+    import { onMount } from 'svelte';
+    import { f7ready } from 'framework7-svelte';
+    
+    const urlParams = new URLSearchParams(window.location.search)
     async function saveReference(){
       console.log(await JSInterface.saveReferencePoint());
     }
 
-    function startClick(){
-      document.getElementById("start").className = "col button button-raised button-fill"
+    let clientId = urlParams.get('clientId');
+	let socket;
+
+	onMount(() => {
+        f7ready(() => {
+            socketSetup()
+        })
+    })
+
+    function socketSetup(){
+        socket = new WebSocket("ws://" + location.hostname + "/websocket")
+
+        socket.onopen = () => {
+            sendInitMessage()
+        }
+
+        socket.onmessage = (event) => {
+            processMessage(JSON.parse(event.data))
+        }
+
+        socket.onclose = (event) => {
+			sendCloseMessage()
+            console.log(event)
+        }
+    }
+
+    function sendInitMessage(){
+        socket.send(JSON.stringify({
+            type : "HELLO",
+            deviceType : 0, // speaker type
+            id: clientId
+        }))
+    }
+
+	function processMessage(message) {
+        console.log(message)
+        switch(message.type){
+            case "REJECTED":
+                socket.close("Connection rejected");
+                break;
+            case "HELLO_BACK":
+                console.log("Connected");
+                break;
+			default: 
+				console.log("unrecognized: " + message);
+				break;
+        }    
+	}
+
+    async function startClick(){
+      console.log(clientId);
+      document.getElementById("start").className = "col button button-raised button-fill";
+      
     }
 
     function stopClick(){
       document.getElementById("start").className = "col button button-raised";
-    }
+    } 
+
 </script>
 
 <Page>

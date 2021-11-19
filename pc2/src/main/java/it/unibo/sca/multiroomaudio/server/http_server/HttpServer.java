@@ -20,16 +20,18 @@ public class HttpServer extends Thread {
         dirUri = null;
         this.port = port;
         service = Service.ignite().port(port).threadPool(poolSize);
+        
     }
 
     public void run(){
+        System.out.println("RUNNING");
         if(dirUri != null){
             service.staticFiles.externalLocation(dirUri);
         }
         else
             service.staticFiles.location("/public");
-        setRoutes();
         service.init();
+        setRoutes();
     }
 
     public void setRoutes(){
@@ -55,6 +57,12 @@ public class HttpServer extends Thread {
 
     public HttpServer setWebSocket(Class<?> webSocketClass){
         service.webSocket("/websocket", webSocketClass);
+        service.webSocketIdleTimeoutMillis(Integer.MAX_VALUE);
+        return this;
+    }
+
+    public HttpServer setWebSocket(ServerWebSocket handler){
+        service.webSocket("/websocket", handler);
         service.webSocketIdleTimeoutMillis(Integer.MAX_VALUE);
         return this;
     }

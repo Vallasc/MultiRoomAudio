@@ -3,6 +3,7 @@ package it.unibo.sca.multiroomaudio.client;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import com.google.gson.Gson;
 
@@ -49,17 +50,19 @@ public class FingerprintService extends Thread {
             try {
                 APInfo[] APs = scanner.scanNetworks();
                 dOut.writeUTF(gson.toJson(APs));
+            } catch(SocketException e) {
+                System.out.println("Server closed connection (usually cause ws died)");
+                isRunning = false;
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;
-            }
-           
-            
-            try {
-                Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            }  
+            if(isRunning)
+                try {
+                    Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
         }
     }
 

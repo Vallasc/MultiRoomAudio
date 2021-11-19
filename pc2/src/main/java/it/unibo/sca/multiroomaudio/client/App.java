@@ -14,42 +14,45 @@ import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 
+
+
 public class App {
+
+    
+// read script file
+
+// call function from script file
     public static void main(String[] args) {
+        
         // Find ip and port with broadcast
         Gson gson = new Gson();
         MsgHelloBack msg = null;
         DiscoveryService discovered = new DiscoveryService();
-        //create socket for the fingerprints
+        //create socket for the fingerprints     
         Socket socket = null;
         try{
-            socket = new Socket(discovered.getServerAddress(), discovered.getPort());
+            socket = new Socket(discovered.getServerAddress(), discovered.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac())));
+            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getIp(), discovered.getMac())));
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
             if(msg.getType().equals("REJECTED")){
                 System.err.println("Connection refused");
                 return;
             }
-            else
-                msg = gson.fromJson(json, MsgHelloBack.class);
-            //
         }catch(IOException e){
             e.printStackTrace();
         }
-        if(msg == null || msg.getPath() == null || msg.getPort() == -1){
-            return;
 
-        }
         if (Desktop.isDesktopSupported()){
             try {
-                Desktop.getDesktop().browse(new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+msg.getPort()+"/?"+msg.getPath()));//do we want to somehow parametrize the port too?
+                Desktop.getDesktop().browse(new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?"+msg.getCompletePath()));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         }
+        
         (new FingerprintService(socket)).start();
     }
 
