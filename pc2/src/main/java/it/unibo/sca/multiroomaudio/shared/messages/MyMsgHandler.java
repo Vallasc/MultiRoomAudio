@@ -9,10 +9,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-
 public class MyMsgHandler{
-    
-    public static byte[] dtgmOutMsg(Msg msg) throws IOException {
+    public static byte[] dtgmOutMsg(Msg msg) throws IOException{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(msg);

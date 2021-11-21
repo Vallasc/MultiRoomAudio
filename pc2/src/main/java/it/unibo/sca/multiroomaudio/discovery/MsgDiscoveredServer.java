@@ -3,19 +3,21 @@ package it.unibo.sca.multiroomaudio.discovery;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
 public class MsgDiscoveredServer extends Msg{
-    private int port;
+    private int fingerprintPort;
+    private int serverPort;
 
-    public MsgDiscoveredServer(int port) {
+    public MsgDiscoveredServer(int fingerprintPort, int serverPort) {
         super("DISCOVERED_SERVER");
-        this.port = port;
+        this.fingerprintPort = fingerprintPort;
+        this.serverPort = serverPort;
+    }    
+
+    public int getServerPort(){
+        return serverPort;
     }
 
-    public void setPort(int port){
-        this.port = port;
-    }
-
-    public int getPort(){
-        return this.port;
+    public int getFingerprintPort(){
+        return this.fingerprintPort;
     }
     
 }

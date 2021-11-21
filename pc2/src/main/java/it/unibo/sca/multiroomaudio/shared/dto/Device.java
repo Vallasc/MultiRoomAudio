@@ -1,59 +1,52 @@
 package it.unibo.sca.multiroomaudio.shared.dto;
 
-import org.eclipse.jetty.websocket.api.Session;
+
+import io.github.vallasc.APInfo;
 
 public class Device {
     
-    private final int type; // 0 client, 1 speaker, 2 listening client
-    private Session session;
-    private final String name;
-    //private final String id;
-    private final String macAddr;
+    private final int type; // 0 client, 1 speaker, 2 listeing client
+    private final String ip;
+    private String mac;
+    private APInfo[] fingerprints;
 
-    public Device(){
-        type = -1;
-        session = null;
-        name = null;
-        //id = null;
-        macAddr = null;
-    }
-    public Device(int type, String macAddr){
+    public Device(int type, String mac, String ip) {
         this.type = type;
-        this.macAddr = macAddr;
-        this.name = null;
+        this.mac = mac;
+        this.ip = ip;
     }
-    public Device(int type, Session session, String name, /*String id, */String macAddr) {
+
+    public Device(int type, String ip) {
         this.type = type;
-        this.session = session;
-        this.name = name;
-        //this.id = id;
-        this.macAddr = macAddr;
+        this.ip = ip;
     }
     
-    /*public String getId() {
-        return id;
-    }*/
+    public String getIp() {
+        return ip;
+    }
 
     public int getType() {
         return type;
     }
 
-    public void setSession(Session session){
-        this.session = session;
+    public synchronized void setFingerprints(APInfo[] fingerprints) {
+        this.fingerprints = fingerprints;
     }
 
-    public Session getSession() {
-        return session;
+    public synchronized APInfo[] getFingerprints() {
+        return fingerprints;
     }
 
-
-    public String getName() {
-        return name;
+    public void setMac(String mac){
+        this.mac = mac;
     }
 
     public String getMac() {
-        return macAddr;
+        return mac;
     }
 
-
+    @Override
+    public boolean equals(Object o) {
+        return ((String) o).equals(this.ip);
+    }
 }

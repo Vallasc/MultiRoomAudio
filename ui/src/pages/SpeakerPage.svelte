@@ -1,6 +1,6 @@
 <script>
     import NowPlaying from "./NowPlaying.svelte";
-    import { Page, f7 } from "framework7-svelte"
+    import { Page, f7 } from "framework7-svelte";
     import { onMount } from 'svelte';
     import { f7ready } from 'framework7-svelte';
 
@@ -55,11 +55,18 @@
         }
 
         socket.onclose = (event) => {
+            sendCloseMessage()
             console.log(event)
             window.clearTimeout(intervalResponse)
         }
     }
 
+    function sendCloseMessage(){
+        socket.send(JSON.stringify({
+            type : "CLOSE",
+            id: clientId
+        }))
+    }
 
     function sendInitMessage(){
         socket.send(JSON.stringify({

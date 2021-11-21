@@ -50,26 +50,20 @@ public class FingerprintService extends Thread {
         while (isRunning) {
             try {
                 APInfo[] APs = scanner.scanNetworks();
-                /*for(APInfo AP : APs){
-                    String json = gson.toJson(AP);
-                    dOut.writeUTF(json);
-                }*/
-                String json = gson.toJson(APs);
-                dOut.writeUTF(json);
-            }catch(SocketException e){
-                System.out.println(e.getMessage());
-            }
-            catch (OperatingSystemNotDefinedException | IOException e) {
+                dOut.writeUTF(gson.toJson(APs));
+            } catch(SocketException e) {
+                System.out.println("Server closed connection (usually cause ws died)");
+                isRunning = false;
+            } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;
-            }
-           
-            
-            try {
-                Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            }  
+            if(isRunning)
+                try {
+                    Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
         }
     }
 

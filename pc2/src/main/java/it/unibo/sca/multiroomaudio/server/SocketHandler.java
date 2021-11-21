@@ -2,83 +2,65 @@ package it.unibo.sca.multiroomaudio.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.Gson;
 
 import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.shared.dto.Device;
-import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class SocketHandler extends Thread{
-    private Socket clientSocket;
-    private DatabaseManager dbm;
-    
-    private Gson gson = new Gson();
-    
+    private final Socket clientSocket;
+    private final DatabaseManager dbm;
     public SocketHandler(Socket clientSocket, DatabaseManager dbm){
         this.clientSocket = clientSocket;
         this.dbm = dbm;
     }
 
-    public void readConnection(){
-        DataInputStream dIn = null;
-        try {
-            dIn = new DataInputStream(clientSocket.getInputStream());
-        } catch (IOException e) {
-            System.err.println("Error while creating the inputstream");
-            e.printStackTrace();
-        }
-        
-        try{
-            DataOutputStream dOut = new DataOutputStream(clientSocket.getOutputStream()); 
-            String json = dIn.readUTF();
-            System.out.println("read the first hello");
-            MsgHello hello = gson.fromJson(json, MsgHello.class);
-            if(hello.getDeviceType() == 0 && !dbm.alreadyConnected(hello.getMac()) && !dbm.isClientConnected()){
-                if(dbm.alreadyConnected(hello.getMac())){
-                    dOut.writeUTF(gson.toJson(new MsgReject("you are somehow already connected"))); 
-                }else{
-                    dOut.writeUTF(gson.toJson(new MsgHelloBack()));
-                    dbm.putConnected(hello.getMac(), new Device(hello.getDeviceType(), hello.getMac()));
-                }
-            }else if(hello.getDeviceType() != 0)
-                dOut.writeUTF(gson.toJson(new MsgReject("Not a client, what are you doing here")));
-            else if(dbm.alreadyConnected(hello.getMac()))
-                dOut.writeUTF(gson.toJson(new MsgReject("You are already connected")));
-            else if(dbm.isClientConnected())
-                dOut.writeUTF(gson.toJson(new MsgReject("There's already a client")));
-        }catch(IOException e){
-            System.err.println("Error in writing on the socket");
-        }
-    }
-
-    public void readFingerprints(){
+    @Override
+    public void run(){
         boolean isRunning = true;
         DataInputStream dIn = null;
+        DataOutputStream dOut = null;
+        Gson gson = new Gson();
+        if(clientSocket == null)
+            return;
+
+        String json;
+        
+        String clientId;
         try {
+            dOut = new DataOutputStream(clientSocket.getOutputStream());
             dIn = new DataInputStream(clientSocket.getInputStream());
+            json = dIn.readUTF();
+            MsgHello hello = gson.fromJson(json, MsgHello.class);
+            clientId = hello.getIp();
+            
+            Boolean res = dbm.connectedDevices.putIfAbsent(clientId, true);
+            if(res != null){//already connected
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("REJECTED")));
+                return;
+            }
+            if(dbm.devices.containsKey(clientId)){
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
+                System.out.println("Contains");
+            }else{
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=newclient", clientId)));
+                dbm.devices.put(clientId, new Device(hello.getDeviceType(), hello.getMac(), clientId));
+            }
+            
         } catch (IOException e) {
-            System.err.println("Error while creating the inputstream");
             e.printStackTrace();
+            return;
         }
-        //client 
+        Device myDevice = dbm.devices.get(clientId);
         while(isRunning){
             List<Fingerprint> fingerprints = new ArrayList<Fingerprint>();
             try {
-                String json = dIn.readUTF();
-                APInfo[] aps = gson.fromJson(json, APInfo[].class);
-                for(APInfo ap : aps){
-                    fingerprints.add(new Fingerprint(ap));
-                    System.out.println(ap);
-                }
-                    //then this thing goes into the db to check the position with respect to the saved fingerprints                
+                json = dIn.readUTF();
+                myDevice.setFingerprints(gson.fromJson(json, APInfo[].class));
             } catch (SocketException e) {
                 e.printStackTrace();
                 System.out.println("Connection closed");
@@ -90,7 +72,14 @@ public class SocketHandler extends Thread{
                 System.err.println("Error while reading from the socket");
                 e.printStackTrace();
                 isRunning = false;
-            } 
+            }
+            if(!dbm.connectedDevices.containsKey(clientId))
+                isRunning = false;
+        }
+        try {
+            clientSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
