@@ -2,13 +2,18 @@ package it.unibo.sca.multiroomaudio.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.Gson;
 
 import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.shared.dto.Device;
+import it.unibo.sca.multiroomaudio.shared.dto.Fingerprint;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class SocketHandler extends Thread{

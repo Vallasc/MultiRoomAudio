@@ -19,7 +19,6 @@ import com.google.gson.JsonSyntaxException;
 @WebSocket
 public class ServerWebSocket {
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
-    private static DatabaseManager dbm;
     private static final Gson gson = new Gson();
     private final DatabaseManager dbm;  
 
@@ -40,7 +39,7 @@ public class ServerWebSocket {
             System.out.println("already removed");
         }
         sessions.remove(session);
-        dbm.removeConnected(session);
+        //dbm.removeConnected(session); TODO
             
         System.out.println("closed");
         
@@ -51,7 +50,7 @@ public class ServerWebSocket {
         System.out.println("Got: " + message);   // Print message
         handleMessage(session, message);
     }
-    
+
     public void handleMessage(Session session, String message) throws JsonSyntaxException, IOException{
 
         if(gson.fromJson(message, JsonObject.class).get("type").getAsString().equals("HELLO")){

@@ -11,7 +11,6 @@ public class ServerMain {
 
     private final static int servport = 8497;
     public static void main(String[] args){
-        DatabaseManager dbm = new DatabaseManager();
         
         // Music http server
         DatabaseManager dbm = new DatabaseManager();
