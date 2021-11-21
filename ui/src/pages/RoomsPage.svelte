@@ -4,7 +4,7 @@
 
 <Page>
     <!-- Top Navbar -->
-    <Navbar title="House rooms" backLink="Back"></Navbar>
+    <Navbar title="House rooms" backLink></Navbar>
     <Fab position="right-bottom" href="/calibration/">
         <Icon md="material:add"></Icon>
     </Fab>

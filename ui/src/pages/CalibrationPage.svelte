@@ -11,7 +11,7 @@
 
 <Page>
     <!-- Top Navbar -->
-    <Navbar title="Add room" backLink="Back"></Navbar>
+    <Navbar title="Add room" backLink></Navbar>
     <Fab position="center-bottom" text="Save">
         <Icon md="material:done"></Icon>
       </Fab>
@@ -24,7 +24,7 @@
         placeholder="Bed room"
       ></ListInput>
     </List>
-    <BlockTitle>Calibration</BlockTitle>
+    <BlockTitle>Calibration nuovo</BlockTitle>
     <Block strong>
       <Button fill preloader loading={isLoading} onClick={saveReference}>
         Save reference

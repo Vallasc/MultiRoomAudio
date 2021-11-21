@@ -19,25 +19,17 @@
   let playingSong
 
   async function fetchSongs() {
-    let res = await fetch("http://localhost:8080/player/list", {
+    let res = await fetch("http://" + location.hostname + ":8080/player/list", {
       method: "GET",
       mode: "cors",
     });
     songs = await res.json()
     songs.forEach((song) => {
       if(song.albumImageUrl != null)
-        song.albumImageUrl = "http://localhost:8080/" + song.albumImageUrl.replace("./", "")
+        song.albumImageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
       else
         song.albumImageUrl = "./imgs/blank_album.png"
-
-      song.songUrl = "http://localhost:8080/" + song.songUrl.replace("./", "")
-      
-      /*if(song.albumImageUrl != null)
-        song.albumImageUrl = "http://localhost:8080/" + encodeURIComponent(song.albumImageUrl.replace("./", ""))
-      else
-        song.albumImageUrl = "./imgs/blank_album.png"
-
-      song.songUrl = "http://localhost:8080/" + encodeURIComponent(song.songUrl.replace("./", "")) */
+      song.songUrl = "http://" + location.hostname + ":8080/" + song.songUrl.replace("./", "")
       song.isPlaying = false
     })
     console.log(songs)
@@ -203,6 +195,10 @@
   }
 
   :global(.list ul:before) {
+    background-color: transparent;
+  }
+
+  :global(.list ul:after) {
     background-color: transparent;
   }
 
