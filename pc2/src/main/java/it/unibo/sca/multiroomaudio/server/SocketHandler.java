@@ -20,7 +20,8 @@ public class SocketHandler extends Thread{
     private Socket clientSocket;
     private DatabaseManager dbm;
     
-    Gson gson = new Gson();
+    private Gson gson = new Gson();
+    
     public SocketHandler(Socket clientSocket, DatabaseManager dbm){
         this.clientSocket = clientSocket;
         this.dbm = dbm;

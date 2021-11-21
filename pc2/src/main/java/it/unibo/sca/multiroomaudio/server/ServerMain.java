@@ -14,11 +14,10 @@ public class ServerMain {
     public static void main(String[] args){
         DatabaseManager dbm = new DatabaseManager();
         
-        
         // Music http server
         try {
-            if(args.length == 2) {
-                new MusicHttpServer(8080, args[1]).listMusic().start();
+            if(args.length >= 1) {
+                new MusicHttpServer(8080, args[0]).listMusic().start();
             } else {
                 new MusicHttpServer(8080, "C:\\Users\\giaco\\Music").listMusic().start(); //TODO
             }

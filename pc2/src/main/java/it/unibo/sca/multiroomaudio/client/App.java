@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.awt.*;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -28,15 +30,15 @@ public class App {
             return;
         }
         // Start socket for web-client conection  
-        /*
+        
         // Open web-interface
-        /*if (Desktop.isDesktopSupported()){
+        if (Desktop.isDesktopSupported()){
             try {
-                Desktop.getDesktop().browse(new URI("http://google.com"));
+                Desktop.getDesktop().browse(new URI("http://" + discovered.getServerAddress().getHostAddress() + "?type=client"));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
         System.out.println("WebSocket connection");
         URI uri = null;
         int type = 0;

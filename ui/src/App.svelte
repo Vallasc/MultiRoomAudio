@@ -41,9 +41,9 @@
 
 <App {...f7Params} themeDark={themeDark}>
   {#if isClient}
-    <View url="/musiclist" />
+    <View url="/musiclist" stackPages={true} main={true} />
   {:else if isSpeaker}
-    <View url="/speaker" />
+    <View url="/speaker" stackPages={true} main={true} />
   {:else}
     <h1>Open Multiroom Audio on your pc</h1>
   {/if}

@@ -10,6 +10,7 @@ import it.unibo.sca.multiroomaudio.shared.dto.Device;
 public class DatabaseManager {
     /*id, device*/
     private ConcurrentHashMap<String, Device> connectedDevices = new ConcurrentHashMap<String, Device>();
+    
     /*
     THIS SHOULD GO IN ANOTHER OBJECT IF I WANT TO USE SYNCHRONIZED
     id (MAC), same as above, related fingerprint for the client<roomId, fingerprintlist>*/
