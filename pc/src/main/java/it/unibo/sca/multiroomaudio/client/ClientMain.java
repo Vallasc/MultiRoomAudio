@@ -13,11 +13,7 @@ import com.google.gson.Gson;
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
-
-
-
-public class App {
-
+public class ClientMain {
     
 // read script file
 
@@ -47,16 +43,16 @@ public class App {
 
         if (Desktop.isDesktopSupported()){
             try {
-                Desktop.getDesktop().browse(new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?"+msg.getCompletePath()));
+                Desktop.getDesktop().browse(
+                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?"+msg.getCompletePath()));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
+        } else {
+            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?"+msg.getCompletePath());
         }
         
         (new FingerprintService(socket)).start();
     }
-
-
-    
 
 }
