@@ -20,8 +20,7 @@
 
   async function fetchSongs() {
     let res = await fetch("http://" + location.hostname + ":8080/player/list", {
-      method: "GET",
-      mode: "cors",
+      method: "GET"
     });
     songs = await res.json()
     songs.forEach((song) => {
