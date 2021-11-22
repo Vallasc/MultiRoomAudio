@@ -41,19 +41,17 @@ public class SocketHandler extends Thread{
             dIn = new DataInputStream(clientSocket.getInputStream());
             json = dIn.readUTF();
             MsgHello hello = gson.fromJson(json, MsgHello.class);
-            clientId = hello.getIp();
+            clientId = hello.getId();
             
-            Boolean res = dbm.connectedDevices.putIfAbsent(clientId, true);
-            if(res != null){//already connected
+            if(dbm.connectedDevices.containsKey(clientId)){//already connected
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("REJECTED")));
                 return;
             }
-            if(dbm.devices.containsKey(clientId)){
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
-                System.out.println("Contains");
+            dbm.connectedDevices.put(clientId, true);
+            if(dbm.devices.putIfAbsent(clientId, new Device(hello.getDeviceType(), hello.getMac(), clientId)) != null){
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("home=hello&&type=client", clientId)));
             }else{
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=newclient", clientId)));
-                dbm.devices.put(clientId, new Device(hello.getDeviceType(), hello.getMac(), clientId));
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("home=hello&&type=newclient", clientId)));
             }
             
         } catch (IOException e) {
@@ -62,13 +60,13 @@ public class SocketHandler extends Thread{
         }
         Device myDevice = dbm.devices.get(clientId);
         while(isRunning){
-            List<Fingerprint> fingerprints = new ArrayList<Fingerprint>();
             try {
                 json = dIn.readUTF();
                 myDevice.setFingerprints(gson.fromJson(json, APInfo[].class));
             } catch (SocketException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 System.out.println("Connection closed");
+                dbm.connectedDevices.remove(clientId);
                 isRunning = false;
             }catch(EOFException e) {
                 System.out.println("EOF");
@@ -78,8 +76,10 @@ public class SocketHandler extends Thread{
                 e.printStackTrace();
                 isRunning = false;
             }
-            if(!dbm.connectedDevices.containsKey(clientId))
+            if(!dbm.connectedDevices.containsKey(clientId)){
                 isRunning = false;
+                System.out.println("closing connection socket");
+            }
         }
         try {
             clientSocket.close();

@@ -51,7 +51,7 @@
     user-select: none; /* Non-prefixed version, currently*/
 
     --f7-popup-tablet-height: 800px;
-}.navbar-bg.svelte-2u5o7c{background:transparent}.navbar-bg.svelte-2u5o7c:before{background:transparent}.title.svelte-2u5o7c{text-align:center;color:var(--f7-fab-bg-color,var(--f7-theme-color))}.navbar-inner.svelte-2u5o7c{justify-content:center}.list-speakers.svelte-1rfkalt.svelte-1rfkalt{height:auto;white-space:nowrap;display:flex;flex-wrap:nowrap;overflow:auto;margin-left:-14px;margin-right:-14px;background-color:var(--f7-list-bg-color);padding-left:7px;padding-right:7px;padding-top:var(--f7-block-title-margin-bottom);padding-bottom:var(--f7-block-title-margin-bottom)}.item-speaker.svelte-1rfkalt.svelte-1rfkalt{border:1px solid rgba(0, 0, 0, 0.247);width:80px;height:80px;flex:0 0 auto;margin-left:7px;margin-right:7px;display:flex;align-items:center;justify-content:center}.toolbarBox.svelte-1rfkalt.svelte-1rfkalt{display:flex}.toolbarBox.svelte-1rfkalt img.svelte-1rfkalt{width:50px;height:50px;margin-left:14px;margin-right:14px;margin-top:7px;margin-bottom:7px}img.svelte-1rfkalt.svelte-1rfkalt{border-radius:5px}.toolbar-bottom{height:70px !important}.list ul:before{background-color:transparent}.list-group-title.svelte-1rfkalt.svelte-1rfkalt{height:auto}.item-title.svelte-1rfkalt.svelte-1rfkalt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:10;font-weight:var(--f7-navbar-title-font-weight);line-height:var(--f7-navbar-title-line-height);text-align:var(--f7-navbar-title-text-align);font-size:16px;padding-top:14px}.block-title.svelte-1rfkalt.svelte-1rfkalt{font-size:14px !important}/**
+}/**
  * Framework7 6.3.5
  * Full featured mobile HTML framework for building iOS & Android apps
  * https://framework7.io/

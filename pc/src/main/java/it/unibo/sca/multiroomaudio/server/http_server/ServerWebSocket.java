@@ -39,8 +39,6 @@ public class ServerWebSocket {
             System.out.println("already removed");
         }
         sessions.remove(session);
-        //dbm.removeConnected(session); TODO
-            
         System.out.println("closed");
         
     }
@@ -67,11 +65,15 @@ public class ServerWebSocket {
 
     public void handleHello(Session session, MsgHello hello) throws IOException{
         if(hello.getDeviceType() == 0){
+            System.out.println(hello.getDeviceType() + " " + hello.getMac());
             //client
-            if(dbm.connectedDevices.putIfAbsent(hello.getIp(), true) == null)
+            if(!dbm.connectedDevices.containsKey(hello.getId())){
                 session.getRemote().sendString(gson.toJson(new MsgHelloBack("REJECTED")));
+                System.out.println("not registered");
+            }
             else{//insert insipe connected device
-                dbm.devices.putIfAbsent(hello.getIp(), new Device(hello.getDeviceType(), hello.getIp()));
+                System.out.println("registered");
+                dbm.devices.putIfAbsent(hello.getId(), new Device(hello.getDeviceType(), hello.getId()));
                 session.getRemote().sendString(gson.toJson(new MsgHelloBack()));
                 sessions.add(session);
             }

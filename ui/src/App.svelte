@@ -4,6 +4,7 @@
   import RoomsPage from './pages/RoomsPage.svelte'
   import SpeakerPage from './pages/SpeakerPage.svelte'
   import CalibrationPage from './pages/CalibrationPage.svelte'
+  import AboutPage from './pages/AboutPage.svelte'
 
   const f7Params = {
     routes: [
@@ -22,6 +23,10 @@
       {
         path: '/speaker',
         component: SpeakerPage,
+      },
+      {
+        path: '/load',
+        component: AboutPage,
       }
 		]
   }
@@ -31,7 +36,7 @@
   let isSpeaker = false
   let isNewClient = false
   let clientConnection = false
-  if(urlParams.get('type') != null && urlParams.get('type') === 'hello'){
+  if(urlParams.get('home') != null && urlParams.get('home') === 'hello'){
     clientConnection = true;
   }else if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
     isClient = true;
@@ -46,7 +51,7 @@
 
 <App {...f7Params} themeDark={themeDark}>
   {#if clientConnection}
-    <View url="/hello" />
+    <View url="/load" />
   {:else if isClient}
     <View url="/musiclist" />
   {:else if isNewClient}
