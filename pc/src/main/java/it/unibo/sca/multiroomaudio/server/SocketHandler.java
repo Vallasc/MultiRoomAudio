@@ -70,6 +70,7 @@ public class SocketHandler extends Thread{
                 isRunning = false;
             }catch(EOFException e) {
                 System.out.println("EOF");
+                isRunning = false;
             }
             catch (IOException e) {
                 System.err.println("Error while reading from the socket");
