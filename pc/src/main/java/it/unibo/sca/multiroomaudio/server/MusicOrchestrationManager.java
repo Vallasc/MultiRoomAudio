@@ -6,10 +6,12 @@ import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 public class MusicOrchestrationManager {
     //private ConcurrentLinkedQueue<Msg> in;
 
-    private MusicOrchestrationManager() { }
+    public MusicOrchestrationManager(DatabaseManager databaseManager) {
+        
+     }
 
 
-    public static void play(Song song, int fromMs) {
+    public void play(Song song, int fromMs) {
         
     }
     

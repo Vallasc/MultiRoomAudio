@@ -112,7 +112,6 @@ public class DiscoveryService {
         }catch(IOException e){
             System.err.println("Error while sending the message");
             return;
-
         }
         //---------------------------------------------------------
         DatagramSocket socket = null;
