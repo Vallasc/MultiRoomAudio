@@ -1,8 +1,6 @@
-out
-outServer
-outClient
-debug.log
-lib/linux64
-lib/win64
-lib/jcef.jar
-Trash
+target
+bin
+.vscode
+.settings
+.project
+.classpath
