@@ -28,11 +28,11 @@ public class ServerMain {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        
         // WebApp http server
-        new MainHttpServer(80, new ServerWebSocket(dbm)).start();      
+        new MainHttpServer(80, new ServerWebSocket(new WebSocketHandler(dbm)) ).start();      
         //(new FingerprintAnalyzer(dbm)).start();
-        try(ServerSocket serverSocket = new ServerSocket(servport)){
+        /*try(ServerSocket serverSocket = new ServerSocket(servport)){
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
             while(true){
                 Socket clientSocket = serverSocket.accept();
@@ -41,7 +41,7 @@ public class ServerMain {
 		}catch(IOException e){
 			e.printStackTrace();
 			return;
-		}
+		}*/
         
     }
    
