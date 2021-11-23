@@ -9,7 +9,7 @@ import java.net.SocketException;
 import com.google.gson.Gson;
 
 import io.github.vallasc.APInfo;
-import it.unibo.sca.multiroomaudio.shared.dto.Device;
+import it.unibo.sca.multiroomaudio.shared.dto.Client;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class SocketHandler extends Thread{
@@ -43,8 +43,8 @@ public class SocketHandler extends Thread{
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("REJECTED")));
                 return;
             }
-            dbm.connectedSocketDevices.put(clientId, new Device(hello.getDeviceType(), hello.getMac(), clientId));
-            if(dbm.devices.putIfAbsent(clientId, new Device(hello.getDeviceType(), hello.getMac(), clientId)) != null){
+            dbm.connectedSocketDevices.put(clientId, new Client(hello.getDeviceType(), hello.getMac(), clientId));
+            if(dbm.devices.putIfAbsent(clientId, new Client(hello.getDeviceType(), hello.getMac(), clientId)) != null){
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
             }else{
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("type=newclient", clientId)));
@@ -54,7 +54,7 @@ public class SocketHandler extends Thread{
             e.printStackTrace();
             return;
         }
-        Device myDevice = dbm.devices.get(clientId);
+        Client myDevice = dbm.devices.get(clientId); // TODO 
         //we have to work on that
         //should be false on init cause it's built that way
         //state = false if running, true if stopped
