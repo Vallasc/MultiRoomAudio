@@ -60,19 +60,22 @@ public class SocketHandler extends Thread{
         while(isRunning){
             try {
                 Boolean currentState = dbm.connectedDevices.get(clientId);
-                if(currentState == null ) return;
-                if(previousState != currentState || !currentState){
-                    previousState = currentState; 
-                    dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentState)));
-                    dOut.flush();
-                    if(!currentState){
-                        myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
-                        System.out.println("fingerprint");
-                        dOut.writeUTF(gson.toJson(new MsgAck()));
+                if(currentState == null ) {
+                    dOut.writeUTF(gson.toJson(new MsgClosedWs()));
+                    //dbm.devices.remove(clientId);
+                }else{
+                    if(previousState != currentState || !currentState){
+                        previousState = currentState; 
+                        dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentState)));
                         dOut.flush();
+                        if(!currentState){
+                            myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
+                            System.out.println("fingerprint");
+                            dOut.writeUTF(gson.toJson(new MsgAck()));
+                            dOut.flush();
+                        }
                     }
                 }
-                
             } catch (SocketException e) {
                 //e.printStackTrace();
                 System.out.println("Connection closed");
@@ -97,11 +100,6 @@ public class SocketHandler extends Thread{
                 System.out.println("closing connection socket");
             }
         }
-        /*try {
-            clientSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
 }

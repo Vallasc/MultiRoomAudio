@@ -56,6 +56,7 @@ public class FingerprintService extends Thread {
             try {
                 String json = dIn.readUTF();
                 String type = gson.fromJson(json, JsonObject.class).get("type").getAsString();
+                System.out.println("type: " + type);
                 if(type.equals("CLOSED_WS")){
                     isRunning = false;
                     socket.close();
