@@ -15,6 +15,7 @@ MusicOrchestrationManager -> (list<speaker>, minutaggio, canzone)*/
 public class DatabaseManager {
 
     public ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
+    //id, true if fingerprint is stopped, false otherwise
     public ConcurrentHashMap<String, Boolean> connectedDevices = new ConcurrentHashMap<>(); // 
     public ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
 

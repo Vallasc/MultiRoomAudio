@@ -55,17 +55,9 @@
         }
 
         socket.onclose = (event) => {
-            sendCloseMessage()
             console.log(event)
             window.clearTimeout(intervalResponse)
         }
-    }
-
-    function sendCloseMessage(){
-        socket.send(JSON.stringify({
-            type : "CLOSE",
-            id: clientId
-        }))
     }
 
     function sendInitMessage(){

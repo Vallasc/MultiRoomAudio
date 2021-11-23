@@ -9,9 +9,9 @@ public enum MsgTypes {
 	HELLO, //[client] announces itself to the server in broadcast
 	HELLO_BACK,//[server] answers positively to a client asking a connection
 	REJECTED, //[server] answers negatively to a client connecting to do things
-	SPECS, //[client] sends it's MAC_ADDR and if it's a speaker or a client to the SLAC
+	SPECS, //[client] sends it's MAC_ADDR and if it's a speaker or a client to the SLAC TODO:TOREMOVE
 	//position registering
-	REF_POINT, //[client] sends the different signals strength at a reference point during the offline phase
+	OFFLINE, //[client] sends the different signals strength at a reference point during the offline phase
 	SPEAKER_HERE, //[client] same as above but with the poisition of a speaker
 
 	//position handling 

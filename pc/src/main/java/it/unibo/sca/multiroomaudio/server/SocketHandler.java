@@ -45,9 +45,9 @@ public class SocketHandler extends Thread{
             }
             dbm.connectedDevices.put(clientId, true);
             if(dbm.devices.putIfAbsent(clientId, new Device(hello.getDeviceType(), hello.getMac(), clientId)) != null){
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("home=hello&&type=client", clientId)));
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
             }else{
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("home=hello&&type=newclient", clientId)));
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=newclient", clientId)));
             }
             
         } catch (IOException e) {
@@ -55,10 +55,23 @@ public class SocketHandler extends Thread{
             return;
         }
         Device myDevice = dbm.devices.get(clientId);
+        boolean previousState = dbm.connectedDevices.get(clientId);
+        //state = false if running, true if stopped
         while(isRunning){
             try {
-                json = dIn.readUTF();
-                myDevice.setFingerprints(gson.fromJson(json, APInfo[].class));
+                boolean currentState = dbm.connectedDevices.get(clientId);
+                if(previousState != currentState || !currentState){
+                    previousState = currentState; 
+                    dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentState)));
+                    dOut.flush();
+                    if(!currentState){
+                        myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
+                        System.out.println("fingerprint");
+                        dOut.writeUTF(gson.toJson(new MsgAck()));
+                        dOut.flush();
+                    }
+                }
+                
             } catch (SocketException e) {
                 //e.printStackTrace();
                 System.out.println("Connection closed");
@@ -75,14 +88,19 @@ public class SocketHandler extends Thread{
             }
             if(!dbm.connectedDevices.containsKey(clientId)){
                 isRunning = false;
+                try {
+                    dOut.writeUTF(gson.toJson(new MsgClosedWs()));
+                }catch(IOException e) {
+                    e.printStackTrace();
+                }
                 System.out.println("closing connection socket");
             }
         }
-        try {
+        /*try {
             clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 }

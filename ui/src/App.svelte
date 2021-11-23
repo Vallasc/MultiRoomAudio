@@ -6,6 +6,7 @@
   import CalibrationPage from './pages/CalibrationPage.svelte'
   import AboutPage from './pages/AboutPage.svelte'
 
+
   const f7Params = {
     routes: [
       {
@@ -36,9 +37,7 @@
   let isSpeaker = false
   let isNewClient = false
   let clientConnection = false
-  if(urlParams.get('home') != null && urlParams.get('home') === 'hello'){
-    clientConnection = true;
-  }else if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
+  if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
     isClient = true;
   }else if(urlParams.get('type') != null && urlParams.get('type') === 'newclient'){
      isNewClient = true;
@@ -46,7 +45,8 @@
     isSpeaker = true;
   } 
 
-  let themeDark = false
+  let themeDark = false  
+
 </script>
 
 <App {...f7Params} themeDark={themeDark}>
