@@ -2,7 +2,7 @@ package it.unibo.sca.multiroomaudio.server.http_server;
 
 import spark.Service;
 
-public class HttpServer extends Thread {
+public abstract class HttpServer extends Thread {
     protected final String dirUri;
     protected final Service service;
     private final int port;
@@ -30,6 +30,23 @@ public class HttpServer extends Thread {
         else
             service.staticFiles.location("/public");
         service.init();
+        enableCORS();
+    }
+
+    public void enableCORS(){
+        // Enable CORS
+        service.options("/*", (request, response) -> {
+            String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+            if (accessControlRequestHeaders != null) {
+                response.header("Access-Control-Allow-Headers",accessControlRequestHeaders);
+            }
+            String accessControlRequestMethod = request .headers("Access-Control-Request-Method");
+            if (accessControlRequestMethod != null) {
+                response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+            }
+            return "OK";
+        });
+        service.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
     }
 
     public HttpServer setWebSocket(Class<?> webSocketClass){

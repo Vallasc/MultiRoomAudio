@@ -14,19 +14,21 @@ import com.google.gson.Gson;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
+import it.unibo.sca.multiroomaudio.server.MusicOrchestrationManager;
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgPlay;
 
 // Only mp3 format supported
 public class MusicHttpServer extends HttpServer {
     private File dir;
     private ArrayList<Song> songs;
     private Gson gson = new Gson();
+    private MusicOrchestrationManager musicManager;
 
-    public MusicHttpServer(int port, String dirUri){
+    public MusicHttpServer(int port, String dirUri, MusicOrchestrationManager musicManager){
         super(port, dirUri);
         dir = new File(dirUri);
         songs = new ArrayList<>();
+        this.musicManager = musicManager;
     }
     
     @Override
@@ -37,10 +39,11 @@ public class MusicHttpServer extends HttpServer {
 
     public void setRoutes(){
         service.path("/player", () -> {
-            service.get("/play/:id", (req, res) -> {
-                System.out.println("PLAY id: " + req.params(":id"));
+            service.put("/play", (req, res) -> {
+                String songId = req.queryParams("id");
+                String sec = req.queryParams("fromSec") != null ? req.queryParams("fromSec") : "0";
                 try{
-                    ServerWebSocket.sendAll(new MsgPlay(songs, Integer.parseInt(req.params(":id")), 0));
+                    musicManager.playSong(Integer.parseInt(songId), Integer.parseInt(sec));
                     return "{\"status\": \"OK\"}";
                 } catch (NumberFormatException e){
                     return "{\"status\": \"KO\"}";
@@ -48,23 +51,14 @@ public class MusicHttpServer extends HttpServer {
             });
             service.put("/pause", (req, res) -> "{\"status\": \"OK\"}");
             service.put("/stop", (req, res) -> "{\"status\": \"OK\"}");
+            service.put("/prev", (req, res) -> "{\"status\": \"OK\"}");
+            service.put("/next", (req, res) -> "{\"status\": \"OK\"}");
             service.get("/list", (req, res) -> songs, gson::toJson);
         });
 
-        // Enable CORS
-        service.options("/*", (request, response) -> {
-            String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
-            if (accessControlRequestHeaders != null) {
-                response.header("Access-Control-Allow-Headers",accessControlRequestHeaders);
-            }
-            String accessControlRequestMethod = request .headers("Access-Control-Request-Method");
-            if (accessControlRequestMethod != null) {
-                response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
-            }
-            return "OK";
-        });
-        service.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
+        service.get("/speakers", (req, res) -> "{\"status\": \"OK\"}");
     }
+
 
     public MusicHttpServer listMusic() throws IOException{
         songs.clear();
@@ -76,7 +70,6 @@ public class MusicHttpServer extends HttpServer {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 try {
                     Optional<String> ext = getExtension(file.toString());
-                    //(ext.get() == ".mp3" || ext.get() == ".MP3")
                     if(ext.isPresent() && (ext.get().equals("mp3") || ext.get().equals("MP3"))) {
                         songs.add(Song.fromMp3File(index++, file, dir));
                         System.out.println("- " + file);
@@ -87,6 +80,7 @@ public class MusicHttpServer extends HttpServer {
                 return FileVisitResult.CONTINUE;
             }
         });
+        musicManager.setMusicList(songs);
         return this;
     }
 
