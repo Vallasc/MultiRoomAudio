@@ -55,7 +55,7 @@
   {:else if isClient}
     <View url="/musiclist" />
   {:else if isNewClient}
-    <View url="/calibration" />
+    <View url="/musiclist" />
   {:else if isSpeaker}
     <View url="/speaker" stackPages={true} main={true} />
   {:else}

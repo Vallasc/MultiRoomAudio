@@ -18,7 +18,6 @@
     function socketSetup(){
         socket = new WebSocket("ws://" + location.hostname + "/websocket");
         socket.onopen = () => {
-            sendInitMessage()
         }
 
         socket.onmessage = (event) => {
@@ -28,15 +27,6 @@
         socket.onclose = (event) => {
             console.log(event)
         }
-    }
-
-    function sendInitMessage(){
-      console.log(clientId);
-        socket.send(JSON.stringify({
-            type : "HELLO",
-            deviceType : 0, // speaker type
-            id: clientId
-        }))
     }
 
 	function processMessage(message) {
@@ -61,12 +51,12 @@
     async function startClick(){
       //console.log(clientId);
       document.getElementById("start").className = "col button button-raised button-fill";
-      sendMessage(false);
+      sendMessage(true);
     }
 
     function stopClick(){
       document.getElementById("start").className = "col button button-raised";
-      sendMessage(true);
+      sendMessage(false);
     } 
 
     function sendMessage(val){

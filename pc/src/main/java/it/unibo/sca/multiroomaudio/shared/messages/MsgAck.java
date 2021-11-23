@@ -1,10 +1,13 @@
 package it.unibo.sca.multiroomaudio.shared.messages;
 
 public class MsgAck extends Msg{
-
-    public MsgAck() {
+    int n;
+    public MsgAck(int n) {
         super("ACK");
-        //TODO Auto-generated constructor stub
+        this.n = n;
     }
     
+    public int getN(){
+        return n;
+    }
 }

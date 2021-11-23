@@ -2,15 +2,15 @@ package it.unibo.sca.multiroomaudio.shared.messages;
 
 public class MsgOfflineServer extends Msg{
 
-    boolean stop = false;
+    boolean start = false;
 
-    public MsgOfflineServer(boolean stop) {
+    public MsgOfflineServer(boolean start) {
         super("OFFLINE_SERVER");
-        this.stop = stop;
+        this.start = start;
     }
 
-    public boolean getStop(){
-        return stop;
+    public boolean getStart(){
+        return start;
     }
     
 }

@@ -56,14 +56,13 @@ public class FingerprintService extends Thread {
             try {
                 String json = dIn.readUTF();
                 String type = gson.fromJson(json, JsonObject.class).get("type").getAsString();
-                System.out.println("type: " + type);
                 if(type.equals("CLOSED_WS")){
                     isRunning = false;
                     socket.close();
                 }else{
                     MsgOfflineServer msgO = gson.fromJson(json, MsgOfflineServer.class);
                     //if stop read again
-                    if(!msgO.getStop()){
+                    if(msgO.getStart()){
                         //if start send
                         APInfo[] APs = scanner.scanNetworks();
                         dOut.writeUTF(gson.toJson(APs));
@@ -71,7 +70,12 @@ public class FingerprintService extends Thread {
                         //then wait for ack, a dIn is enough tbh
                         MsgAck msgA = gson.fromJson(dIn.readUTF(), MsgAck.class);
                         if(msgA.getType().equals("ACK")){
-                            System.out.println("ACK");
+                            System.out.println("ACK: " + msgA.getN());
+                        }
+                        try {
+                            Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 }               
@@ -81,13 +85,7 @@ public class FingerprintService extends Thread {
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;
-            }  
-            if(isRunning)
-                try {
-                    Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            }                  
         }
 
     }

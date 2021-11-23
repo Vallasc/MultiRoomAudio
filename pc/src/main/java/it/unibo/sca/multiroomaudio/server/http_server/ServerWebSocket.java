@@ -33,7 +33,7 @@ public class ServerWebSocket {
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
         try{
-            dbm.connectedDevices.remove(dbm.getKeyDevice(session.getRemoteAddress().getHostString()));
+            dbm.removeConnectedSocketDevice(dbm.getKeyDevice(session.getRemoteAddress().getHostString()));
         }catch(NullPointerException e){
             System.out.println("already removed");
         }
@@ -67,7 +67,7 @@ public class ServerWebSocket {
     public void handleHello(Session session, MsgHello hello) throws IOException{
         if(hello.getDeviceType() == 0){
             //client
-            if(!dbm.connectedDevices.containsKey(hello.getId())){
+            if(!dbm.connectedSocketDevices.containsKey(hello.getId())){
                 session.getRemote().sendString(gson.toJson(new MsgHelloBack("REJECTED")));
                 System.out.println("not registered");
             }
@@ -81,12 +81,12 @@ public class ServerWebSocket {
     }
 
     public void handleClose(MsgClose close){
-        dbm.connectedDevices.remove(close.getIp());
+        dbm.connectedSocketDevices.remove(close.getIp());
     }
 
     public void handleOffline(MsgOffline offline){
         System.out.println(offline.getStart());
-        dbm.connectedDevices.put(offline.getId(), offline.getStart());
+        dbm.devices.get(offline.getId()).setStart(offline.getStart());
     }
 
     synchronized public static void sendAll(Msg message){

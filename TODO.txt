@@ -1,7 +1,2 @@
 TODO:
-Bisogna fixare l'asincronicità dei metodi di lettura e scrittura sul socket.
-se stop aspetta lo start->
-	come start manda fingerprint e aspetta ack
-	wait
-	poi riaspetta un aggiornamento sullo stato, perchè se ho stoppato nel frattempo non manda nulla
-se start->
+Scartare testa e coda dei fingerprint perchè potrebbero essere quelli vecchi di una stanza precedente (oppure se c'è un modo per buttare via il canale non lo so)
