@@ -59,7 +59,8 @@ public class SocketHandler extends Thread{
         //state = false if running, true if stopped
         while(isRunning){
             try {
-                boolean currentState = dbm.connectedDevices.get(clientId);
+                Boolean currentState = dbm.connectedDevices.get(clientId);
+                if(currentState == null ) return;
                 if(previousState != currentState || !currentState){
                     previousState = currentState; 
                     dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentState)));
