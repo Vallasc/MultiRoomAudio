@@ -1,7 +1,15 @@
 package it.unibo.sca.multiroomaudio.server;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.jetty.websocket.api.Session;
 
 import it.unibo.sca.multiroomaudio.shared.dto.*;
 /*HashMap<id, Device> (tutti i device)
@@ -14,14 +22,46 @@ MusicOrchestrationManager -> (list<speaker>, minutaggio, canzone)*/
 
 public class DatabaseManager {
 
-    public ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
-    public ConcurrentHashMap<String, Boolean> connectedDevices = new ConcurrentHashMap<>(); // 
-    public ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
+    public final ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
+    public final ConcurrentHashMap<String, Pair<Session, Device>> connectedWebDevices = new ConcurrentHashMap<>(); //all the connected devices
+    public final ConcurrentHashMap<String, Device> connectedSocketDevices = new ConcurrentHashMap<>(); 
+    public final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
 
     public String getKeyDevice(String ip){
+        // Can throw ConcurrentModificationException if an element is deleted during the iteration
+        // but we don't delete devices :)
         for(String key : devices.keySet())
             if(devices.get(key).getIp().equals(ip))
                 return key;
         return null;
+    }
+
+    public List<Pair<Session, Device>> getConnectedWebSpeakers(){
+        return getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight().getType() == 1)
+                    .collect(Collectors.toList());
+    }
+
+    public List<Pair<Session, Device>> getConnectedWebClients(){
+        return getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight().getType() == 0)
+                    .collect(Collectors.toList());
+    }
+
+
+    public List<Pair<Session, Device>> getConnectedWebDevices(){
+        return connectedWebDevices.values().stream().collect(Collectors.toList()); // Streams are immutable
+    }
+
+    public void addConnectedWebDevice(Session session, String deviceId){
+        connectedWebDevices.putIfAbsent(deviceId, new ImmutablePair<Session, Device>(session, devices.get(deviceId)));
+    }
+
+    public void removeConnectedWebDevice(String deviceId){
+        connectedWebDevices.remove(deviceId);
+    }
+
+    public boolean isConnectedWeb(String deviceId){
+        return connectedWebDevices.containsKey(deviceId);
     }
 }

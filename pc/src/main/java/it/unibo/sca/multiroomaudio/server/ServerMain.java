@@ -21,9 +21,9 @@ public class ServerMain {
         // Music http server
         try {
             if(args.length >= 1) {
-                new MusicHttpServer(8080, args[0]).listMusic().start();
+                new MusicHttpServer(8080, args[0], musicManager).listMusic().start();
             } else {
-                new MusicHttpServer(8080, "/home/vallasc/Musica").listMusic().start(); 
+                new MusicHttpServer(8080, "/home/vallasc/Musica", musicManager).listMusic().start(); 
             }
         } catch (IOException e) {
             e.printStackTrace();

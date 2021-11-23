@@ -17,5 +17,5 @@ public class MsgSpecs extends Msg {
     public int getDeviceType() {
         return deviceType;
     }
-    
+
 }
