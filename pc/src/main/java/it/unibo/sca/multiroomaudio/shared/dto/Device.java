@@ -9,6 +9,8 @@ public class Device {
     private final String ip;
     private String mac;
     private APInfo[] fingerprints;
+    //is true if start is clicked, false otherwise
+    private boolean start = false;
 
     public Device(int type, String mac, String ip) {
         this.type = type;
@@ -43,6 +45,25 @@ public class Device {
 
     public String getMac() {
         return mac;
+    }
+
+    public synchronized void setStart(boolean start){
+        this.start = start;
+    }
+
+    public synchronized boolean getStart(){
+        return start;
+    }
+
+    /**
+     * @return: true if state changed, false otherwise
+     */
+    public synchronized boolean changeStart(boolean start){
+        if(this.start != start){ 
+            this.start = start;
+            return true;
+        }
+        return false;
     }
 
     @Override

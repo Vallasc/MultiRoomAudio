@@ -1,4 +1,2 @@
 TODO:
-bisogna fare che il metodo che accetta la connessione sul server è separato rispetto a quello che gestisce poi i fingerprint, perchè accetta la connessione, poi dopo che ha accettato la connessione in qualche modo sta in attesa sull'id del device che deve venire scritto.
-La soluzione comunque sarebbe chiedere il nome al client direttamente, molto semplicemente, se già un client con quel nome è connesso allora non lo fai attaccare, se no sì.
-E quando avvii l'applicazione puoi comunque smontare tutto sul socket normale se si connettono due robe con nomi diversi ma stesso mac
+Scartare testa e coda dei fingerprint perchè potrebbero essere quelli vecchi di una stanza precedente (oppure se c'è un modo per buttare via il canale non lo so)

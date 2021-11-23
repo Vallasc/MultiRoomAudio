@@ -23,8 +23,8 @@ MusicOrchestrationManager -> (list<speaker>, minutaggio, canzone)*/
 public class DatabaseManager {
 
     public final ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
-    public final ConcurrentHashMap<String, Pair<Session, Device>> connectedWebDevices = new ConcurrentHashMap<>(); //all the connected devices
-    public final ConcurrentHashMap<String, Device> connectedSocketDevices = new ConcurrentHashMap<>(); 
+    public final ConcurrentHashMap<String, Pair<Session, Device>> connectedWebDevices = new ConcurrentHashMap<>(); //all the connected web devices
+    public final ConcurrentHashMap<String, Device> connectedSocketDevices = new ConcurrentHashMap<>(); //all the connected socket devices
     public final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
 
     public String getKeyDevice(String ip){
@@ -63,5 +63,22 @@ public class DatabaseManager {
 
     public boolean isConnectedWeb(String deviceId){
         return connectedWebDevices.containsKey(deviceId);
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------------
+    public List<Device> getConnectedSocketDevices(){
+        return connectedSocketDevices.values().stream().collect(Collectors.toList()); // Streams are immutable
+    }
+
+    public void addConnectedSocketDevice(String clientId){
+        connectedSocketDevices.putIfAbsent(clientId, devices.get(clientId));
+    }
+
+    public void removeConnectedSocketDevice(String clientId){
+        connectedSocketDevices.remove(clientId);
+    }
+
+    public boolean isConnectedSocket(String clientId){
+        return connectedSocketDevices.containsKey(clientId);
     }
 }

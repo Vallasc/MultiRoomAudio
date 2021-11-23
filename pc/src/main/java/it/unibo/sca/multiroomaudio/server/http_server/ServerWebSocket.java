@@ -1,6 +1,5 @@
 package it.unibo.sca.multiroomaudio.server.http_server;
 
-import org.eclipse.jetty.io.EofException;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
@@ -34,18 +33,18 @@ public class ServerWebSocket {
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
         try{
-            dbm.connectedDevices.remove(dbm.getKeyDevice(session.getRemoteAddress().getHostString()));
+            dbm.removeConnectedSocketDevice(dbm.getKeyDevice(session.getRemoteAddress().getHostString()));
         }catch(NullPointerException e){
             System.out.println("already removed");
         }
         sessions.remove(session);
-        System.out.println("closed");
+        System.out.println("closed " + statusCode + " " +reason );
         
     }
 
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
-        System.out.println("Got: " + message);   // Print message
+        //System.out.println("Got: " + message);   // Print message
         handleMessage(session, message);
     }
 
@@ -55,6 +54,8 @@ public class ServerWebSocket {
             handleHello(session, gson.fromJson(message, MsgHello.class));
         }else if(gson.fromJson(message, JsonObject.class).get("type").getAsString().equals("CLOSE")){
             handleClose(gson.fromJson(message, MsgClose.class));
+        }else if(gson.fromJson(message, JsonObject.class).get("type").getAsString().equals("OFFLINE")){
+            handleOffline(gson.fromJson(message, MsgOffline.class));
         }
     }
 
@@ -65,9 +66,8 @@ public class ServerWebSocket {
 
     public void handleHello(Session session, MsgHello hello) throws IOException{
         if(hello.getDeviceType() == 0){
-            System.out.println(hello.getDeviceType() + " " + hello.getMac());
             //client
-            if(!dbm.connectedDevices.containsKey(hello.getId())){
+            if(!dbm.connectedSocketDevices.containsKey(hello.getId())){
                 session.getRemote().sendString(gson.toJson(new MsgHelloBack("REJECTED")));
                 System.out.println("not registered");
             }
@@ -81,7 +81,12 @@ public class ServerWebSocket {
     }
 
     public void handleClose(MsgClose close){
-        dbm.connectedDevices.remove(close.getIp());
+        dbm.connectedSocketDevices.remove(close.getIp());
+    }
+
+    public void handleOffline(MsgOffline offline){
+        System.out.println(offline.getStart());
+        dbm.devices.get(offline.getId()).setStart(offline.getStart());
     }
 
     synchronized public static void sendAll(Msg message){
