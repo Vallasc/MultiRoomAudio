@@ -8,11 +8,7 @@ import com.google.gson.JsonSyntaxException;
 
 import org.eclipse.jetty.websocket.api.Session;
 
-import it.unibo.sca.multiroomaudio.shared.dto.Client;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgClose;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgHelloBack;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgOffline;
 
 public class WebSocketHandler {
     private static final Gson gson = new Gson();
@@ -23,21 +19,34 @@ public class WebSocketHandler {
         this.dbm = dbm;
     }
 
+    public void handleClose(Session session){
+        String key = dbm.removeSessions(session);
+        
+        if(dbm.countSessions(key) == 0)
+            dbm.removeConnectedSocketClient(key);
+        
+    }
+
     public void handleHello(Session session, MsgHello hello) throws IOException{
-        if(hello.getDeviceType() == 0){ // Client
+        /*if(hello.getDeviceType() == 0){ // Client
+            System.out.println(hello.getId());
+            
             // TODO 
+            //not needed anymore cause there could be more than one websocket for each client
             if(!dbm.isConnectedSocket(hello.getId())){
-                session.getRemote().sendString(gson.toJson(new MsgHelloBack("REJECTED"))); // TODO Non serve reject basdta che chiudi la connessione
                 System.out.println("not registered");
+                dbm.addConnectedWebDevice(session, hello); // TODO fare simile a speaker sotto
             }
             else{//insert insipe connected device
                 System.out.println("registered");
-                //dbm.addConnectedWebDevice(hello.getId(), new Client(hello.getId())); // TODO fare simile a speaker sotto
-                session.getRemote().sendString(gson.toJson(new MsgHelloBack())); // TODO HELLOBACK serve nel webSocket??
+                dbm.addConnectedWebDevice(session, hello); // TODO fare simile a speaker sotto
             }
         } else if(hello.getDeviceType() == 1){ // Speaker
             dbm.addConnectedWebDevice(session, hello);
-        }
+        }*/
+        dbm.addSession(session, hello.getId());
+
+        dbm.addConnectedWebDevice(session, hello);
     }
     
     public void handleMessage(org.eclipse.jetty.websocket.api.Session session, String message) throws JsonSyntaxException, IOException{
@@ -47,20 +56,5 @@ public class WebSocketHandler {
             MsgHello msg = gson.fromJson(message, MsgHello.class);
             handleHello(session, msg);
         }
-        
-        else if( msgType.equals("CLOSE")){ // TODO la close può essere gestita direttamente dal metodo close, non serve creare un nuovo messaggio
-            //handleClose(gson.fromJson(message, MsgClose.class));
-        }else if( msgType.equals("OFFLINE")){
-            //handleOffline(gson.fromJson(message, MsgOffline.class));
-        }
-    }
-
-    public void handleClose(Session session){
-        dbm.removeConnectedWebDevice(session);
-    }
-
-    public void handleOffline(MsgOffline offline){ // TODO mi sa che non serve offline
-        System.out.println(offline.getStart());
-        //((Client) dbm.devices.get(offline.getId())).setStart(offline.getStart()); TODO
     }
 }

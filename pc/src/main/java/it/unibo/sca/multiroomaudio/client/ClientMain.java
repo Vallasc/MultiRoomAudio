@@ -26,21 +26,20 @@ public class ClientMain {
         DiscoveryService discovered = new DiscoveryService();
         //create socket for the fingerprints     
         Socket socket = null;
+        
         try{
             socket = new Socket(discovered.getServerAddress(), discovered.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getIp(), discovered.getMac())));
+            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac())));
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
-            if(msg.getType().equals("REJECTED")){
-                System.err.println("Connection refused");
-                return;
-            }
+            
+            
         }catch(IOException e){
             e.printStackTrace();
         }
-
+        
         if (Desktop.isDesktopSupported()){
             try {
                 Desktop.getDesktop().browse(
@@ -51,8 +50,14 @@ public class ClientMain {
         } else {
             System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?"+msg.getCompletePath());
         }
-        
-        (new FingerprintService(socket)).start();
+        if(!msg.getPath().equals("type=rejected")){
+            (new FingerprintService(socket)).start();
+        } else
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
 }

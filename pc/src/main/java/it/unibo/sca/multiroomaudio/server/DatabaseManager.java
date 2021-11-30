@@ -27,6 +27,7 @@ public class DatabaseManager {
     private final ConcurrentHashMap<String, Pair<Session, Device>> connectedWebDevices = new ConcurrentHashMap<>(); //all the connected web devices
     private final ConcurrentHashMap<String, Client> connectedSocketDevices = new ConcurrentHashMap<>(); //all the connected socket devices
     private final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
+    private final ConcurrentHashMap<Session, String> sessions = new ConcurrentHashMap<>(); //should be to save the sessions 
 
     public String getKeyDevice(String id){
         // Can throw ConcurrentModificationException if an element is deleted during the iteration
@@ -36,6 +37,16 @@ public class DatabaseManager {
                 return key;
         return null;
     }
+
+    public boolean deviceContains(String device){
+        return devices.containsKey(device);
+    }
+
+    public Device getDevice(String key){
+        return devices.get(key);
+    }
+
+    //-------------------------------------------------------------------------------------------------------------
 
     public List<Pair<Session, Device>> getConnectedWebSpeakers(){
         return getConnectedWebDevices().stream()
@@ -75,13 +86,18 @@ public class DatabaseManager {
         connectedWebDevices.remove(deviceId);
     }
 
-    public void removeConnectedWebDevice(Session session){
+    public String removeConnectedWebDevice(Session session){
         List<String> found = connectedWebDevices.values().stream()
                             .filter(pair -> pair.getLeft() == session)
                             .map(pair -> pair.getRight().getId())
                             .collect(Collectors.toList());
-        if(found.size() > 0)
+        System.out.println(found.size());
+        if(found.size() == 1){
             connectedWebDevices.remove(found.get(0));
+            return found.get(0);
+        }else if(found.size() > 1)
+            connectedWebDevices.remove(found.get(0));
+        return null;
     }
 
     public boolean isConnectedWeb(String deviceId){
@@ -106,5 +122,18 @@ public class DatabaseManager {
 
     public boolean isConnectedSocket(String clientId){
         return connectedSocketDevices.containsKey(clientId);
+    }
+
+    //---------------------------------------------------------------------------------
+    public void addSession(Session session, String id){
+        sessions.putIfAbsent(session, id);
+    }
+
+    public String removeSessions(Session session){
+        return sessions.remove(session);
+    }
+
+    public long countSessions(String id){
+        return sessions.values().stream().filter(val -> val.equals(id)).count();
     }
 }

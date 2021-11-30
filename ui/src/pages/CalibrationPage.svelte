@@ -49,7 +49,7 @@
     }
 
     async function startClick(){
-      //console.log(clientId);
+      console.log(clientId);
       document.getElementById("start").className = "col button button-raised button-fill";
       sendMessage(true);
     }
@@ -63,7 +63,7 @@
       socket.send(JSON.stringify({
             type : "OFFLINE",
             start: val,
-			id: clientId
+			      id: clientId
         }))
     }
 

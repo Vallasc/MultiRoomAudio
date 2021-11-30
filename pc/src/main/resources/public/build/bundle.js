@@ -84380,9 +84380,8 @@ var MultiRoomAudio = (function () {
     	}
 
     	async function startClick() {
-    		//console.log(clientId);
+    		console.log(clientId);
     		document.getElementById("start").className = "col button button-raised button-fill";
-
     		sendMessage(true);
     	}
 
@@ -84665,7 +84664,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			h1 = element("h1");
     			h1.textContent = "Open Multiroom Audio on your pc";
-    			add_location(h1, file, 61, 4, 1635);
+    			add_location(h1, file, 61, 4, 1677);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, h1, anchor);
@@ -85039,7 +85038,7 @@ var MultiRoomAudio = (function () {
     	let isNewClient = false;
     	let clientConnection = false;
 
-    	if (urlParams.get('type') != null && urlParams.get('type') === 'client') {
+    	if (urlParams.get('type') != null && (urlParams.get('type') === 'client' || urlParams.get('type') === 'rejected')) {
     		isClient = true;
     	} else if (urlParams.get('type') != null && urlParams.get('type') === 'newclient') {
     		isNewClient = true;

@@ -28,7 +28,15 @@ public class FingerprintService extends Thread {
     public FingerprintService(Socket socket){
         scanner = new WlanScanner();
         this.socket = socket;
-        
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -80,7 +88,7 @@ public class FingerprintService extends Thread {
                     }
                 }               
             } catch(SocketException e) {
-                System.out.println("Server closed connection");
+                System.out.println("Closed connection");
                 isRunning = false;
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();

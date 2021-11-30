@@ -18,6 +18,10 @@ public class MsgHelloBack extends Msg {
         this.id = id;
     }
 
+    public String getPath(){
+        return this.path;
+    }
+
     public String getCompletePath(){
         return this.path+"&&clientId="+this.id; // TODO perchè doppio &?
     }

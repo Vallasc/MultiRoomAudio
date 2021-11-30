@@ -23,7 +23,7 @@ public class ServerMain {
             if(args.length >= 1) {
                 new MusicHttpServer(8080, args[0], musicManager).listMusic().start();
             } else {
-                new MusicHttpServer(8080, "/home/vallasc/Musica", musicManager).listMusic().start(); 
+                new MusicHttpServer(8080, "C:/Users/giaco/Music", musicManager).listMusic().start(); //C:/Music/User/giac /home/vallasc/Musica C:\Users\giaco\Music
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -32,7 +32,7 @@ public class ServerMain {
         // WebApp http server
         new MainHttpServer(80, new ServerWebSocket(new WebSocketHandler(dbm)) ).start();      
         //(new FingerprintAnalyzer(dbm)).start();
-        /*try(ServerSocket serverSocket = new ServerSocket(servport)){
+        try(ServerSocket serverSocket = new ServerSocket(servport)){
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
             while(true){
                 Socket clientSocket = serverSocket.accept();
@@ -41,7 +41,7 @@ public class ServerMain {
 		}catch(IOException e){
 			e.printStackTrace();
 			return;
-		}*/
+		}
         
     }
    

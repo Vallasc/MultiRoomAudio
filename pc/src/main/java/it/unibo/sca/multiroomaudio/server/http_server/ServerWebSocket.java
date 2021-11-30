@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @WebSocket
 public class ServerWebSocket {
-    private final Queue<Session> sessions = new ConcurrentLinkedQueue<>(); // TODO In futuro andra tolto
 
     private final WebSocketHandler webSocketHandler;
 
@@ -22,7 +21,6 @@ public class ServerWebSocket {
 
     @OnWebSocketConnect
     public void connected(Session session) {
-        sessions.add(session);
     }
 
 
@@ -34,15 +32,7 @@ public class ServerWebSocket {
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
-        /*try{
-            dbm.removeConnectedSocketDevice(dbm.getKeyDevice(session.getRemoteAddress().getHostString()));
-        }catch(NullPointerException e){
-            System.out.println("already removed");
-        }*/
-        sessions.remove(session);
-
-        webSocketHandler.handleClose(session);
-        
+        webSocketHandler.handleClose(session);        
         System.out.println("closed " + statusCode + " " +reason );
         
     }

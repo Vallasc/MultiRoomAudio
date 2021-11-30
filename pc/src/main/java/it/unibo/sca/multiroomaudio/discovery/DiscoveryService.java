@@ -81,16 +81,17 @@ public class DiscoveryService {
                             try{
                                 socket.connect(new InetSocketAddress("google.com", 80), 1000);
                             }catch(BindException e){
-                                //address already in use
                                 socket.close();
                                 this.mac = buildMac(n.getHardwareAddress());
                                 this.broadcast = addr.getBroadcast();
                                 this.ip=addr.getAddress().getHostAddress();
+                                return;
                             }
                             socket.close();
                             this.mac = buildMac(n.getHardwareAddress());
                             this.broadcast = addr.getBroadcast();
                             this.ip=addr.getAddress().getHostAddress();
+
                           }catch(IOException e) {
                             continue;
                           }

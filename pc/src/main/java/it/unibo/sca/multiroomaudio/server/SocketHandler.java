@@ -6,6 +6,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+
 import com.google.gson.Gson;
 
 import io.github.vallasc.APInfo;
@@ -39,12 +41,13 @@ public class SocketHandler extends Thread{
             MsgHello hello = gson.fromJson(json, MsgHello.class);
             clientId = hello.getId();
             
-            if(dbm.connectedSocketDevices.containsKey(clientId)){//already connected
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("REJECTED")));
+            if(dbm.isConnectedSocket(clientId)){//already connected
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=rejected", clientId)));
                 return;
             }
-            dbm.connectedSocketDevices.put(clientId, new Client(hello.getDeviceType(), hello.getMac(), clientId));
-            if(dbm.devices.putIfAbsent(clientId, new Client(hello.getDeviceType(), hello.getMac(), clientId)) != null){
+
+            dbm.addConnectedSocketClient(clientId, hello);
+            if(dbm.deviceContains(clientId)){
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
             }else{
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("type=newclient", clientId)));
@@ -54,16 +57,26 @@ public class SocketHandler extends Thread{
             e.printStackTrace();
             return;
         }
-        Client myDevice = dbm.devices.get(clientId); // TODO 
+        Client myDevice = (Client) dbm.getDevice(clientId); // TODO 
         //we have to work on that
         //should be false on init cause it's built that way
         //state = false if running, true if stopped
         boolean currentStart;
+        try {
+            clientSocket.setSoTimeout(1000);
+        } catch (SocketException e) {
+        }
         while(isRunning){
             try {
                 int i = 0;
                 //find a change in the start/stop state
                 currentStart = myDevice.getStart();
+                try{
+                    if(clientSocket.getInputStream().read() == -1){
+                        isRunning = false;
+                        dbm.removeConnectedSocketClient(clientId);
+                    }
+                }catch(SocketTimeoutException e){}
                 if(currentStart){
                     //send start to the client
                     dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentStart)));
@@ -83,11 +96,10 @@ public class SocketHandler extends Thread{
                     }while(currentStart);
                     //stopped, send stop to the client
                 }
-
             } catch (SocketException e) {
                 //e.printStackTrace();
                 System.out.println("Connection closed");
-                dbm.removeConnectedSocketDevice(clientId);
+                dbm.removeConnectedSocketClient(clientId);
                 isRunning = false;
             }catch(EOFException e) {
                 System.out.println("EOF");
@@ -105,9 +117,9 @@ public class SocketHandler extends Thread{
                 }catch(IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println("closing connection socket");
             }
         }
+        System.out.println("STOP");
     }
 
 }

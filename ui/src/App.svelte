@@ -37,7 +37,7 @@
   let isSpeaker = false
   let isNewClient = false
   let clientConnection = false
-  if(urlParams.get('type') != null && urlParams.get('type') === 'client'){
+  if(urlParams.get('type') != null && (urlParams.get('type') === 'client' || urlParams.get('type') === 'rejected')){
     isClient = true;
   }else if(urlParams.get('type') != null && urlParams.get('type') === 'newclient'){
      isNewClient = true;
