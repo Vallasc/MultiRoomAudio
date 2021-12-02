@@ -1,2 +1,0 @@
-TODO:
-Scartare testa e coda dei fingerprint perchè potrebbero essere quelli vecchi di una stanza precedente (oppure se c'è un modo per buttare via il canale non lo so)

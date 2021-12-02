@@ -8,6 +8,7 @@ public class Client extends Device {
     private APInfo[] fingerprints;
     //is true if start is clicked, false otherwise
     private boolean start = false;
+    private String activeRoom;
 
     public Client(int type, String mac, String ip) {
         super(mac);
@@ -40,8 +41,9 @@ public class Client extends Device {
         return mac;
     }
 
-    public synchronized void setStart(boolean start){
+    public synchronized void setStart(boolean start, String activeRoom){
         this.start = start;
+        this.activeRoom = activeRoom;
     }
 
     public synchronized boolean getStart(){
@@ -57,6 +59,10 @@ public class Client extends Device {
             return true;
         }
         return false;
+    }
+
+    public String getActiveRoom(){
+        return this.activeRoom;
     }
 
     @Override

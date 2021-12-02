@@ -40,7 +40,6 @@ public class SocketHandler extends Thread{
             json = dIn.readUTF();
             MsgHello hello = gson.fromJson(json, MsgHello.class);
             clientId = hello.getId();
-            
             if(dbm.isConnectedSocket(clientId)){//already connected
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("type=rejected", clientId)));
                 return;
@@ -57,14 +56,17 @@ public class SocketHandler extends Thread{
             e.printStackTrace();
             return;
         }
+
         Client myDevice = (Client) dbm.getDevice(clientId); 
         boolean currentStart;
+        String roomId;
         while(isRunning){
             try {
                 int i = 0;
                 //find a change in the start/stop state
                 currentStart = myDevice.getStart();
                 if(currentStart){
+                    roomId = myDevice.getActiveRoom();
                     try {
                         clientSocket.setSoTimeout(0);
                     } catch (SocketException e) {}
@@ -72,8 +74,14 @@ public class SocketHandler extends Thread{
                     dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentStart)));
                     dOut.flush();
                     do{
-                        //read the fingerprints (set fingerprint is for the online phase, for the offline phase is like a savefingerprints, next thing to do)
-                        myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
+                        //if room id is null and start it means that i'm in the online phase cause idk which room i'm in
+                        //wait do i need another thread for the computations on the fingerprints?
+                        if(roomId == null)
+                            myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
+                        //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
+                        else{
+                            dbm.putFingerprint(roomId, clientId, gson.fromJson(dIn.readUTF(), APInfo[].class));
+                        }
                         //send the ack
                         System.out.println("ACK: " + i);
                         dOut.writeUTF(gson.toJson(new MsgAck(i)));
@@ -86,9 +94,7 @@ public class SocketHandler extends Thread{
                     }while(currentStart);
                     //stopped, send stop to the client
                 }else{
-                    try {
                         clientSocket.setSoTimeout(1000);
-                    } catch (SocketException e) {}
                     try{
                         if(clientSocket.getInputStream().read() == -1){
                             isRunning = false;

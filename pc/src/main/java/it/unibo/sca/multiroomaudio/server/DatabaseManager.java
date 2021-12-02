@@ -4,17 +4,17 @@ package it.unibo.sca.multiroomaudio.server;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
 
+import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.shared.dto.*;
 /*HashMap<id, Device> (tutti i device)
 list<device> (device connessi)
-Map<stanzaID, stanza> -> Stanza(Nome, Map<idClient, List<Fingerprint>>)
+Map<stanzaID, stanza> -> Stanza(Nome, Map<idClient, List<Fingerprint>>)  -> 
 Device -> se il device è un client il fingerprint va salvato dentro device e il thread che si occupa del calcolo gira sui device connessi
         che sono client
         alcune robe che vengono accedute da device devono essere accedute con metodi synchronized
@@ -26,8 +26,10 @@ public class DatabaseManager {
     private final ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
     private final ConcurrentHashMap<String, Pair<Session, Device>> connectedWebDevices = new ConcurrentHashMap<>(); //all the connected web devices
     private final ConcurrentHashMap<String, Client> connectedSocketDevices = new ConcurrentHashMap<>(); //all the connected socket devices
-    private final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); //dunno if concurrent
+    private final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); 
     private final ConcurrentHashMap<Session, String> sessions = new ConcurrentHashMap<>(); //should be to save the sessions 
+
+    //-------------------------------DEVICES-----------------------------------------------------------
 
     public String getKeyDevice(String id){
         // Can throw ConcurrentModificationException if an element is deleted during the iteration
@@ -46,10 +48,19 @@ public class DatabaseManager {
         return devices.get(key);
     }
 
-    public boolean setDeviceStart(String key){
+    public boolean setDeviceStart(String key, String roomId){
         try{
-            ((Client) devices.get(key)).setStart(true);
+            ((Client) devices.get(key)).setStart(true, roomId);
             return true;
+        }catch(ClassCastException e){
+            System.err.println("you casted a speaker to a client, what's going on?");
+            return false;
+        }
+    }
+
+    public boolean getDeviceStart(String key){
+        try{
+            return ((Client) devices.get(key)).getStart();
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
             return false;
@@ -58,7 +69,7 @@ public class DatabaseManager {
 
     public boolean setDeviceStop(String key){
         try{
-            ((Client) devices.get(key)).setStart(false);
+            ((Client) devices.get(key)).setStart(false, null);
             return true;
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
@@ -66,7 +77,7 @@ public class DatabaseManager {
         }
     }
 
-    //-------------------------------------------------------------------------------------------------------------
+    //--------------------------------CONNECTEDWEBDEVICES----------------------------------------------------
 
     public List<Pair<Session, Device>> getConnectedWebSpeakers(){
         return getConnectedWebDevices().stream()
@@ -124,7 +135,7 @@ public class DatabaseManager {
         return connectedWebDevices.containsKey(deviceId);
     }
 
-    //--------------------------------------------------------------------------------------------------------------------------------
+    //--------------------------------CONNECTEDSOCKETDEVICES---------------------------------------------------
     public List<Client> getConnectedSocketClients(){
         return connectedSocketDevices.values().stream().collect(Collectors.toList()); // Streams are immutable
     }
@@ -144,7 +155,7 @@ public class DatabaseManager {
         return connectedSocketDevices.containsKey(clientId);
     }
 
-    //---------------------------------------------------------------------------------
+    //------------------------------SESSIONS-------------------------------------------
     public void addSession(Session session, String id){
         sessions.putIfAbsent(session, id);
     }
@@ -156,4 +167,20 @@ public class DatabaseManager {
     public long countSessions(String id){
         return sessions.values().stream().filter(val -> val.equals(id)).count();
     }
+
+    //-------------------------------ROOMS-----------------------------------------
+    public void putRoom(String roomKey){
+        Room newRoom = new Room(roomKey, new ConcurrentHashMap<String, List<Fingerprint>>());
+        rooms.putIfAbsent(roomKey, newRoom);
+    }
+
+    public void putFingerprint(String roomKey, String clientKey, APInfo[] scans){
+        List<Fingerprint> fingerprints = new ArrayList<>();
+        for(APInfo fingerprint : scans){
+            fingerprints.add(new Fingerprint(fingerprint));
+        }
+        rooms.get(roomKey).putClientFingerprints(clientKey, fingerprints);
+    }
+
+
 }
