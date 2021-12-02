@@ -83,7 +83,7 @@
     console.log(songs)
   }
 
-  function palyPauseSong(song) {
+  function playPauseSong(song) {
     console.log(song)
     if (!song.isPlaying) {
       if (playingSong != null) playingSong.pause();
@@ -172,13 +172,13 @@
             <Link
               iconMd="material:pause_arrow"
               iconOnly
-              on:click={palyPauseSong(song)}
+              on:click={playPauseSong(song)}
             />
           {:else}
             <Link
               iconMd="material:play_arrow"
               iconOnly
-              on:click={palyPauseSong(song)}
+              on:click={playPauseSong(song)}
             />
           {/if}
         </span>

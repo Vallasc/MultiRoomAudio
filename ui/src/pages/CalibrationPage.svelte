@@ -2,70 +2,36 @@
     import { Page, Navbar, NavRight, Link, List, ListInput, 
               BlockTitle, Block, Button, ListItem, Row, Col } from 'framework7-svelte';
 
-	import { onMount } from 'svelte';
-    import { f7ready } from 'framework7-svelte';
-
-    let socket;
-    const urlParams = new URLSearchParams(window.location.search);
+			  const urlParams = new URLSearchParams(window.location.search);
     let clientId = urlParams.get('clientId');
   
-    onMount(() => {
-        f7ready(() => {
-            socketSetup()
-        })
-    })
 
-    function socketSetup(){
-        socket = new WebSocket("ws://" + location.hostname + "/websocket");
-        socket.onopen = () => {
-        }
-
-        socket.onmessage = (event) => {
-            processMessage(JSON.parse(event.data))
-        }
-
-        socket.onclose = (event) => {
-            console.log(event)
-        }
-    }
-
-	function processMessage(message) {
-        console.log(message)
-        switch(message.type){
-            case "REJECTED":
-                socket.close("Connection rejected");
-                break;
-            case "HELLO_BACK":
-                console.log("Connected");
-                break;
-			default: 
-				console.log("unrecognized: " + message);
-				break;
-        }    
-	}
 
     async function saveReference(){
       console.log(await JSInterface.saveReferencePoint());
     }
 
     async function startClick(){
-      console.log(clientId);
-      document.getElementById("start").className = "col button button-raised button-fill";
-      sendMessage(true);
+      	document.getElementById("start").className = "col button button-raised button-fill";
+	  	await fetch("http://" + location.hostname + ":80/offline/start", {
+			method: 'PUT',
+			body: JSON.stringify({
+					type: "offline",
+					id: clientId
+				})
+		});
     }
 
-    function stopClick(){
+    async function stopClick(){
       document.getElementById("start").className = "col button button-raised";
-      sendMessage(false);
+	  await fetch("http://" + location.hostname + ":80/offline/stop", {
+			method: 'PUT',
+			body: JSON.stringify({
+					type: "offline",
+					id: clientId
+				})
+		})
     } 
-
-    function sendMessage(val){
-      socket.send(JSON.stringify({
-            type : "OFFLINE",
-            start: val,
-			      id: clientId
-        }))
-    }
 
 </script>
 

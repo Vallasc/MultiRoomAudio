@@ -81977,7 +81977,7 @@ var MultiRoomAudio = (function () {
     		});
 
     	link.$on("click", function () {
-    		if (is_function(/*palyPauseSong*/ ctx[2](/*song*/ ctx[12]))) /*palyPauseSong*/ ctx[2](/*song*/ ctx[12]).apply(this, arguments);
+    		if (is_function(/*playPauseSong*/ ctx[2](/*song*/ ctx[12]))) /*playPauseSong*/ ctx[2](/*song*/ ctx[12]).apply(this, arguments);
     	});
 
     	const block = {
@@ -82030,7 +82030,7 @@ var MultiRoomAudio = (function () {
     		});
 
     	link.$on("click", function () {
-    		if (is_function(/*palyPauseSong*/ ctx[2](/*song*/ ctx[12]))) /*palyPauseSong*/ ctx[2](/*song*/ ctx[12]).apply(this, arguments);
+    		if (is_function(/*playPauseSong*/ ctx[2](/*song*/ ctx[12]))) /*playPauseSong*/ ctx[2](/*song*/ ctx[12]).apply(this, arguments);
     	});
 
     	const block = {
@@ -82353,7 +82353,7 @@ var MultiRoomAudio = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*songs, palyPauseSong*/ 5) {
+    			if (dirty & /*songs, playPauseSong*/ 5) {
     				each_value = /*songs*/ ctx[0];
     				validate_each_argument(each_value);
     				let i;
@@ -82731,7 +82731,7 @@ var MultiRoomAudio = (function () {
     		console.log(songs);
     	}
 
-    	function palyPauseSong(song) {
+    	function playPauseSong(song) {
     		console.log(song);
 
     		if (!song.isPlaying) {
@@ -82782,7 +82782,7 @@ var MultiRoomAudio = (function () {
     		popupOpened,
     		playingSong,
     		fetchSongs,
-    		palyPauseSong
+    		playPauseSong
     	});
 
     	$$self.$inject_state = $$props => {
@@ -82797,7 +82797,7 @@ var MultiRoomAudio = (function () {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [songs, popupOpened, palyPauseSong, func];
+    	return [songs, popupOpened, playPauseSong, func];
     }
 
     class MusicListPage extends SvelteComponentDev {
@@ -83649,7 +83649,7 @@ var MultiRoomAudio = (function () {
 
     const { console: console_1 } = globals;
 
-    // (75:2) <NavRight>
+    // (41:2) <NavRight>
     function create_default_slot_10(ctx) {
     	let link;
     	let current;
@@ -83690,14 +83690,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_10.name,
     		type: "slot",
-    		source: "(75:2) <NavRight>",
+    		source: "(41:2) <NavRight>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (74:4) <Navbar title="Add room"  backLink="back">
+    // (40:4) <Navbar title="Add room"  backLink="back">
     function create_default_slot_9(ctx) {
     	let navright;
     	let current;
@@ -83721,7 +83721,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const navright_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				navright_changes.$$scope = { dirty, ctx };
     			}
 
@@ -83745,14 +83745,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_9.name,
     		type: "slot",
-    		source: "(74:4) <Navbar title=\\\"Add room\\\"  backLink=\\\"back\\\">",
+    		source: "(40:4) <Navbar title=\\\"Add room\\\"  backLink=\\\"back\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (82:4) <List noHairlinesMd>
+    // (48:4) <List noHairlinesMd>
     function create_default_slot_8(ctx) {
     	let listinput;
     	let current;
@@ -83795,14 +83795,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_8.name,
     		type: "slot",
-    		source: "(82:4) <List noHairlinesMd>",
+    		source: "(48:4) <List noHairlinesMd>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (91:4) <BlockTitle>
+    // (57:4) <BlockTitle>
     function create_default_slot_7(ctx) {
     	let t;
 
@@ -83822,14 +83822,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_7.name,
     		type: "slot",
-    		source: "(91:4) <BlockTitle>",
+    		source: "(57:4) <BlockTitle>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (95:10) <Button id="start" class="col button button-raised" on:click={startClick}>
+    // (61:10) <Button id="start" class="col button button-raised" on:click={startClick}>
     function create_default_slot_6(ctx) {
     	let t;
 
@@ -83849,14 +83849,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_6.name,
     		type: "slot",
-    		source: "(95:10) <Button id=\\\"start\\\" class=\\\"col button button-raised\\\" on:click={startClick}>",
+    		source: "(61:10) <Button id=\\\"start\\\" class=\\\"col button button-raised\\\" on:click={startClick}>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (94:8) <Col tag="span">
+    // (60:8) <Col tag="span">
     function create_default_slot_5(ctx) {
     	let button;
     	let current;
@@ -83884,7 +83884,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const button_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				button_changes.$$scope = { dirty, ctx };
     			}
 
@@ -83908,14 +83908,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_5.name,
     		type: "slot",
-    		source: "(94:8) <Col tag=\\\"span\\\">",
+    		source: "(60:8) <Col tag=\\\"span\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (98:10) <Button col class="col button button-raised" on:click={stopClick}>
+    // (64:10) <Button col class="col button button-raised" on:click={stopClick}>
     function create_default_slot_4(ctx) {
     	let t;
 
@@ -83935,14 +83935,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_4.name,
     		type: "slot",
-    		source: "(98:10) <Button col class=\\\"col button button-raised\\\" on:click={stopClick}>",
+    		source: "(64:10) <Button col class=\\\"col button button-raised\\\" on:click={stopClick}>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (97:8) <Col tag="span">
+    // (63:8) <Col tag="span">
     function create_default_slot_3(ctx) {
     	let button;
     	let current;
@@ -83970,7 +83970,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const button_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				button_changes.$$scope = { dirty, ctx };
     			}
 
@@ -83994,14 +83994,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_3.name,
     		type: "slot",
-    		source: "(97:8) <Col tag=\\\"span\\\">",
+    		source: "(63:8) <Col tag=\\\"span\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (93:6) <Row tag="p">
+    // (59:6) <Row tag="p">
     function create_default_slot_2(ctx) {
     	let col0;
     	let t;
@@ -84041,14 +84041,14 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const col0_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				col0_changes.$$scope = { dirty, ctx };
     			}
 
     			col0.$set(col0_changes);
     			const col1_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				col1_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84076,14 +84076,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_2.name,
     		type: "slot",
-    		source: "(93:6) <Row tag=\\\"p\\\">",
+    		source: "(59:6) <Row tag=\\\"p\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (92:4) <Block strong>
+    // (58:4) <Block strong>
     function create_default_slot_1$1(ctx) {
     	let row;
     	let current;
@@ -84108,7 +84108,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const row_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				row_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84132,14 +84132,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_1$1.name,
     		type: "slot",
-    		source: "(92:4) <Block strong>",
+    		source: "(58:4) <Block strong>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (72:0) <Page>
+    // (38:0) <Page>
     function create_default_slot$2(ctx) {
     	let navbar;
     	let t0;
@@ -84209,28 +84209,28 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const navbar_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				navbar_changes.$$scope = { dirty, ctx };
     			}
 
     			navbar.$set(navbar_changes);
     			const list_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				list_changes.$$scope = { dirty, ctx };
     			}
 
     			list.$set(list_changes);
     			const blocktitle_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				blocktitle_changes.$$scope = { dirty, ctx };
     			}
 
     			blocktitle.$set(blocktitle_changes);
     			const block_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				block_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84266,7 +84266,7 @@ var MultiRoomAudio = (function () {
     		block: block_1,
     		id: create_default_slot$2.name,
     		type: "slot",
-    		source: "(72:0) <Page>",
+    		source: "(38:0) <Page>",
     		ctx
     	});
 
@@ -84299,7 +84299,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, [dirty]) {
     			const page_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 16) {
     				page_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84337,65 +84337,25 @@ var MultiRoomAudio = (function () {
     function instance$2($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('CalibrationPage', slots, []);
-    	let socket;
     	const urlParams = new URLSearchParams(window.location.search);
     	let clientId = urlParams.get('clientId');
 
-    	onMount(() => {
-    		f7ready(() => {
-    			socketSetup();
-    		});
-    	});
-
-    	function socketSetup() {
-    		socket = new WebSocket("ws://" + location.hostname + "/websocket");
-
-    		socket.onopen = () => {
-    			
-    		};
-
-    		socket.onmessage = event => {
-    			processMessage(JSON.parse(event.data));
-    		};
-
-    		socket.onclose = event => {
-    			console.log(event);
-    		};
-    	}
-
-    	function processMessage(message) {
-    		console.log(message);
-
-    		switch (message.type) {
-    			case "REJECTED":
-    				socket.close("Connection rejected");
-    				break;
-    			case "HELLO_BACK":
-    				console.log("Connected");
-    				break;
-    			default:
-    				console.log("unrecognized: " + message);
-    				break;
-    		}
-    	}
-
     	async function startClick() {
-    		console.log(clientId);
     		document.getElementById("start").className = "col button button-raised button-fill";
-    		sendMessage(true);
+
+    		await fetch("http://" + location.hostname + ":80/offline/start", {
+    			method: 'PUT',
+    			body: JSON.stringify({ type: "offline", id: clientId })
+    		});
     	}
 
-    	function stopClick() {
+    	async function stopClick() {
     		document.getElementById("start").className = "col button button-raised";
-    		sendMessage(false);
-    	}
 
-    	function sendMessage(val) {
-    		socket.send(JSON.stringify({
-    			type: "OFFLINE",
-    			start: val,
-    			id: clientId
-    		}));
+    		await fetch("http://" + location.hostname + ":80/offline/stop", {
+    			method: 'PUT',
+    			body: JSON.stringify({ type: "offline", id: clientId })
+    		});
     	}
 
     	const writable_props = [];
@@ -84417,21 +84377,14 @@ var MultiRoomAudio = (function () {
     		ListItem: List_item,
     		Row,
     		Col,
-    		onMount,
-    		f7ready,
-    		socket,
     		urlParams,
     		clientId,
-    		socketSetup,
-    		processMessage,
     		saveReference,
     		startClick,
-    		stopClick,
-    		sendMessage
+    		stopClick
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('socket' in $$props) socket = $$props.socket;
     		if ('clientId' in $$props) clientId = $$props.clientId;
     	};
 

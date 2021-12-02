@@ -46,6 +46,26 @@ public class DatabaseManager {
         return devices.get(key);
     }
 
+    public boolean setDeviceStart(String key){
+        try{
+            ((Client) devices.get(key)).setStart(true);
+            return true;
+        }catch(ClassCastException e){
+            System.err.println("you casted a speaker to a client, what's going on?");
+            return false;
+        }
+    }
+
+    public boolean setDeviceStop(String key){
+        try{
+            ((Client) devices.get(key)).setStart(false);
+            return true;
+        }catch(ClassCastException e){
+            System.err.println("you casted a speaker to a client, what's going on?");
+            return false;
+        }
+    }
+
     //-------------------------------------------------------------------------------------------------------------
 
     public List<Pair<Session, Device>> getConnectedWebSpeakers(){

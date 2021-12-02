@@ -22,9 +22,10 @@ public class WebSocketHandler {
     public void handleClose(Session session){
         String key = dbm.removeSessions(session);
         
-        if(dbm.countSessions(key) == 0)
+        if(dbm.countSessions(key) == 0){
             dbm.removeConnectedSocketClient(key);
-        
+            dbm.setDeviceStop(key);
+        }
     }
 
     public void handleHello(Session session, MsgHello hello) throws IOException{
