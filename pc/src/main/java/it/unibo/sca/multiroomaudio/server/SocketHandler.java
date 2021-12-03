@@ -65,8 +65,8 @@ public class SocketHandler extends Thread{
                 int i = 0;
                 //find a change in the start/stop state
                 currentStart = myDevice.getStart();
+                roomId = myDevice.getActiveRoom();
                 if(currentStart){
-                    roomId = myDevice.getActiveRoom();
                     try {
                         clientSocket.setSoTimeout(0);
                     } catch (SocketException e) {}
@@ -76,11 +76,11 @@ public class SocketHandler extends Thread{
                     do{
                         //if room id is null and start it means that i'm in the online phase cause idk which room i'm in
                         //wait do i need another thread for the computations on the fingerprints?
-                        if(roomId == null)
+                        if(myDevice.getPlay())
                             myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
                         //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
                         else{
-                            dbm.putFingerprint(roomId, clientId, gson.fromJson(dIn.readUTF(), APInfo[].class));
+                            dbm.putScans(clientId, roomId, gson.fromJson(dIn.readUTF(), APInfo[].class));
                         }
                         //send the ack
                         System.out.println("ACK: " + i);
@@ -126,6 +126,7 @@ public class SocketHandler extends Thread{
             }
         }
         System.out.println("STOP");
+        //dbm.printFingerprintDb(clientId);
     }
 
 }

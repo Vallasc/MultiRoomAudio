@@ -1,7 +1,6 @@
 package it.unibo.sca.multiroomaudio.server;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -14,7 +13,7 @@ import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.shared.dto.*;
 /*HashMap<id, Device> (tutti i device)
 list<device> (device connessi)
-Map<stanzaID, stanza> -> Stanza(Nome, Map<idClient, List<Fingerprint>>)  -> 
+Map<clientID, stanza> -> Stanza(Nome, Map<idClient, List<Fingerprint>>)  -> 
 Device -> se il device è un client il fingerprint va salvato dentro device e il thread che si occupa del calcolo gira sui device connessi
         che sono client
         alcune robe che vengono accedute da device devono essere accedute con metodi synchronized
@@ -26,7 +25,7 @@ public class DatabaseManager {
     private final ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
     private final ConcurrentHashMap<String, Pair<Session, Device>> connectedWebDevices = new ConcurrentHashMap<>(); //all the connected web devices
     private final ConcurrentHashMap<String, Client> connectedSocketDevices = new ConcurrentHashMap<>(); //all the connected socket devices
-    private final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); 
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Room>> clientScans = new ConcurrentHashMap<>(); //the rooms for each client
     private final ConcurrentHashMap<Session, String> sessions = new ConcurrentHashMap<>(); //should be to save the sessions 
 
     //-------------------------------DEVICES-----------------------------------------------------------
@@ -48,9 +47,10 @@ public class DatabaseManager {
         return devices.get(key);
     }
 
-    public boolean setDeviceStart(String key, String roomId){
+    public boolean setDeviceStart(String clientId, String roomId){
         try{
-            ((Client) devices.get(key)).setStart(true, roomId);
+            setClientRoom(clientId,roomId);
+            ((Client) devices.get(clientId)).setStart(true, roomId);
             return true;
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
@@ -169,18 +169,28 @@ public class DatabaseManager {
     }
 
     //-------------------------------ROOMS-----------------------------------------
-    public void putRoom(String roomKey){
-        Room newRoom = new Room(roomKey, new ConcurrentHashMap<String, List<Fingerprint>>());
-        rooms.putIfAbsent(roomKey, newRoom);
-    }
-
-    public void putFingerprint(String roomKey, String clientKey, APInfo[] scans){
-        List<Fingerprint> fingerprints = new ArrayList<>();
-        for(APInfo fingerprint : scans){
-            fingerprints.add(new Fingerprint(fingerprint));
+    public void setClientRoom(String clientId, String roomId){
+        ConcurrentHashMap<String, Room> newRoom = new ConcurrentHashMap<>();
+        System.out.println("room: " + roomId);
+        newRoom.putIfAbsent(roomId, new Room(roomId));
+        ConcurrentHashMap<String, Room> presentHM = clientScans.putIfAbsent(clientId, newRoom);
+        //there was already the hashmap
+        if(presentHM != null){
+            presentHM.putIfAbsent(roomId, new Room(roomId));
         }
-        rooms.get(roomKey).putClientFingerprints(clientKey, fingerprints);
     }
 
+    public void putScans(String clientId, String roomId, APInfo[] scans){
+        clientScans.get(clientId).get(roomId).putClientFingerprints(scans);
+    }
+
+    public void printFingerprintDb(String clientId){
+        for(String clientKey : clientScans.keySet()){
+            for(String roomKey : clientScans.get(clientKey).keySet()){
+                System.out.println("room: " + roomKey);
+                clientScans.get(clientKey).get(roomKey).printFingerprints();
+            }
+        }
+    }
 
 }

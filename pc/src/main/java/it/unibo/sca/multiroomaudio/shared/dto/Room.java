@@ -1,39 +1,49 @@
 package it.unibo.sca.multiroomaudio.shared.dto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
-//Stanza(Nome, Map<idClient, List<Fingerprint>>)
+import io.github.vallasc.APInfo;
+
+//Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
     String id;
-    List<String> activeClients = new ArrayList<>();//i need this to know which clients are scanning in which room during the offline phase
-    final ConcurrentHashMap<String, List<Fingerprint>> clientFingerprints;
+    final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
     
-    public Room(String id, ConcurrentHashMap<String, List<Fingerprint>> clientFingerprints){
+    public Room(String id){
+        fingerprints = new HashMap<>();
+    }
+
+    public Room(String id, HashMap<String, List<ScanResult>> fingerprints) {
         this.id = id;
-        this.clientFingerprints = clientFingerprints;
+        this.fingerprints = fingerprints;
     }
 
     public void setNewClient(String clientId){
-        clientFingerprints.put(clientId, new ArrayList<Fingerprint>());
     }
     
     public String getId(){
         return id;
     }
 
-    public void putActive(String clientId){
-        activeClients.add(clientId);
-    }
-
-    //synchronized just to be sure evenif only one thread is supposed to remove a client
-    public synchronized void removeActive(String clientId){
-        activeClients.remove(clientId);
-    }
-
-    public synchronized void putClientFingerprints(String clientId, List<Fingerprint> fingerprints){
-        clientFingerprints.get(clientId).addAll(fingerprints);
+    public synchronized void putClientFingerprints(APInfo[] scans){
         //server tenerli ordinati?
+        List<ScanResult> list;
+        for(APInfo ap : scans){
+            list = fingerprints.get(ap.getBSSID());
+            if(list == null){
+                List<ScanResult> results = new ArrayList<>();
+                results.add(new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
+                fingerprints.put(ap.getBSSID(), results);
+            }else{
+                list.add(new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
+            }
+        }
+    }
+
+    public void printFingerprints() {
+        System.out.println(fingerprints.keySet().size());
     }
 }

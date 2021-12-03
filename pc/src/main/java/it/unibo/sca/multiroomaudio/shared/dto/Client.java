@@ -3,12 +3,17 @@ package it.unibo.sca.multiroomaudio.shared.dto;
 import io.github.vallasc.APInfo;
 
 public class Client extends Device {
+    public class SharedState{
+        private boolean start = false;
+        private boolean play = false;
+        private String activeRoom = null;
+    }
+
     private final String ip;
     private String mac;
     private APInfo[] fingerprints;
     //is true if start is clicked, false otherwise
-    private boolean start = false;
-    private String activeRoom;
+    private SharedState state = new SharedState();
 
     public Client(int type, String mac, String ip) {
         super(mac);
@@ -41,32 +46,53 @@ public class Client extends Device {
         return mac;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return ((String) o).equals(this.ip);
+    }
+
+    
+    //---------------------STATE THINGS------------------------------------
     public synchronized void setStart(boolean start, String activeRoom){
-        this.start = start;
-        this.activeRoom = activeRoom;
+        state.start = start;
+        state.activeRoom = activeRoom;
     }
 
     public synchronized boolean getStart(){
-        return start;
+        return state.start;
     }
 
     /**
      * @return: true if state changed, false otherwise
      */
     public synchronized boolean changeStart(boolean start){
-        if(this.start != start){ 
-            this.start = start;
+        if(state.start != start){ 
+            state.start = start;
             return true;
         }
         return false;
     }
 
-    public String getActiveRoom(){
-        return this.activeRoom;
+    public synchronized boolean getPlay(){
+        return state.play;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return ((String) o).equals(this.ip);
+    public synchronized void setPlay(boolean play){
+        if(state.start && !state.play) return;
+        state.start = play;
+        state.play = play;
     }
+
+    public synchronized void setActiveRoom(String activeRoom){
+        state.activeRoom = activeRoom;
+    }
+
+    public synchronized String getActiveRoom(){
+        return state.activeRoom;
+    }
+
+    public synchronized String get(){
+        return state.activeRoom;
+    }
+
 }

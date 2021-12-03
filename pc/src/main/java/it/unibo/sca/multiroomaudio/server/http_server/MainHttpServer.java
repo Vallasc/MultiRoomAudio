@@ -27,10 +27,10 @@ public class MainHttpServer extends HttpServer {
             service.put("/start", (req, res) -> {
                 //a start request is coming from a client
                 MsgOffline msg = gson.fromJson(req.body(), MsgOffline.class);
-                dbm.putRoom(msg.getRoom());
                 if(dbm.getDeviceStart(msg.getId())) 
                     return "{\"status\": \"KO\"}";
                 if(dbm.setDeviceStart(msg.getId(), msg.getRoom())){
+                    
                     return "{\"status\": \"OK\"}";
                 }
                 else
