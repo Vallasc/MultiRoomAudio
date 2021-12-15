@@ -7,15 +7,13 @@
 
     let socket = null;
     const audio = new Audio();
-    console.log(audio)
-    audio.mute = true;
 
-    let songList = []
     let songId = -1;
     let currentTimeSec = 0;
     let songDurationSec = 0;
 
-    let imageUrl = "http://" + location.hostname + ":80/imgs/blank_album.png"
+    const blankSong = "http://" + location.hostname + ":80/imgs/blank_album.png"
+    let imageUrl = blankSong
     let title = "Waiting for music..."
     let artist = ""
 
@@ -30,7 +28,6 @@
     })
 
     function loadId(){
-        console.log("okookkook")
         speakerId = localStorage.getItem("id")
         console.log(speakerId)
         if(speakerId == null){
@@ -42,12 +39,13 @@
         }
     }
 
+    let alertShowed = false
     function socketSetup(){
         socket = new WebSocket("ws://" + location.hostname + "/websocket")
 
         socket.onopen = () => {
             sendInitMessage()
-            f7.dialog.alert('Speaker connected')
+            dialogInsertName()
         }
 
         socket.onmessage = (event) => {
@@ -58,6 +56,14 @@
             console.log(event)
             window.clearTimeout(intervalResponse)
         }
+    }
+
+    function dialogInsertName(){
+        f7.dialog.prompt('Inserire nome speaker', 'Multiroom Audio', () => {
+                alertShowed = true;
+        }, () => {
+            dialogInsertName()
+        });
     }
 
     function sendInitMessage(){
@@ -73,51 +79,71 @@
         console.log(message)
         switch(message.type){
             case "PLAY":
-                playSong(message)
+                play(message)
                 break;
-            case "CURRENT_PLAYING":
-                currentTimeSec = message.currentTimeSec
+            case "PAUSE":
+                pause()
                 break;
-        }    }
+            case "STOP":
+                stop()
+                break;
+        }    
+    }
 
-    function playSong(message) {
-        songList = message.songList
-        songId = message.songId
+    async function play(message) {
+        if(songId != message.songId){
+            // Get image and all metadata
+            songId = message.songId
+            let song = message.song
+            console.log("Playing song")
+            console.log(song)
 
-        let song = songList[songId]
-        imageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
-        title = song.title
-        artist = song.artist
+            if(song.albumImageUrl == null)
+                imageUrl = blankSong
+            else 
+                imageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
+            title = song.title89
+            artist = song.artist
 
-        audio.src = "http://" + location.hostname + ":8080/" + song.songUrl.replace("./", "")
-        console.log(song)
-        audio.currentTime = message.fromTimeSec
-        audio.load()
-        audio.onloadeddata = () => {
-            songDurationSec = audio.duration
-            audio.play()
+            let res = await fetch("http://" + location.hostname + ":8080/" + song.songUrl.replace("./", ""))
+            let blob = await res.blob()
+            audio.src = URL.createObjectURL(blob)
+            audio.onloadeddata = () => {
+                songDurationSec = audio.duration
+            }
+            audio.load()
+            audio.currentTime = message.fromTimeSec
+            if(alertShowed)
+                audio.play()
+        } else {
+            // Allign time
+            const syncWindow = 4;
+            if(audio.currentTime > message.fromTimeSec + syncWindow/2 || audio.currentTime < message.fromTimeSec - syncWindow/2)
+                audio.currentTime = message.fromTimeSec
+            if(audio.paused)
+                audio.play()
         }
-        sendCurrentTime()
+        //console.log("Current time " + audio.currentTime);
+        //console.log(message.fromTimeSec)
     }
 
-    audio.onplay = () => {
-
+    function pause(){
+        audio.pause()
     }
+
+    function stop(){
+        audio.load()
+    }
+
+    // Update progress bar
+    let updateTime;
+    //audio.onplay = () => {
+    setInterval(() => currentTimeSec = audio.currentTime, 500)
+    //}
 
     audio.onended = () => {
-        let songId = -1;
         console.log("Audio ended")
-    }
-
-    let intervalResponse
-    function sendCurrentTime() {
-        intervalResponse = window.setInterval(() => {
-            socket.send(JSON.stringify({
-                type: "CURRENT_PLAYING",
-                songId : songId,
-                currentTimeSec : audio.currentTime
-            }));
-        }, 1000); 
+        //state = 0
     }
 
 </script>
@@ -135,7 +161,8 @@
         artist = {artist}
         currentValue = {currentTimeSec} 
         songDuration = {songDurationSec}
-        isSpeaker = {true} />
+        isSpeaker
+        disabled />
 </Page>
 
 <style>

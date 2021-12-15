@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount } from "svelte"
   import {
     Page,
     Navbar,
@@ -8,101 +8,175 @@
     NavRight,
     ListItem,
     List,
-    Popup
+    Popup,
+    Block,
+    Chip
   } from "framework7-svelte"
   import { text } from "../stores.js"
   import NowPlaying from "./NowPlaying.svelte"
-	import { f7ready } from 'framework7-svelte';
 
-  	let socket;
-    const urlParams = new URLSearchParams(window.location.search);
-    let clientId = urlParams.get('clientId');
-  
-    onMount(() => {
-        f7ready(() => {
-            socketSetup()
-        })
-    })
+  let socket
+  const urlParams = new URLSearchParams(window.location.search)
+  let clientId = urlParams.get("clientId")
+  const blankSong = "http://" + location.hostname + ":80/imgs/blank_album.png"
 
-    function socketSetup(){
-        socket = new WebSocket("ws://" + location.hostname + "/websocket");
-        socket.onopen = () => {
-            sendInitMessage()
-        }
+  onMount(() => {
+    fetchSongs()
+    socketSetup()
+  });
 
-        socket.onmessage = (event) => {
-            processMessage(JSON.parse(event.data))
-        }
+  function socketSetup() {
+    socket = new WebSocket("ws://" + location.hostname + "/websocket");
+    socket.onopen = () => {
+      sendInitMessage();
+    };
 
-        socket.onclose = (event) => {
-            console.log(event)
-        }
+    socket.onmessage = (event) => {
+      processMessage(JSON.parse(event.data));
+    };
+
+    socket.onclose = (event) => {
+      console.log(event);
+    };
+  }
+
+  function sendInitMessage() {
+    console.log(clientId);
+    socket.send(
+      JSON.stringify({
+        type: "HELLO",
+        deviceType: 0, // client type
+        id: clientId,
+        name: "vallascClient", // TODO change name
+      })
+    );
+  }
+
+  function makeImageurl(albumImageUrl) {
+    if (albumImageUrl != null)
+      albumImageUrl = "http://" + location.hostname + ":8080/" + albumImageUrl.replace("./", "")
+    else 
+      albumImageUrl = blankSong
+    return albumImageUrl
+  }
+
+  function processMessage(message) {
+    console.log(message);
+    switch (message.type) {
+      case "PLAY":
+        state = 1
+        playingSong = message;
+        playingSong.song.albumImageUrl = makeImageurl(playingSong.song.albumImageUrl)
+        progress = playingSong.fromTimeSec * 100 / (playingSong.song.durationMs / 1000)
+        break
+      case "PAUSE":
+        state = 2
+        playingSong = message;
+        playingSong.song.albumImageUrl = makeImageurl(playingSong.song.albumImageUrl)
+        progress = playingSong.fromTimeSec * 100 / (playingSong.song.durationMs / 1000)
+        break
+      case "STOP":
+        state = 0
+        progress = 0
+        break
     }
-
-    function sendInitMessage(){
-      console.log(clientId);
-        socket.send(JSON.stringify({
-            type : "HELLO",
-            deviceType : 0, // speaker type
-            id: clientId
-        }))
-    }
-
-	function processMessage(message) {
-        console.log(message)
-        switch(message.type){
-            case "REJECTED":
-                socket.close("Connection rejected");
-                break;
-            case "HELLO_BACK":
-                console.log("Connected");
-                break;
-			default: 
-				console.log("unrecognized: " + message);
-				break;
-        }    
-	}
+  }
 
   let songs = []
   let popupOpened = false
-  let playingSong
+  let state = 0 // 0 stop, 1 play, 2 pause
+  let playingSong = null
+  let progress = 0
 
   async function fetchSongs() {
-    let res = await fetch("http://" + location.hostname + ":8080/player/list", {
-      method: "GET"
+    let res = await fetch("http://" + location.hostname + ":8080/songs", {
+      method: "GET",
     });
-    songs = await res.json()
+    songs = await res.json();
     songs.forEach((song) => {
-      if(song.albumImageUrl != null)
-        song.albumImageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
-      else
-        song.albumImageUrl = "./imgs/blank_album.png"
-      song.songUrl = "http://" + location.hostname + ":8080/" + song.songUrl.replace("./", "")
-      song.isPlaying = false
-    })
-    console.log(songs)
+      if (song.albumImageUrl != null)
+        song.albumImageUrl =
+          "http://" +
+          location.hostname +
+          ":8080/" +
+          song.albumImageUrl.replace("./", "");
+      else song.albumImageUrl = "./imgs/blank_album.png";
+      song.songUrl =
+        "http://" +
+        location.hostname +
+        ":8080/" +
+        song.songUrl.replace("./", "");
+      song.isPlaying = false;
+    });
+    console.log("Song list");
+    console.log(songs);
   }
 
-  function playPauseSong(song) {
-    console.log(song)
-    if (!song.isPlaying) {
-      if (playingSong != null) playingSong.pause();
-      playingSong = new Audio(song.songUrl);
-      playingSong.play();
-    } else {
-      playingSong.pause();
+  async function playPause() {
+    if(state == 2 && playingSong != null) {
+      play(playingSong.song, playingSong.fromTimeSec)
+    } else if(state == 1) {
+      pause()
     }
-    song.isPlaying = !song.isPlaying;
-    songs = songs; // Update for svelte
   }
 
-  onMount(async () => {
-    fetchSongs();
-    document.getElementsByClassName("toolbar-bottom")[0].onclick = () =>
-      (popupOpened = true);
-  });
+  async function play(song, fromTimeSec) {
+    console.log("Playing " + song.title)
+    socket.send(
+      JSON.stringify({
+        type: "PLAY",
+        songId: song.id,
+        fromTimeSec: fromTimeSec,
+      })
+    );
+  }
 
- </script>
+  async function pause() {
+    console.log("Pause " + playingSong.song.title)
+    socket.send(
+      JSON.stringify({
+        type: "PAUSE",
+      })
+    );
+  }
+
+  function stop() {
+    console.log("Stop playing " + playingSong.song.title)
+    socket.send(
+      JSON.stringify({
+        type: "STOP",
+      })
+    );
+  }
+
+  function next() {
+    console.log("Next song ")
+    socket.send(
+      JSON.stringify({
+        type: "NEXT",
+      })
+    );
+  }
+
+  function prev() {
+    console.log("Prev song ")
+    socket.send(
+      JSON.stringify({
+        type: "PREV",
+      })
+    );
+  }
+
+  let lastTitleBlock = ""
+  function setLastTitleBlock(newTitleBlock){
+    if(lastTitleBlock != newTitleBlock){
+      lastTitleBlock = newTitleBlock
+      return true;
+    }
+    return false;
+  }
+
+</script>
 
 <Page>
   <!-- Top Navbar -->
@@ -112,77 +186,110 @@
       <Link iconMd="material:settings" iconOnly />
     </NavRight>
   </Navbar>
-  <!-- Toolbar -->
-  <Toolbar bottom >
-    <div class="toolbarBox">
-      <img
-        id="album"
-        alt=""
-        src="https://www.nuovecanzoni.com/wp-content/uploads/2021/07/Una-Direzione-Giusta-supreme.jpg"
-      />
-      <div class="item-inner">
-        <div class="item-title-row" style="display: flex">
-          <div class="item-title">Yellow Submarine</div>
-        </div>
-        <div class="item-subtitle">Beatles</div>
-      </div>
-    </div>
-    <div style="margin-right:14px">
-      <Link iconMd="material:play_arrow" />
+  <Toolbar top>
+    <div class="list-speakers">
+      <Chip text="Cucina" color="#6200ee" iconMd="material:volume_up" />
+      <Chip text="Camera letto" iconMd="material:volume_mute" />
+      <Chip text="Salone" iconMd="material:volume_mute" />
+      <Chip text="Mansarda" iconMd="material:volume_mute" />
     </div>
   </Toolbar>
-
-  <List mediaList>
-    <div class="block-title" style="margin-bottom:0px;">Connected speakers</div>
-    <li class="list-group-title">
-      <div class="list-speakers">
-        <div class="item-speaker">
-          <Link iconMd="material:add" iconOnly />
-        </div>
-        <div class="item-speaker" />
-        <div class="item-speaker" />
-        <div class="item-speaker" />
-        <div class="item-speaker" />
-        <div class="item-speaker" />
-        <div class="item-speaker" />
-        <div class="item-speaker" />
-      </div>
-    </li>
-
-    <div class="block-title">SLAC songs</div>
-    <!-- {#each Array(12) as _, i}
-      <ListItem title="Yellow Submarine" subtitle="Beatles">
-        <img
-          slot="media"
-          src="https://cdn.framework7.io/placeholder/fashion-88x88-1.jpg"
-          width="44"
-        />
-      </ListItem>
-    {/each}-->
-    {#each songs as song}
-      <ListItem title={song.title} subtitle={song.artist}>
-        <img
-          slot="media"
-          alt={song.title}
-          src={song.albumImageUrl}
-          width="44"
-        />
-        <span slot="after">
-          {#if song.isPlaying}
-            <Link
-              iconMd="material:pause_arrow"
-              iconOnly
-              on:click={playPauseSong(song)}
+  <!-- Toolbar -->
+  {#if playingSong != null}
+      <div class="toolbar toolbar-bottom" data-f7-slot="fixed"> 
+        <span class="progressbar">
+          <span style="transform: translate3d({progress-100}%, 0px, 0px);"></span>
+        </span>
+        <div class="toolbar-inner">
+          <div class="toolbarBox" on:click={() => (popupOpened = true)}>
+            <img
+              id="album"
+              alt={playingSong.song.title}
+              src={playingSong.song.albumImageUrl}
             />
-          {:else}
+            <div class="item-inner">
+              <div class="item-title-row" style="display: flex">
+                <div class="item-title">{playingSong.song.title}</div>
+              </div>
+              <div class="item-subtitle">{playingSong.song.artist}</div>
+            </div>
+          </div>
+          <div style="height: 70px;flex: 1;" on:click={() => (popupOpened = true)}></div>
+          <div style="margin-right:14px">
+            {#if state != 1}
+              <Link
+                iconMd="material:play_arrow"
+                iconOnly
+                on:click={(event) => {
+                  event.preventDefault();
+                  play(playingSong.song, 0);
+                }}
+              />
+            {:else}
+              <Link
+                iconMd="material:pause"
+                iconOnly
+                on:click={(event) => {
+                  event.preventDefault();
+                  pause();
+                }}
+              />
+            {/if}
+          </div>
+        </div>
+      </div>
+  {/if}
+
+  <Block>Bella zio se ti piace il nostro lavoro mettici un bel 30 😆</Block>
+  <List mediaList>
+    {#each songs as song}
+      {#if setLastTitleBlock(song.dirPath)}
+        <li class="list-group-title">
+          <div class="block-path">{song.dirPath}</div>
+        </li>
+      {/if}
+      {#if playingSong != null && song.id == playingSong.songId && state == 1}
+        <div style="background-color:#5521f314;">
+          <ListItem title={song.title} subtitle={song.artist}>
+            <img
+              slot="media"
+              alt={song.title}
+              src={song.albumImageUrl}
+              width="44"
+            />
+            <span slot="after" style="margin-right: 10px;">
+              <Link
+                iconMd="material:pause"
+                iconOnly
+                on:click={(event) => {
+                  event.preventDefault();
+                  pause();
+                }}
+              />
+            </span>
+          </ListItem>
+        </div>
+      {:else}
+        <ListItem title={song.title} subtitle={song.artist} 
+                  on:click={(event) => {
+                    event.preventDefault();
+                    play(song, 0);
+                  }} 
+                  link = {true} >
+          <img
+            slot="media"
+            alt={song.title}
+            src={song.albumImageUrl}
+            width="44"
+          />
+          <span slot="after" style="margin-right: 10px;">
             <Link
               iconMd="material:play_arrow"
               iconOnly
-              on:click={playPauseSong(song)}
             />
-          {/if}
-        </span>
-      </ListItem>
+          </span>
+        </ListItem>
+      {/if}
     {/each}
   </List>
 </Page>
@@ -191,35 +298,37 @@
   opened={popupOpened}
   onPopupClosed={() => (popupOpened = false)}
   swipeToClose
-  >
-    <NowPlaying></NowPlaying>
+>
+  {#if playingSong != null}
+    <NowPlaying
+      imageUrl={playingSong.song.albumImageUrl}
+      title={playingSong.song.title}
+      artist={playingSong.song.artist}
+      currentValue={playingSong.fromTimeSec}
+      songDuration={playingSong.song.durationMs / 1000}
+      onNext = {next}
+      onPrev = {prev}
+      onPlayPause = {playPause}
+      playing = {state == 1}
+      onValueChanged = { (value) => play(playingSong.song, value)}
+    />
+  {:else}
+    <NowPlaying
+      imageUrl={blankSong}
+      title={"Waiting for music..."}
+      artist={""}
+      currentValue={0}
+      songDuration={0}
+    />
+  {/if}
 </Popup>
 
 <style>
   .list-speakers {
-    height: auto;
     white-space: nowrap;
-    display: flex;
-    flex-wrap: nowrap;
     overflow: auto;
-    margin-left: -14px;
-    margin-right: -14px;
-    background-color: var(--f7-list-bg-color);
     padding-left: 7px;
     padding-right: 7px;
-    padding-top: var(--f7-block-title-margin-bottom);
-    padding-bottom: var(--f7-block-title-margin-bottom);
-  }
-  .item-speaker {
-    border: 1px solid rgba(0, 0, 0, 0.247);
-    width: 80px;
-    height: 80px;
-    flex: 0 0 auto;
-    margin-left: 7px;
-    margin-right: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .toolbarBox {
@@ -242,30 +351,50 @@
     height: 70px !important;
   }
 
-  :global(.list ul:before) {
+  /*:global(.list ul:before) {
     background-color: transparent;
   }
 
   :global(.list ul:after) {
     background-color: transparent;
+  }*/
+
+  :global(.item-title-row:before) {
+    display: none !important;
+  }
+  :global(.item-title-row) {
+    padding-right: 0px !important;
   }
 
-  .list-group-title {
-    height: auto;
+  .item-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 10;
+    font-weight: var(--f7-navbar-title-font-weight);
+    line-height: var(--f7-navbar-title-line-height);
+    text-align: var(--f7-navbar-title-text-align);
+    font-size: 16px;
+    padding-top: 14px;
+    max-width: 60vw;
   }
-  .item-title{
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex-shrink: 10;
-      font-weight: var(--f7-navbar-title-font-weight);
-      line-height: var(--f7-navbar-title-line-height);
-      text-align: var(--f7-navbar-title-text-align);
-      font-size: 16px;
-      padding-top: 14px;
-    }
-  
-  .block-title {
-    font-size: 14px !important;
+
+  .item-subtitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60vw;
+  }
+
+  .block-path {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80vw;
+  }
+
+  .progressbar {
+    background: #5521f314;
+    height: var(--f7-progressbar-height);
   }
 </style>

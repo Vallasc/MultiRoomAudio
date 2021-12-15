@@ -7,10 +7,21 @@
     export let currentValue
     export let songDuration
     export let isSpeaker = false;
+    export let disabled = false;
+    export let playing = false;
 
-    let leftTime;
-    let rightTime;
+    export let onNext = () => {}
+    export let onPrev =  () => {}
+    export let onPlayPause =  () => {}
+    export let onValueChanged =  (value) => {}
 
+    let sliderDragged = false
+    let leftTime
+    let rightTime
+    let rangeValuePressed = 0
+
+    $: currentPerc = currentValue*100/songDuration
+    $: rangeValue = !sliderDragged ? currentPerc : rangeValuePressed
     $: leftTime = getMinutesSecondsLeft(currentValue)
     $: rightTime = getMinutesSecondsRight(currentValue, songDuration)
 
@@ -28,6 +39,14 @@
         let minutes = n(Math.floor((songDuration- currentValue)/60))
         let seconds = n(Math.floor((songDuration - currentValue) % 60))
         return "-" + minutes + ":" + seconds
+    }
+
+    function onPointerUp(){
+        // Fix glitch before receiving new command by server
+        setTimeout(() => sliderDragged = false, 1000)
+        if( rangeValuePressed > currentPerc + 3 ||  rangeValuePressed < currentPerc - 3){
+            onValueChanged(songDuration * rangeValuePressed / 100)
+        }
     }
 </script>
 
@@ -66,8 +85,14 @@
                 <div class="row-flex">
                     <div class="song-subtitle">{artist}</div>
                 </div>
-                <div class="row-flex music-slider">
-                    <Range min={0} max={100} step={0.1} value={currentValue*100/songDuration} />
+                <div class="row-flex music-slider" 
+                    on:pointerdown = {() => sliderDragged = true} 
+                    on:pointerup={onPointerUp}>
+                    <Range min={0} max={100} 
+                        step={0.1} 
+                        value={rangeValue}
+                        {disabled}
+                        onRangeChange = {(value) => rangeValuePressed = value}/>
                 </div>
                 <div class="row-flex row-time">
                     <div style="margin-left: 17%;">{leftTime}</div>
@@ -75,26 +100,41 @@
                 </div>
                 <div class="row-flex">
                     {#if !isSpeaker}
-                        <div class="fab">
+                        <div class="fab color-white tansparent" on:click={(event) => {
+                            event.preventDefault()
+                            onPrev()
+                          }}>
                             <!-- svelte-ignore a11y-missing-attribute -->
                             <a>
-                                <i class="icon material-icons" style=""
+                                <i class="icon material-icons"
                                     >skip_previous
                                 </i>
                             </a>
                         </div>
-                        <div class="fab">
+                        <div class="fab" on:click={(event) => {
+                            event.preventDefault()
+                            onPlayPause()
+                          }}>
                             <!-- svelte-ignore a11y-missing-attribute -->
                             <a class="fab-play">
-                                <i class="icon material-icons" style=""
-                                    >play_arrow
-                                </i>
+                                {#if playing}
+                                    <i class="icon material-icons"
+                                        >pause
+                                    </i>
+                                {:else}
+                                    <i class="icon material-icons"
+                                        >play_arrow
+                                    </i>
+                                {/if}
                             </a>
                         </div>
-                        <div class="fab">
+                        <div class="fab color-white tansparent" on:click={(event) => {
+                            event.preventDefault()
+                            onNext()
+                          }}>
                             <!-- svelte-ignore a11y-missing-attribute -->
                             <a>
-                                <i class="icon material-icons" style=""
+                                <i class="icon material-icons "
                                     >skip_next
                                 </i>
                             </a>
@@ -149,10 +189,24 @@
         margin: 5px;
     }
 
+    .tansparent>a {
+        box-shadow: none;
+    }
+
+    .tansparent i {
+        color: #000;
+    }
+
+    .fab i {
+        font-size: 30px;
+    }
+
     .fab-play {
         height: 80px;
         width: 80px;
         border-radius: 40px;
+        margin-right: 10px;
+        margin-left: 10px;
     }
 
     .row-flex {
