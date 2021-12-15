@@ -31,7 +31,7 @@ public class ClientMain {
             socket = new Socket(discovered.getServerAddress(), discovered.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac())));
+            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac(), "Francesco"))); // TODO cambiare nome
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
             
