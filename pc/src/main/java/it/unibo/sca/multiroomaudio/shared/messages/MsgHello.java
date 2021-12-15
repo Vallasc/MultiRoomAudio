@@ -3,18 +3,13 @@ package it.unibo.sca.multiroomaudio.shared.messages;
 public class MsgHello extends Msg{
     private int deviceType; // 0 client, 1 speaker
     private String id;
-    private String name = "Pippo"; // TODO implmentation of constructor
+    private String name;
 
-    public MsgHello(int deviceType, String id) {
+    public MsgHello(int deviceType, String id, String name) {
         super("HELLO");
         this.deviceType = deviceType;
         this.id = id;
-    }
-
-    public MsgHello(int deviceType, String id, String mac) {
-        super("HELLO");
-        this.deviceType = deviceType;
-        this.id = id;
+        this.name = name;
     }
 
     public String getId() {

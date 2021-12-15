@@ -23,6 +23,6 @@ public class MsgHelloBack extends Msg {
     }
 
     public String getCompletePath(){
-        return this.path+"&&clientId="+this.id; // TODO perchè doppio &?
+        return this.path+"&clientId="+this.id;
     }
 }

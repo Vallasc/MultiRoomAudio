@@ -1,30 +1,33 @@
 package it.unibo.sca.multiroomaudio.shared.messages.player;
 
-import java.util.List;
-
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
 public class MsgPlay extends Msg {
-    private List<Song> songList;
+    private Song song; // Used only by speaker
     private int songId;
     private float fromTimeSec;
 
-    
-    public MsgPlay(List<Song> songList, int songId, float fromSec) {
+    public MsgPlay(Song song, int songId, float fromTimeSec) {
         super("PLAY");
-        this.songList = songList;
-        this.fromTimeSec = fromSec;
+        this.song = song;
+        this.fromTimeSec = fromTimeSec;
         this.songId = songId;
     }
 
+    public MsgPlay(int songId, float fromTimeSec) {
+        super("PLAY");
+        this.song = null;
+        this.fromTimeSec = fromTimeSec;
+        this.songId = songId;
+    }
 
     public int getSongId() {
         return songId;
     }
 
-    public List<Song> getSongList() {
-        return songList;
+    public Song getSong() {
+        return song;
     }
 
     public float getFromTimeSec() {
