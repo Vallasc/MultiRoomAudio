@@ -8,54 +8,54 @@ import com.google.gson.JsonSyntaxException;
 
 import org.eclipse.jetty.websocket.api.Session;
 
+import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
+import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPause;
+import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
+import it.unibo.sca.multiroomaudio.shared.messages.player.MsgStop;
 
 public class WebSocketHandler {
     private static final Gson gson = new Gson();
     private final DatabaseManager dbm;  
+    private MusicOrchestrationManager musicManager;
 
 
-    public WebSocketHandler(DatabaseManager dbm) {
+    public WebSocketHandler(DatabaseManager dbm, MusicOrchestrationManager musicManager) {
         this.dbm = dbm;
+        this.musicManager = musicManager;
     }
 
     public void handleClose(Session session){
-        String key = dbm.removeSessions(session);
-        
-        if(dbm.countSessions(key) == 0){
-            dbm.removeConnectedSocketClient(key);
-            dbm.setDeviceStop(key);
+        String deviceId = dbm.removeConnectedWebDevice(session);
+        if(deviceId != null){
+            dbm.removeConnectedSocketClient(deviceId); // If it is not a clint does nothing
+            System.out.println("Device [" + deviceId + "] disconnected");
         }
     }
 
-    public void handleHello(Session session, MsgHello hello) throws IOException{
-        /*if(hello.getDeviceType() == 0){ // Client
-            System.out.println(hello.getId());
-            
-            // TODO 
-            //not needed anymore cause there could be more than one websocket for each client
-            if(!dbm.isConnectedSocket(hello.getId())){
-                System.out.println("not registered");
-                dbm.addConnectedWebDevice(session, hello); // TODO fare simile a speaker sotto
-            }
-            else{//insert insipe connected device
-                System.out.println("registered");
-                dbm.addConnectedWebDevice(session, hello); // TODO fare simile a speaker sotto
-            }
-        } else if(hello.getDeviceType() == 1){ // Speaker
-            dbm.addConnectedWebDevice(session, hello);
-        }*/
-        dbm.addSession(session, hello.getId());
-
-        dbm.addConnectedWebDevice(session, hello);
-    }
     
     public void handleMessage(org.eclipse.jetty.websocket.api.Session session, String message) throws JsonSyntaxException, IOException{
 
         String msgType = gson.fromJson(message, JsonObject.class).get("type").getAsString();
         if( msgType.equals("HELLO") ){
             MsgHello msg = gson.fromJson(message, MsgHello.class);
-            handleHello(session, msg);
+            dbm.addConnectedWebDevice(session, msg);
+            System.out.println("Device [" + msg.getId() + "] connected");
+        } else if( msgType.equals("PLAY") ){ // Client want to play TODO controllare che sia effettivamente il client
+            MsgPlay msg = gson.fromJson(message, MsgPlay.class);
+            musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
+        } else if( msgType.equals("PAUSE") ){ // Client want to pause
+            musicManager.pauseCurrentSong();
+        } else if( msgType.equals("STOP") ){ // Client want to stop
+            musicManager.stopCurrentSong();
+        } else if( msgType.equals("NEXT") ){ // Client want next song
+            musicManager.nextSong();
+        } else if( msgType.equals("PREV") ){ // Client want next song
+            musicManager.prevSong();
         }
+    }
+
+    public static void sendMessage(Session session, Msg message) throws IOException{
+        session.getRemote().sendString( gson.toJson(message) );
     }
 }
