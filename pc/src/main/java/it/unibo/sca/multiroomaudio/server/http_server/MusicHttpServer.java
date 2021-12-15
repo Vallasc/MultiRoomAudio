@@ -7,7 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
 
 import com.google.gson.Gson;
@@ -35,43 +37,28 @@ public class MusicHttpServer extends HttpServer {
     public void run() {
         super.run();
         setRoutes();
+        setStaticFilesHeader();
     }
 
     public void setRoutes(){
-        service.path("/player", () -> {
-            service.put("/play", (req, res) -> {
-                String songId = req.queryParams("id");
-                String sec = req.queryParams("fromSec") != null ? req.queryParams("fromSec") : "0";
-                try{
-                    musicManager.playSong(Integer.parseInt(songId), Integer.parseInt(sec));
-                    return "{\"status\": \"OK\"}";
-                } catch (NumberFormatException e){
-                    return "{\"status\": \"KO\"}";
-                }
-            });
-            service.put("/pause", (req, res) -> "{\"status\": \"OK\"}");
-            service.put("/stop", (req, res) -> "{\"status\": \"OK\"}");
-            service.put("/prev", (req, res) -> "{\"status\": \"OK\"}");
-            service.put("/next", (req, res) -> "{\"status\": \"OK\"}");
-            service.get("/list", (req, res) -> songs, gson::toJson);
-        });
-
+        service.get("/songs", (req, res) -> songs, gson::toJson);
         service.get("/speakers", (req, res) -> "{\"status\": \"OK\"}");
     }
 
+    public void setStaticFilesHeader(){
+        service.staticFiles.header("Access-Control-Allow-Origin", "*");
+    }
 
     public MusicHttpServer listMusic() throws IOException{
         songs.clear();
         System.out.println("Songs:");
         Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
-            private int index = 0;
-
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 try {
                     Optional<String> ext = getExtension(file.toString());
                     if(ext.isPresent() && (ext.get().equals("mp3") || ext.get().equals("MP3"))) {
-                        songs.add(Song.fromMp3File(index++, file, dir));
+                        songs.add(Song.fromMp3File(0, file, dir));
                         System.out.println("- " + file);
                     }
                 } catch (UnsupportedTagException | InvalidDataException | IOException e) {
@@ -80,6 +67,18 @@ public class MusicHttpServer extends HttpServer {
                 return FileVisitResult.CONTINUE;
             }
         });
+        Collator collator = Collator.getInstance();
+        songs.sort( new Comparator<Song>() {
+            @Override
+            public int compare(Song s1, Song s2){
+                return collator.compare(s1.getFilePath(), s2.getFilePath());
+            }
+        });
+
+        // Set song id
+        for(int songIndex = 0; songIndex< songs.size(); songIndex++)
+            songs.get(songIndex).setId(songIndex);
+
         musicManager.setMusicList(songs);
         return this;
     }
