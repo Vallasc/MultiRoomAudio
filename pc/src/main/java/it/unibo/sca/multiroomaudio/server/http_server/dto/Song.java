@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.mpatric.mp3agic.ID3v1;
 import com.mpatric.mp3agic.ID3v2;
@@ -20,33 +21,14 @@ public class Song {
     private String album = null;
     private String year = null;
     private String songUrl = null;
+    private String dirPath = null;
+    private String fileName = null;
+    private String filePath = null;
     private String albumImageUrl = null;
+    private long durationMs = 0;
 
-    public Song(){}
-
-    public Song setId(int id){
+    public void setId(int id){
         this.id = id;
-        return this;
-    }
-
-    public Song setArtist(String artist){
-        this.artist = artist;
-        return this;
-    }
-
-    public Song setTitle(String title){
-        this.title = title;
-        return this;
-    }
-
-    public Song setAlbum(String album){
-        this.album = album;
-        return this;
-    }
-
-    public Song setYear(String year){
-        this.year = year;
-        return this;
     }
 
     public int getId(){
@@ -73,25 +55,53 @@ public class Song {
         return songUrl;
     }
 
+    public long getDuration(){
+        return durationMs;
+    }
+
+    public float getDurationSec(){
+        return durationMs/1000;
+    }
+
+    public String getDir(){
+        return dirPath;
+    }
+
+    public String getFilePath(){
+        return filePath;
+    }
+
+    public String getFileName(){
+        return fileName;
+    }
+
     public static Song fromMp3File(int id, Path filePath, File musicDir) 
                                         throws UnsupportedTagException, InvalidDataException, IOException{
         File songFile = filePath.toFile();
         Mp3File mp3file = new Mp3File(filePath);
         Song song = new Song();
         song.id = id;
-        song.songUrl = songFile.toString()
+        song.filePath = songFile.toString()
                                 .replace(musicDir.toString(), "")
                                 .replace("\\", "/");
-        //System.out.println("song url " + song.songUrl);
-        song.songUrl = "./" + EncodingUtil.encodeURIComponent(song.songUrl);
-        //System.out.println("song url2 " + song.songUrl);
+        song.songUrl = "./" + EncodingUtil.encodeURIComponent(song.filePath);
+        song.durationMs = mp3file.getLengthInMilliseconds();
+
+        Path p = Paths.get(song.filePath);
+        String fileName = p.getFileName().toString();
+        song.fileName = fileName;
+        song.dirPath = song.filePath.replace(fileName, "");
+        song.dirPath = song.dirPath.replaceAll("^\\\\+", ""); //TODO Testing
+        song.dirPath = song.dirPath.replaceAll("^\\/+", "");
+        song.dirPath = song.dirPath.replaceAll("\\\\+$", "");
+        song.dirPath = song.dirPath.replaceAll("\\/+$", "");
 
         if (mp3file.hasId3v2Tag()) {
             ID3v2 id3v2Tag = mp3file.getId3v2Tag();
-            song.setArtist(id3v2Tag.getArtist())
-                .setTitle(id3v2Tag.getTitle())
-                .setAlbum(id3v2Tag.getAlbum())
-                .setYear(id3v2Tag.getYear());
+            song.artist = id3v2Tag.getArtist();
+            song.title = id3v2Tag.getTitle();
+            song.album = id3v2Tag.getAlbum();
+            song.year = id3v2Tag.getYear();
 
             byte[] imageData = id3v2Tag.getAlbumImage();
             if (imageData != null) {
@@ -114,12 +124,12 @@ public class Song {
             }
         } else if (mp3file.hasId3v1Tag()) {
             ID3v1 id3v1Tag = mp3file.getId3v1Tag();
-            song.setArtist(id3v1Tag.getArtist())
-                .setTitle(id3v1Tag.getTitle())
-                .setAlbum(id3v1Tag.getAlbum())
-                .setYear(id3v1Tag.getYear());
+            song.artist = id3v1Tag.getArtist();
+            song.title = id3v1Tag.getTitle();
+            song.album = id3v1Tag.getAlbum();
+            song.year = id3v1Tag.getYear();
         } else {
-            song.setTitle(mp3file.getFilename());
+            song.title = song.fileName;
         }
         return song;
     }
