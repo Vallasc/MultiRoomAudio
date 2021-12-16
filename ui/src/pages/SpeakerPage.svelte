@@ -17,19 +17,19 @@
     let title = "Waiting for music..."
     let artist = ""
 
-    let speakerId;
-    let speakerName = "Sandro"
+    let speakerId
+    let speakerName
 
     onMount(() => {
         f7ready(() => {
             loadId()
-            socketSetup()
+            loadName()
+            dialogInsertName()
         })
     })
 
     function loadId(){
         speakerId = localStorage.getItem("id")
-        console.log(speakerId)
         if(speakerId == null){
             speakerId = Math.random().toString(36).substring(2, 15) + 
                         Math.random().toString(36).substring(2, 15) + 
@@ -37,15 +37,29 @@
                         Math.random().toString(36).substring(2, 15)
             localStorage.setItem("id", speakerId)
         }
+        console.log("Id : " + speakerId)
     }
 
-    let alertShowed = false
+    function loadName(){
+        speakerName = localStorage.getItem("name")
+        if(speakerName == null){
+            speakerName = "Bed room"
+            localStorage.setItem("name", speakerName)
+        }
+    }
+
+    function saveName(value){
+        if(value == speakerName)
+            return
+        speakerName = value
+        localStorage.setItem("name", value)
+    }
+
     function socketSetup(){
         socket = new WebSocket("ws://" + location.hostname + "/websocket")
 
         socket.onopen = () => {
             sendInitMessage()
-            dialogInsertName()
         }
 
         socket.onmessage = (event) => {
@@ -58,12 +72,16 @@
         }
     }
 
+    let alertShowed = false
     function dialogInsertName(){
-        f7.dialog.prompt('Inserire nome speaker', 'Multiroom Audio', () => {
+        f7.dialog.prompt('Insert speaker name', 'Multiroom Audio', (value) => {
                 alertShowed = true;
+                saveName(value)
+                console.log("Name : " + speakerId)
+                socketSetup()
         }, () => {
             dialogInsertName()
-        });
+        }, speakerName);
     }
 
     function sendInitMessage(){
@@ -102,7 +120,7 @@
                 imageUrl = blankSong
             else 
                 imageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
-            title = song.title89
+            title = song.title
             artist = song.artist
 
             let res = await fetch("http://" + location.hostname + ":8080/" + song.songUrl.replace("./", ""))
