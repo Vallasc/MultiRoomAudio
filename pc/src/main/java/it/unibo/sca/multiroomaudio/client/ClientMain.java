@@ -43,12 +43,12 @@ public class ClientMain {
         if (Desktop.isDesktopSupported()){
             try {
                 Desktop.getDesktop().browse(
-                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?"+msg.getCompletePath()));
+                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath()));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?"+msg.getCompletePath());
+            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath());
         }
         if(!msg.getPath().equals("type=rejected")){
             (new FingerprintService(socket)).start();
