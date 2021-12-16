@@ -17,7 +17,7 @@
 
   let socket
   const urlParams = new URLSearchParams(window.location.search)
-  let clientId = urlParams.get("clientId")
+  const clientId = urlParams.get("clientId")
   const blankSong = "http://" + location.hostname + ":80/imgs/blank_album.png"
 
   onMount(() => {
@@ -60,6 +60,13 @@
     return albumImageUrl
   }
 
+  let songs = []
+  let speakerList = []
+  let popupOpened = false
+  let state = 0 // 0 stop, 1 play, 2 pause
+  let playingSong = null
+  let progress = 0
+
   function processMessage(message) {
     console.log(message);
     switch (message.type) {
@@ -79,14 +86,11 @@
         state = 0
         progress = 0
         break
+      case "SPEAKER_LIST":
+        speakerList = message.speakerList
+        break
     }
   }
-
-  let songs = []
-  let popupOpened = false
-  let state = 0 // 0 stop, 1 play, 2 pause
-  let playingSong = null
-  let progress = 0
 
   async function fetchSongs() {
     let res = await fetch("http://" + location.hostname + ":8080/songs", {
@@ -188,10 +192,15 @@
   </Navbar>
   <Toolbar top>
     <div class="list-speakers">
-      <Chip text="Cucina" color="#6200ee" iconMd="material:volume_up" />
-      <Chip text="Camera letto" iconMd="material:volume_mute" />
-      <Chip text="Salone" iconMd="material:volume_mute" />
-      <Chip text="Mansarda" iconMd="material:volume_mute" />
+      {#each speakerList as speaker}
+        <div class="speaker-chip">
+          {#if speaker.isMuted}
+            <Chip text={speaker.name} iconMd="material:volume_mute" />
+          {:else}
+            <Chip text={speaker.name} color="#6200ee" iconMd="material:volume_up"/>
+          {/if}
+        </div>
+      {/each}
     </div>
   </Toolbar>
   <!-- Toolbar -->
@@ -396,5 +405,11 @@
   .progressbar {
     background: #5521f314;
     height: var(--f7-progressbar-height);
+  }
+
+  .speaker-chip {
+    margin-left: 7px;
+    margin-right: 7px;
+    display: inline-flex;
   }
 </style>
