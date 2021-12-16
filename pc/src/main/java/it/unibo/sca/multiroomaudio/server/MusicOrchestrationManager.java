@@ -15,9 +15,8 @@ import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgStop;
 
 public class MusicOrchestrationManager extends Thread {
-    private final static Logger LOGGER = Logger.getLogger(MusicOrchestrationManager.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(MusicOrchestrationManager.class.getSimpleName());
 
-    private int state = 0; // 0 = stop, 1 = play, 2 = pause
     private DatabaseManager databaseManager;
     private Player musicPlayer;
 
@@ -33,17 +32,20 @@ public class MusicOrchestrationManager extends Thread {
         while(true){
             
             List<Pair<Session, Device>> connectedDevices = databaseManager.getConnectedWebDevices();
-            // Stream to all
-            synchronized (this) {
-                for(Pair<Session, Device> speaker : connectedDevices){
-                    Session session = speaker.getLeft();
-                    try {
-                        WebSocketHandler.sendMessage(session, musicPlayer.prepareMessage());
-                    } catch (Exception e) {
-                        //e.printStackTrace();
-                    }
+            Msg currentPlayerState;
+            synchronized(musicPlayer) {
+                currentPlayerState = musicPlayer.prepareMessage();
+            }
+            // Stream current player state to all web devices
+            for(Pair<Session, Device> device : connectedDevices){
+                Session session = device.getLeft();
+                try {
+                    WebSocketHandler.sendMessage(session, currentPlayerState);
+                } catch (Exception e) {
+                    //RIP
                 }
             }
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -57,43 +59,46 @@ public class MusicOrchestrationManager extends Thread {
     }
 
     public void playSong(int songId, float fromSec) {
-        Song song = this.databaseManager.getSongs().get(songId);
-        synchronized (this) {
-            musicPlayer.play(songId, (long) (fromSec* 1000));
-            state = 1;
-            LOGGER.info("PLAYING: " + musicPlayer.getCurrentSong().getTitle());
+        try{
+            this.databaseManager.getSongs().get(songId);
+        } catch (IndexOutOfBoundsException e) {
+            return;
         }
+        synchronized (musicPlayer) {
+            musicPlayer.play(songId, (long) (fromSec* 1000));
+        }
+        LOGGER.info("PLAYING: " + musicPlayer.getCurrentSong().getTitle());
     }
 
     public void pauseCurrentSong() {
-        synchronized (this) {
-            if(state == 1){
-                musicPlayer.pause();
-                state = 2;
-                LOGGER.info("PAUSE: " + musicPlayer.getCurrentSong().getTitle());
-            }
+        synchronized (musicPlayer) {
+            musicPlayer.pause();
         }
+        LOGGER.info("PAUSE: " + musicPlayer.getCurrentSong().getTitle());
     }
     
     public void stopCurrentSong() {
-        synchronized (this) {
+        synchronized (musicPlayer) {
                 musicPlayer.stop();
-                state = 0;
-            LOGGER.info("STOP: " + musicPlayer.getCurrentSong().getTitle());
         }
+        LOGGER.info("STOP: " + musicPlayer.getCurrentSong().getTitle());
     }
 
     public void nextSong() {
-        musicPlayer.next();
+        synchronized (musicPlayer) {
+            musicPlayer.next();
+        }
         LOGGER.info("NEXT: " + musicPlayer.getCurrentSong().getTitle());
     }
 
     public void prevSong() {
-        musicPlayer.prev();
+        synchronized (musicPlayer) {
+            musicPlayer.prev();
+        }
         LOGGER.info("PREV: " + musicPlayer.getCurrentSong().getTitle());  
     }
 
-    public class Player { // TODO syncronize object?
+    public class Player {
         private List<Song> songs;
         private int songIndex = 0;
         private long startTime;
@@ -171,7 +176,8 @@ public class MusicOrchestrationManager extends Thread {
                     currentSongTime = 0;
                     break;
             }
-            if( currentSongTime >= songs.get(songIndex).getDuration() ) { // New song in the list
+            if( songs.size() > 0 && 
+                currentSongTime >= songs.get(songIndex).getDuration() ) {
                 next();
                 return 0;
             }
@@ -179,6 +185,8 @@ public class MusicOrchestrationManager extends Thread {
         }  
 
         public Msg prepareMessage(){
+            if( songs.size() == 0)
+                return new MsgStop();
             float currentTimeSec = getCurrentSongTimeMs()/1000;
             Song song = songs.get(songIndex);
             switch(state){

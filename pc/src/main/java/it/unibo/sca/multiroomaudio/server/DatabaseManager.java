@@ -123,18 +123,15 @@ public class DatabaseManager {
     }
 
     // return deviceId
-    public String removeConnectedWebDevice(Session session){
+    public Device removeConnectedWebDevice(Session session){
         Device old = connectedWebDevices.remove(session);
         if(old != null)
-            return old.getId();
+            return old;
         return null;
     }
 
-    public boolean isConnectedWeb(String deviceId){
-        for(Pair<Session, Device> pair : getConnectedWebDevices())
-            if(pair.getRight().getId() == deviceId)
-            return true;
-        return false;
+    public Device getConnectedWebDevice(Session session){
+        return connectedWebDevices.get(session);
     }
 
     //--------------------------------CONNECTEDSOCKETDEVICES---------------------------------------------------
