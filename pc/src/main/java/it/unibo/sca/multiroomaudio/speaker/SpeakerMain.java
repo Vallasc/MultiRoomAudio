@@ -16,12 +16,12 @@ public class SpeakerMain {
         if (Desktop.isDesktopSupported()){
             try {
                 Desktop.getDesktop().browse(
-                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?type=speaker"));
+                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?type=speaker"));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"/?type=speaker");
+            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?type=speaker");
         }
         
     }
