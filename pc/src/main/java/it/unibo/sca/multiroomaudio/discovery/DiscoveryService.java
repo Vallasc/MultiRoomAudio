@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import it.unibo.sca.multiroomaudio.shared.messages.MyMsgHandler;
 
@@ -73,9 +74,11 @@ public class DiscoveryService {
                 if(n.isUp() && !n.isLoopback() && !n.isVirtual()){
                     List<InterfaceAddress> addresses = n.getInterfaceAddresses();
                     for(InterfaceAddress addr : addresses){
+
                         InetAddress inetAddr = addr.getAddress();
                         if (inetAddr instanceof Inet6Address) continue;
                         Socket socket = new Socket();
+                        socket.setReuseAddress(true);
                         try {
                             socket.bind(new InetSocketAddress(inetAddr, 15000));
                             try{
@@ -93,7 +96,8 @@ public class DiscoveryService {
                             this.ip=addr.getAddress().getHostAddress();
 
                           }catch(IOException e) {
-                            continue;
+                                System.err.println("socket is still bound");
+                                continue;
                           }
                     }
                 }
