@@ -1,14 +1,14 @@
 <script>
-    import { Page, Range } from "framework7-svelte";
+    import { Page, Range } from "framework7-svelte"
 
     export let imageUrl
     export let title
     export let artist
     export let currentValue
     export let songDuration
-    export let isSpeaker = false;
-    export let disabled = false;
-    export let playing = false;
+    export let isSpeaker = false
+    export let disabled = false
+    export let playing = false
 
     export let onNext = () => {}
     export let onPrev =  () => {}
@@ -42,6 +42,7 @@
     }
 
     function onPointerUp(){
+        if(!sliderDragged) return
         // Fix glitch before receiving new command by server
         setTimeout(() => sliderDragged = false, 1000)
         if( rangeValuePressed > currentPerc + 3 ||  rangeValuePressed < currentPerc - 3){
@@ -87,7 +88,8 @@
                 </div>
                 <div class="row-flex music-slider" 
                     on:pointerdown = {() => sliderDragged = true} 
-                    on:pointerup={onPointerUp}>
+                    on:pointerup = {onPointerUp}
+                    on:mouseleave = {onPointerUp}>
                     <Range min={0} max={100} 
                         step={0.1} 
                         value={rangeValue}

@@ -64,6 +64,8 @@ public class WebSocketHandler {
                     musicManager.nextSong();
                 } else if( msgType.equals("PREV") ){ // Client want next song
                     musicManager.prevSong();
+                } else if( msgType.equals("anObject")){
+                    
                 }
             }
         }

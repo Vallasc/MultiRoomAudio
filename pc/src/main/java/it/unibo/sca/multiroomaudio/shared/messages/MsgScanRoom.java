@@ -1,11 +1,11 @@
 package it.unibo.sca.multiroomaudio.shared.messages;
 
-public class MsgOffline extends Msg{
+public class MsgScanRoom extends Msg{
     String id;
     String room;
 
-    public MsgOffline(boolean start, String id, String room) {
-        super("OFFLINE");
+    public MsgScanRoom(boolean start, String id, String room) {
+        super("SCAN_ROOM");
         this.id = id;
         this.room = room;
     }

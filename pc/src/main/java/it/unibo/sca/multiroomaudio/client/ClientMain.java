@@ -15,9 +15,6 @@ import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class ClientMain {
     
-// read script file
-
-// call function from script file
     public static void main(String[] args) {
         
         // Find ip and port with broadcast
@@ -26,21 +23,21 @@ public class ClientMain {
         DiscoveryService discovered = new DiscoveryService();
         //create socket for the fingerprints     
         Socket socket = null;
-        
-        try{
+
+        try {
             socket = new Socket(discovered.getServerAddress(), discovered.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
             dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac(), "Francesco"))); // TODO cambiare nome
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
+            System.out.println("NON CI ARRIVO QUI IL CLIENT SI BLOCCA"); // TODO
             
-            
-        }catch(IOException e){
+        } catch(IOException e) {
             e.printStackTrace();
         }
         
-        if (Desktop.isDesktopSupported()){
+        if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(
                     new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath()));
@@ -50,14 +47,15 @@ public class ClientMain {
         } else {
             System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath());
         }
-        if(!msg.getPath().equals("type=rejected")){
+        if(!msg.getPath().equals("type=rejected")) {
             (new FingerprintService(socket)).start();
-        } else
+        } else {
             try {
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
     }
 
 }
