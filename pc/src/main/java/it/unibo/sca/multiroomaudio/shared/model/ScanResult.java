@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.shared.dto;
+package it.unibo.sca.multiroomaudio.shared.model;
 
 public class ScanResult {
     private final String BSSID;

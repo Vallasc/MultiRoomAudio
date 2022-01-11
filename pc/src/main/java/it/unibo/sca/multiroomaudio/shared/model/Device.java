@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.shared.dto;
+package it.unibo.sca.multiroomaudio.shared.model;
 
 public abstract class Device { // TODO Needs to be renamed to Device
     private final String id;

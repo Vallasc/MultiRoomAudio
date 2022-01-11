@@ -1,7 +1,6 @@
-package it.unibo.sca.multiroomaudio.shared.dto;
+package it.unibo.sca.multiroomaudio.shared.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,10 +8,11 @@ import io.github.vallasc.APInfo;
 
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
-    String id;
-    final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
+    private final String id;
+    private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
     
     public Room(String id){
+        this.id = id;
         fingerprints = new HashMap<>();
     }
 
@@ -20,14 +20,17 @@ public class Room {
         this.id = id;
         this.fingerprints = fingerprints;
     }
-
-    public void setNewClient(String clientId){
-    }
     
     public String getId(){
         return id;
     }
 
+    public int getFingerprintsSize(){
+        return fingerprints.values()
+                        .stream()
+                        .map((scan) -> scan.size())
+                        .reduce(0, (tot, element) -> tot + element);
+    }
     public synchronized void putClientFingerprints(APInfo[] scans){
         //server tenerli ordinati?
         List<ScanResult> list;
