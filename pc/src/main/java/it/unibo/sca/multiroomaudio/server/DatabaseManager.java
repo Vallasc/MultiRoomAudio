@@ -12,7 +12,6 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
-import it.unibo.sca.multiroomaudio.shared.dto.*;
 /*HashMap<id, Device> (tutti i device)
 list<device> (device connessi)
 Map<clientID, stanza> -> Stanza(Nome, Map<idClient, List<Fingerprint>>)  -> 
@@ -21,6 +20,7 @@ Device -> se il device è un client il fingerprint va salvato dentro device e il
         alcune robe che vengono accedute da device devono essere accedute con metodi synchronized
 MusicOrchestrationManager -> (list<speaker>, minutaggio, canzone)*/
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
+import it.unibo.sca.multiroomaudio.shared.model.*;
 
 public class DatabaseManager {
     private final List<Song> songs = new ArrayList<Song>();
@@ -53,8 +53,9 @@ public class DatabaseManager {
     }
 
     public boolean setDeviceStart(String clientId, String roomId){
+        setDeviceStop(clientId);
         try{
-            setClientRoom(clientId,roomId);
+            setClientRoom(clientId, roomId);
             ((Client) devices.get(clientId)).setStart(true, roomId);
             return true;
         }catch(ClassCastException e){
@@ -63,18 +64,9 @@ public class DatabaseManager {
         }
     }
 
-    public boolean getDeviceStart(String key){
+    public boolean setDeviceStop(String clientId){
         try{
-            return ((Client) devices.get(key)).getStart();
-        }catch(ClassCastException e){
-            System.err.println("you casted a speaker to a client, what's going on?");
-            return false;
-        }
-    }
-
-    public boolean setDeviceStop(String key){
-        try{
-            ((Client) devices.get(key)).setStart(false, null);
+            ((Client) devices.get(clientId)).setStart(false, null);
             return true;
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
@@ -170,8 +162,8 @@ public class DatabaseManager {
     //-------------------------------ROOMS-----------------------------------------
     public void setClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> newRoom = new ConcurrentHashMap<>();
-        System.out.println("room: " + roomId);
-        newRoom.putIfAbsent(roomId, new Room(roomId));
+        System.out.println("New room for client "+ clientId + ", roomID: " + roomId);
+        newRoom.putIfAbsent(roomId.toLowerCase(), new Room(roomId));
         ConcurrentHashMap<String, Room> presentHM = clientScans.putIfAbsent(clientId, newRoom);
         //there was already the hashmap
         if(presentHM != null){
@@ -179,7 +171,20 @@ public class DatabaseManager {
         }
     }
 
+    public void deleteClientRoom(String clientId, String roomId){
+        ConcurrentHashMap<String, Room> rooms = clientScans.get(clientId);
+        if( rooms == null ) return;
+        rooms.remove(roomId);
+    }
+
+    public List<Room> getClientRooms(String clientId){
+        ConcurrentHashMap<String, Room> rooms = clientScans.get(clientId);
+        if( rooms == null ) return null;
+        return new ArrayList<>(rooms.values());
+    }
+
     public void putScans(String clientId, String roomId, APInfo[] scans){
+        roomId = roomId.toLowerCase();
         clientScans.get(clientId).get(roomId).putClientFingerprints(scans);
     }
 
