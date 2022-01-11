@@ -31,7 +31,6 @@ public class ClientMain {
             dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac(), "Francesco"))); // TODO cambiare nome
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
-            System.out.println("NON CI ARRIVO QUI IL CLIENT SI BLOCCA"); // TODO
             
         } catch(IOException e) {
             e.printStackTrace();
