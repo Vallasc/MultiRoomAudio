@@ -1,9 +1,10 @@
-package it.unibo.sca.multiroomaudio.shared.messages;
+package it.unibo.sca.multiroomaudio.shared.messages.player;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import it.unibo.sca.multiroomaudio.shared.dto.Speaker;
+import it.unibo.sca.multiroomaudio.shared.messages.Msg;
+import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
 public class MsgSpeakerList extends Msg {
     private List<SpeakerDTO> speakerList;
