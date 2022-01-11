@@ -56,13 +56,13 @@
         <div class="navbar-bg" />
         <div class="navbar-inner sliding">
             {#if !isSpeaker}
-                <div class="left">
+                <div class="right" style="margin-right: 14px;">
                     <!-- svelte-ignore a11y-invalid-attribute -->
                     <a
                         class="link icon-only popup-close"
                         href="#"
-                        iconmd="material:expand_more"
-                        ><i class="icon material-icons" style="">expand_more </i>
+                        iconmd="material:close"
+                        ><i class="icon material-icons" style="">close</i>
                     </a>
                 </div>
             {/if}

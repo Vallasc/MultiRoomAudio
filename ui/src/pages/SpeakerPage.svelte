@@ -1,16 +1,16 @@
 <script>
-    import NowPlaying from "./NowPlaying.svelte";
-    import { Page, f7 } from "framework7-svelte";
-    import { onMount } from 'svelte';
-    import { f7ready } from 'framework7-svelte';
+    import NowPlaying from "./NowPlaying.svelte"
+    import { Page, f7 } from "framework7-svelte"
+    import { onMount } from 'svelte'
+    import { f7ready } from 'framework7-svelte'
 
 
-    let socket = null;
-    const audio = new Audio();
+    let socket = null
+    const audio = new Audio()
 
-    let songId = -1;
-    let currentTimeSec = 0;
-    let songDurationSec = 0;
+    let songId = -1
+    let currentTimeSec = 0
+    let songDurationSec = 0
 
     const blankSong = "http://" + location.hostname + ":80/imgs/blank_album.png"
     let imageUrl = blankSong
@@ -75,13 +75,13 @@
     let alertShowed = false
     function dialogInsertName(){
         f7.dialog.prompt('Insert speaker name', 'Multiroom Audio', (value) => {
-                alertShowed = true;
+                alertShowed = true
                 saveName(value)
                 console.log("Name : " + speakerId)
                 socketSetup()
         }, () => {
             dialogInsertName()
-        }, speakerName);
+        }, speakerName)
     }
 
     function sendInitMessage(){
@@ -98,13 +98,13 @@
         switch(message.type){
             case "PLAY":
                 play(message)
-                break;
+                break
             case "PAUSE":
                 pause()
-                break;
+                break
             case "STOP":
                 stop()
-                break;
+                break
         }    
     }
 
@@ -135,13 +135,13 @@
                 audio.play()
         } else {
             // Allign time
-            const syncWindow = 4;
+            const syncWindow = 4
             if(audio.currentTime > message.fromTimeSec + syncWindow/2 || audio.currentTime < message.fromTimeSec - syncWindow/2)
                 audio.currentTime = message.fromTimeSec
             if(audio.paused)
                 audio.play()
         }
-        //console.log("Current time " + audio.currentTime);
+        //console.log("Current time " + audio.currentTime)
         //console.log(message.fromTimeSec)
     }
 
@@ -154,7 +154,7 @@
     }
 
     // Update progress bar
-    let updateTime;
+    let updateTime
     //audio.onplay = () => {
     setInterval(() => currentTimeSec = audio.currentTime, 500)
     //}
