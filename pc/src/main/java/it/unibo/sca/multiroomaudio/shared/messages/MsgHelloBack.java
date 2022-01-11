@@ -2,15 +2,7 @@ package it.unibo.sca.multiroomaudio.shared.messages;
 
 public class MsgHelloBack extends Msg {
     private String path;
-    String id;
-
-    public MsgHelloBack() {
-        super("HELLO_BACK");
-    }
-
-    public MsgHelloBack(String type){
-        super(type);
-    }
+    private String id;
 
     public MsgHelloBack(String path, String id) {
         super("HELLO_BACK");
