@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
 
-import it.unibo.sca.multiroomaudio.shared.dto.Device;
-import it.unibo.sca.multiroomaudio.shared.dto.Speaker;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgSpeakerList;
+import it.unibo.sca.multiroomaudio.shared.messages.player.MsgSpeakerList;
+import it.unibo.sca.multiroomaudio.shared.model.Device;
+import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
 public class SpeakerManager {
     private final static Logger LOGGER = Logger.getLogger(SpeakerManager.class.getSimpleName());

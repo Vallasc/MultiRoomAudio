@@ -1,6 +1,8 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -8,12 +10,17 @@ import com.google.gson.JsonSyntaxException;
 
 import org.eclipse.jetty.websocket.api.Session;
 
-import it.unibo.sca.multiroomaudio.shared.dto.Client;
-import it.unibo.sca.multiroomaudio.shared.dto.Device;
-import it.unibo.sca.multiroomaudio.shared.dto.Speaker;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgCreateRoom;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgRooms;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanRoom;
+import it.unibo.sca.multiroomaudio.shared.model.Client;
+import it.unibo.sca.multiroomaudio.shared.model.Device;
+import it.unibo.sca.multiroomaudio.shared.model.Room;
+import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
 public class WebSocketHandler {
     private static final Gson gson = new Gson();
@@ -62,10 +69,34 @@ public class WebSocketHandler {
                     musicManager.stopCurrentSong();
                 } else if( msgType.equals("NEXT") ){ // Client want next song
                     musicManager.nextSong();
-                } else if( msgType.equals("PREV") ){ // Client want next song
+                } else if( msgType.equals("PREV") ){ // Client want prev song
                     musicManager.prevSong();
-                } else if( msgType.equals("anObject")){
-                    
+                } else if( msgType.equals("ROOMS_REQUEST")){
+                    List<Room> rooms = dbm.getClientRooms(connected.getId());
+                    if(rooms != null)
+                        sendMessage(session, new MsgRooms(rooms));
+                    else
+                        sendMessage(session, new MsgRooms(new ArrayList<Room>()));
+                } else if( msgType.equals("CREATE_ROOM")){
+                    MsgCreateRoom msg = gson.fromJson(message, MsgCreateRoom.class);
+                    dbm.setClientRoom(connected.getId(), msg.getRoomId());
+
+                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                } else if( msgType.equals("DELETE_ROOM")){
+                    MsgDeleteRoom msg = gson.fromJson(message, MsgDeleteRoom.class);
+                    dbm.deleteClientRoom(connected.getId(), msg.getRoomId());
+
+                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                } else if( msgType.equals("SCAN_ROOM")){
+                    MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
+                    if(msg.getStartScan()){
+                        System.out.print("DEBUG: Start scan");
+                        dbm.setDeviceStart(connected.getId(), msg.getRoomId());
+                    } else {
+                        System.out.print("DEBUG: Stop scan");
+                        dbm.setDeviceStop(connected.getId());
+                        sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                    }
                 }
             }
         }
