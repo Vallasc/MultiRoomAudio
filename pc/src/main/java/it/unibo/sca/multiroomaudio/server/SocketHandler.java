@@ -11,8 +11,8 @@ import java.net.SocketTimeoutException;
 import com.google.gson.Gson;
 
 import io.github.vallasc.APInfo;
-import it.unibo.sca.multiroomaudio.shared.dto.Client;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
+import it.unibo.sca.multiroomaudio.shared.model.Client;
 
 public class SocketHandler extends Thread{
     private final Socket clientSocket;
@@ -46,11 +46,7 @@ public class SocketHandler extends Thread{
             }
 
             dbm.addConnectedSocketClient(clientId, hello);
-            if(dbm.deviceContains(clientId)){
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
-            }else{
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=newclient", clientId)));
-            }
+            dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
             
         } catch (IOException e) {
             e.printStackTrace();

@@ -8,11 +8,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
 
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
-import it.unibo.sca.multiroomaudio.shared.dto.Device;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPause;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgStop;
+import it.unibo.sca.multiroomaudio.shared.model.Device;
 
 public class MusicOrchestrationManager extends Thread {
     private final static Logger LOGGER = Logger.getLogger(MusicOrchestrationManager.class.getSimpleName());

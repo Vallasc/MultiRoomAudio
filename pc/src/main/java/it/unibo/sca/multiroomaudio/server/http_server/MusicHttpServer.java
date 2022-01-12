@@ -42,7 +42,6 @@ public class MusicHttpServer extends HttpServer {
 
     public void setRoutes(){
         service.get("/songs", (req, res) -> songs, gson::toJson);
-        service.get("/speakers", (req, res) -> "{\"status\": \"OK\"}");
     }
 
     public void setStaticFilesHeader(){

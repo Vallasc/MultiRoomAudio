@@ -1,8 +1,7 @@
 package it.unibo.sca.multiroomaudio.shared.messages;
 
 public class MsgClose extends Msg{
-
-    String ip;
+    private String ip;
 
     public MsgClose(String ip){
         super("CLOSE");
@@ -12,5 +11,4 @@ public class MsgClose extends Msg{
     public String getIp(){
         return this.ip;
     }
-    
 }

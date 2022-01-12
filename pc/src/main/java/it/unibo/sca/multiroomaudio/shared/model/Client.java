@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.shared.dto;
+package it.unibo.sca.multiroomaudio.shared.model;
 
 import io.github.vallasc.APInfo;
 

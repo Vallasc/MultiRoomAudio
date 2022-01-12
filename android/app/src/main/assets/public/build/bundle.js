@@ -1031,7 +1031,7 @@ var MultiRoomAudio = (function () {
       return this;
     }
 
-    function text$2(text) {
+    function text$1(text) {
       if (typeof text === 'undefined') {
         return this[0] ? this[0].textContent.trim() : null;
       }
@@ -1915,7 +1915,7 @@ var MultiRoomAudio = (function () {
         stop: stop,
         styles: styles,
         submit: submit,
-        text: text$2,
+        text: text$1,
         toggleClass: toggleClass,
         touchend: touchend,
         touchmove: touchmove,
@@ -15618,7 +15618,7 @@ var MultiRoomAudio = (function () {
       }
     };
 
-    var Progressbar = {
+    var Progressbar$1 = {
       set: function set() {
         var app = this;
 
@@ -15752,12 +15752,12 @@ var MultiRoomAudio = (function () {
         return $progressbarEl;
       }
     };
-    var Progressbar$1 = {
+    var Progressbar$2 = {
       name: 'progressbar',
       create: function create() {
         var app = this;
         bindMethods(app, {
-          progressbar: Progressbar
+          progressbar: Progressbar$1
         });
       },
       on: {
@@ -30889,7 +30889,7 @@ var MultiRoomAudio = (function () {
       css: css,
       each: each,
       html: html,
-      text: text$2,
+      text: text$1,
       is: is,
       index: index,
       eq: eq,
@@ -41327,7 +41327,7 @@ var MultiRoomAudio = (function () {
      *
      * Released on: September 30, 2021
      */
-    Framework7$1.use([DeviceModule, SupportModule, UtilsModule, ResizeModule, RequestModule, TouchModule, ClicksModule, RouterModule, HistoryModule, ServiceWorkerModule, StoreModule, Statusbar$1, View$1, Navbar$2, Toolbar$2, Subnavbar, TouchRipple, Modal, Appbar, Dialog, Popup$1, LoginScreen, Popover, Actions, Sheet, Toast, Preloader$2, Progressbar$1, Sortable$1, Swipeout$1, Accordion$1, ContactsList, VirtualList, ListIndex, Timeline, Tabs, Panel, Card, Chip$1, Form, Input$1, Checkbox, Radio, Toggle, Range$1, Stepper, SmartSelect, Grid$1, Calendar, Picker, InfiniteScroll$1, PullToRefresh, Lazy$1, DataTable, Fab$2, Searchbar, Messages, Messagebar, Swiper, PhotoBrowser, Notification, Autocomplete, Tooltip, Skeleton, Menu$1, ColorPicker, Treeview$1, TextEditor, Elevation, Typography]);
+    Framework7$1.use([DeviceModule, SupportModule, UtilsModule, ResizeModule, RequestModule, TouchModule, ClicksModule, RouterModule, HistoryModule, ServiceWorkerModule, StoreModule, Statusbar$1, View$1, Navbar$2, Toolbar$2, Subnavbar, TouchRipple, Modal, Appbar, Dialog, Popup$1, LoginScreen, Popover, Actions, Sheet, Toast, Preloader$2, Progressbar$2, Sortable$1, Swipeout$1, Accordion$1, ContactsList, VirtualList, ListIndex, Timeline, Tabs, Panel, Card, Chip$1, Form, Input$1, Checkbox, Radio, Toggle, Range$1, Stepper, SmartSelect, Grid$1, Calendar, Picker, InfiniteScroll$1, PullToRefresh, Lazy$1, DataTable, Fab$2, Searchbar, Messages, Messagebar, Swiper, PhotoBrowser, Notification, Autocomplete, Tooltip, Skeleton, Menu$1, ColorPicker, Treeview$1, TextEditor, Elevation, Typography]);
 
     /**
      * Framework7 6.3.5
@@ -41874,6 +41874,21 @@ var MultiRoomAudio = (function () {
     function is_empty(obj) {
         return Object.keys(obj).length === 0;
     }
+    function validate_store(store, name) {
+        if (store != null && typeof store.subscribe !== 'function') {
+            throw new Error(`'${name}' is not a store with a 'subscribe' method`);
+        }
+    }
+    function subscribe(store, ...callbacks) {
+        if (store == null) {
+            return noop;
+        }
+        const unsub = store.subscribe(...callbacks);
+        return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+    }
+    function component_subscribe(component, store, callback) {
+        component.$$.on_destroy.push(subscribe(store, callback));
+    }
     function create_slot(definition, ctx, $$scope, fn) {
         if (definition) {
             const slot_ctx = get_slot_context(definition, ctx, $$scope, fn);
@@ -41966,14 +41981,14 @@ var MultiRoomAudio = (function () {
     function svg_element(name) {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
-    function text$1(data) {
+    function text(data) {
         return document.createTextNode(data);
     }
     function space() {
-        return text$1(' ');
+        return text(' ');
     }
     function empty() {
-        return text$1('');
+        return text('');
     }
     function listen(node, event, handler, options) {
         node.addEventListener(event, handler, options);
@@ -42011,16 +42026,6 @@ var MultiRoomAudio = (function () {
     }
     function set_style(node, key, value, important) {
         node.style.setProperty(key, value, important ? 'important' : '');
-    }
-    function select_option(select, value) {
-        for (let i = 0; i < select.options.length; i += 1) {
-            const option = select.options[i];
-            if (option.__value === value) {
-                option.selected = true;
-                return;
-            }
-        }
-        select.selectedIndex = -1; // no option should be selected
     }
     function toggle_class(element, name, toggle) {
         element.classList[toggle ? 'add' : 'remove'](name);
@@ -42091,9 +42096,6 @@ var MultiRoomAudio = (function () {
     }
     function add_render_callback(fn) {
         render_callbacks.push(fn);
-    }
-    function add_flush_callback(fn) {
-        flush_callbacks.push(fn);
     }
     let flushing = false;
     const seen_callbacks = new Set();
@@ -42312,14 +42314,6 @@ var MultiRoomAudio = (function () {
     }
     function get_spread_object(spread_props) {
         return typeof spread_props === 'object' && spread_props !== null ? spread_props : {};
-    }
-
-    function bind(component, name, callback) {
-        const index = component.$$.props[name];
-        if (index !== undefined) {
-            component.$$.bound[index] = callback;
-            callback(component.$$.ctx[index]);
-        }
     }
     function create_component(block) {
         block && block.c();
@@ -42712,16 +42706,16 @@ var MultiRoomAudio = (function () {
     };
 
     /* node_modules\framework7-svelte\esm\svelte\routable-modals.svelte generated by Svelte v3.44.0 */
-    const file$w = "node_modules\\framework7-svelte\\esm\\svelte\\routable-modals.svelte";
+    const file$t = "node_modules\\framework7-svelte\\esm\\svelte\\routable-modals.svelte";
 
-    function get_each_context$2(ctx, list, i) {
+    function get_each_context$3(ctx, list, i) {
     	const child_ctx = ctx.slice();
     	child_ctx[5] = list[i];
     	return child_ctx;
     }
 
     // (33:2) {#each modals as modal (modal.id)}
-    function create_each_block$2(key_1, ctx) {
+    function create_each_block$3(key_1, ctx) {
     	let first;
     	let switch_instance;
     	let switch_instance_anchor;
@@ -42814,7 +42808,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_each_block$2.name,
+    		id: create_each_block$3.name,
     		type: "each",
     		source: "(33:2) {#each modals as modal (modal.id)}",
     		ctx
@@ -42823,7 +42817,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$z(ctx) {
+    function create_fragment$v(ctx) {
     	let div;
     	let each_blocks = [];
     	let each_1_lookup = new Map();
@@ -42831,12 +42825,12 @@ var MultiRoomAudio = (function () {
     	let each_value = /*modals*/ ctx[0];
     	validate_each_argument(each_value);
     	const get_key = ctx => /*modal*/ ctx[5].id;
-    	validate_each_keys(ctx, each_value, get_each_context$2, get_key);
+    	validate_each_keys(ctx, each_value, get_each_context$3, get_key);
 
     	for (let i = 0; i < each_value.length; i += 1) {
-    		let child_ctx = get_each_context$2(ctx, each_value, i);
+    		let child_ctx = get_each_context$3(ctx, each_value, i);
     		let key = get_key(child_ctx);
-    		each_1_lookup.set(key, each_blocks[i] = create_each_block$2(key, child_ctx));
+    		each_1_lookup.set(key, each_blocks[i] = create_each_block$3(key, child_ctx));
     	}
 
     	const block = {
@@ -42848,7 +42842,7 @@ var MultiRoomAudio = (function () {
     			}
 
     			attr_dev(div, "class", "framework7-modals");
-    			add_location(div, file$w, 31, 0, 629);
+    			add_location(div, file$t, 31, 0, 629);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -42868,8 +42862,8 @@ var MultiRoomAudio = (function () {
     				each_value = /*modals*/ ctx[0];
     				validate_each_argument(each_value);
     				group_outros();
-    				validate_each_keys(ctx, each_value, get_each_context$2, get_key);
-    				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div, outro_and_destroy_block, create_each_block$2, null, get_each_context$2);
+    				validate_each_keys(ctx, each_value, get_each_context$3, get_key);
+    				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div, outro_and_destroy_block, create_each_block$3, null, get_each_context$3);
     				check_outros();
     			}
     		},
@@ -42902,7 +42896,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$z.name,
+    		id: create_fragment$v.name,
     		type: "component",
     		source: "",
     		ctx
@@ -42911,7 +42905,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$v($$self, $$props, $$invalidate) {
+    function instance$s($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Routable_modals', slots, []);
     	let modals = [];
@@ -42983,21 +42977,21 @@ var MultiRoomAudio = (function () {
     class Routable_modals extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$v, create_fragment$z, safe_not_equal, {});
+    		init(this, options, instance$s, create_fragment$v, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Routable_modals",
     			options,
-    			id: create_fragment$z.name
+    			id: create_fragment$v.name
     		});
     	}
     }
 
     /* node_modules\framework7-svelte\esm\svelte\app.svelte generated by Svelte v3.44.0 */
-    const file$v = "node_modules\\framework7-svelte\\esm\\svelte\\app.svelte";
+    const file$s = "node_modules\\framework7-svelte\\esm\\svelte\\app.svelte";
 
-    function create_fragment$y(ctx) {
+    function create_fragment$u(ctx) {
     	let div;
     	let t;
     	let routablemodals;
@@ -43013,7 +43007,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			create_component(routablemodals.$$.fragment);
     			attr_dev(div, "class", /*classes*/ ctx[1]);
-    			add_location(div, file$v, 32, 0, 843);
+    			add_location(div, file$s, 32, 0, 843);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -43071,7 +43065,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$y.name,
+    		id: create_fragment$u.name,
     		type: "component",
     		source: "",
     		ctx
@@ -43080,7 +43074,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$u($$self, $$props, $$invalidate) {
+    function instance$r($$self, $$props, $$invalidate) {
     	let classes;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('App', slots, ['default']);
@@ -43154,13 +43148,13 @@ var MultiRoomAudio = (function () {
     class App extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$u, create_fragment$y, safe_not_equal, { class: 2 });
+    		init(this, options, instance$r, create_fragment$u, safe_not_equal, { class: 2 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "App",
     			options,
-    			id: create_fragment$y.name
+    			id: create_fragment$u.name
     		});
     	}
 
@@ -43221,9 +43215,9 @@ var MultiRoomAudio = (function () {
     };
 
     /* node_modules\framework7-svelte\esm\svelte\badge.svelte generated by Svelte v3.44.0 */
-    const file$u = "node_modules\\framework7-svelte\\esm\\svelte\\badge.svelte";
+    const file$r = "node_modules\\framework7-svelte\\esm\\svelte\\badge.svelte";
 
-    function create_fragment$x(ctx) {
+    function create_fragment$t(ctx) {
     	let span;
     	let useTooltip_action;
     	let current;
@@ -43243,7 +43237,7 @@ var MultiRoomAudio = (function () {
     			span = element("span");
     			if (default_slot) default_slot.c();
     			set_attributes(span, span_data);
-    			add_location(span, file$u, 15, 0, 435);
+    			add_location(span, file$r, 15, 0, 435);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -43311,7 +43305,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$x.name,
+    		id: create_fragment$t.name,
     		type: "component",
     		source: "",
     		ctx
@@ -43320,7 +43314,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$t($$self, $$props, $$invalidate) {
+    function instance$q($$self, $$props, $$invalidate) {
     	let classes;
     	const omit_props_names = ["class","tooltip","tooltipTrigger"];
     	let $$restProps = compute_rest_props($$props, omit_props_names);
@@ -43373,13 +43367,13 @@ var MultiRoomAudio = (function () {
     class Badge extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$t, create_fragment$x, safe_not_equal, { class: 4, tooltip: 0, tooltipTrigger: 1 });
+    		init(this, options, instance$q, create_fragment$t, safe_not_equal, { class: 4, tooltip: 0, tooltipTrigger: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Badge",
     			options,
-    			id: create_fragment$x.name
+    			id: create_fragment$t.name
     		});
     	}
 
@@ -43405,182 +43399,6 @@ var MultiRoomAudio = (function () {
 
     	set tooltipTrigger(value) {
     		throw new Error("<Badge>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
-
-    /* node_modules\framework7-svelte\esm\svelte\block-title.svelte generated by Svelte v3.44.0 */
-    const file$t = "node_modules\\framework7-svelte\\esm\\svelte\\block-title.svelte";
-
-    function create_fragment$w(ctx) {
-    	let div;
-    	let current;
-    	const default_slot_template = /*#slots*/ ctx[6].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[5], null);
-    	let div_levels = [{ class: /*classes*/ ctx[0] }, restProps(/*$$restProps*/ ctx[1])];
-    	let div_data = {};
-
-    	for (let i = 0; i < div_levels.length; i += 1) {
-    		div_data = assign(div_data, div_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (default_slot) default_slot.c();
-    			set_attributes(div, div_data);
-    			add_location(div, file$t, 22, 0, 469);
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, [dirty]) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 32)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[5],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[5])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[5], dirty, null),
-    						null
-    					);
-    				}
-    			}
-
-    			set_attributes(div, div_data = get_spread_update(div_levels, [
-    				(!current || dirty & /*classes*/ 1) && { class: /*classes*/ ctx[0] },
-    				dirty & /*$$restProps*/ 2 && restProps(/*$$restProps*/ ctx[1])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (default_slot) default_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$w.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$s($$self, $$props, $$invalidate) {
-    	let classes;
-    	const omit_props_names = ["large","medium","class"];
-    	let $$restProps = compute_rest_props($$props, omit_props_names);
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('Block_title', slots, ['default']);
-    	let { large = false } = $$props;
-    	let { medium = false } = $$props;
-    	let { class: className = undefined } = $$props;
-
-    	$$self.$$set = $$new_props => {
-    		$$invalidate(7, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
-    		$$invalidate(1, $$restProps = compute_rest_props($$props, omit_props_names));
-    		if ('large' in $$new_props) $$invalidate(2, large = $$new_props.large);
-    		if ('medium' in $$new_props) $$invalidate(3, medium = $$new_props.medium);
-    		if ('class' in $$new_props) $$invalidate(4, className = $$new_props.class);
-    		if ('$$scope' in $$new_props) $$invalidate(5, $$scope = $$new_props.$$scope);
-    	};
-
-    	$$self.$capture_state = () => ({
-    		colorClasses,
-    		classNames,
-    		restProps,
-    		large,
-    		medium,
-    		className,
-    		classes
-    	});
-
-    	$$self.$inject_state = $$new_props => {
-    		$$invalidate(7, $$props = assign(assign({}, $$props), $$new_props));
-    		if ('large' in $$props) $$invalidate(2, large = $$new_props.large);
-    		if ('medium' in $$props) $$invalidate(3, medium = $$new_props.medium);
-    		if ('className' in $$props) $$invalidate(4, className = $$new_props.className);
-    		if ('classes' in $$props) $$invalidate(0, classes = $$new_props.classes);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	$$self.$$.update = () => {
-    		$$invalidate(0, classes = classNames(
-    			className,
-    			'block-title',
-    			{
-    				'block-title-large': large,
-    				'block-title-medium': medium
-    			},
-    			colorClasses($$props)
-    		));
-    	};
-
-    	$$props = exclude_internal_props($$props);
-    	return [classes, $$restProps, large, medium, className, $$scope, slots];
-    }
-
-    class Block_title extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-    		init(this, options, instance$s, create_fragment$w, safe_not_equal, { large: 2, medium: 3, class: 4 });
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "Block_title",
-    			options,
-    			id: create_fragment$w.name
-    		});
-    	}
-
-    	get large() {
-    		throw new Error("<Block_title>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set large(value) {
-    		throw new Error("<Block_title>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get medium() {
-    		throw new Error("<Block_title>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set medium(value) {
-    		throw new Error("<Block_title>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get class() {
-    		throw new Error("<Block_title>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set class(value) {
-    		throw new Error("<Block_title>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
@@ -43619,9 +43437,9 @@ var MultiRoomAudio = (function () {
     };
 
     /* node_modules\framework7-svelte\esm\svelte\block.svelte generated by Svelte v3.44.0 */
-    const file$s = "node_modules\\framework7-svelte\\esm\\svelte\\block.svelte";
+    const file$q = "node_modules\\framework7-svelte\\esm\\svelte\\block.svelte";
 
-    function create_fragment$v(ctx) {
+    function create_fragment$s(ctx) {
     	let div;
     	let current;
     	const default_slot_template = /*#slots*/ ctx[21].default;
@@ -43638,7 +43456,7 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (default_slot) default_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$s, 58, 0, 1600);
+    			add_location(div, file$q, 58, 0, 1600);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -43692,7 +43510,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$v.name,
+    		id: create_fragment$s.name,
     		type: "component",
     		source: "",
     		ctx
@@ -43701,7 +43519,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$r($$self, $$props, $$invalidate) {
+    function instance$p($$self, $$props, $$invalidate) {
     	let classes;
 
     	const omit_props_names = [
@@ -43877,7 +43695,7 @@ var MultiRoomAudio = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$r, create_fragment$v, safe_not_equal, {
+    		init(this, options, instance$p, create_fragment$s, safe_not_equal, {
     			inset: 3,
     			xsmallInset: 4,
     			smallInset: 5,
@@ -43901,7 +43719,7 @@ var MultiRoomAudio = (function () {
     			component: this,
     			tagName: "Block",
     			options,
-    			id: create_fragment$v.name
+    			id: create_fragment$s.name
     		});
     	}
 
@@ -44114,9 +43932,9 @@ var MultiRoomAudio = (function () {
     };
 
     /* node_modules\framework7-svelte\esm\svelte\icon.svelte generated by Svelte v3.44.0 */
-    const file$r = "node_modules\\framework7-svelte\\esm\\svelte\\icon.svelte";
+    const file$p = "node_modules\\framework7-svelte\\esm\\svelte\\icon.svelte";
 
-    function create_fragment$u(ctx) {
+    function create_fragment$r(ctx) {
     	let i;
     	let t0_value = (/*iconText*/ ctx[4] || '') + "";
     	let t0;
@@ -44143,11 +43961,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			i = element("i");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (default_slot) default_slot.c();
     			set_attributes(i, i_data);
-    			add_location(i, file$r, 89, 0, 2329);
+    			add_location(i, file$p, 89, 0, 2329);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -44222,7 +44040,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$u.name,
+    		id: create_fragment$r.name,
     		type: "component",
     		source: "",
     		ctx
@@ -44231,7 +44049,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$q($$self, $$props, $$invalidate) {
+    function instance$o($$self, $$props, $$invalidate) {
     	let iconClasses;
     	let iconText;
     	let iconSize;
@@ -44443,7 +44261,7 @@ var MultiRoomAudio = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$q, create_fragment$u, safe_not_equal, {
+    		init(this, options, instance$o, create_fragment$r, safe_not_equal, {
     			style: 7,
     			class: 8,
     			material: 9,
@@ -44461,7 +44279,7 @@ var MultiRoomAudio = (function () {
     			component: this,
     			tagName: "Icon",
     			options,
-    			id: create_fragment$u.name
+    			id: create_fragment$r.name
     		});
     	}
 
@@ -44557,13 +44375,13 @@ var MultiRoomAudio = (function () {
     /* node_modules\framework7-svelte\esm\svelte\use-icon.svelte generated by Svelte v3.44.0 */
 
     // (9:2) {#if icon.badge}
-    function create_if_block$k(ctx) {
+    function create_if_block$i(ctx) {
     	let badge;
     	let current;
     	const badge_spread_levels = [/*icon*/ ctx[0].badge.props];
 
     	let badge_props = {
-    		$$slots: { default: [create_default_slot_1$6] },
+    		$$slots: { default: [create_default_slot_1$5] },
     		$$scope: { ctx }
     	};
 
@@ -44608,7 +44426,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$k.name,
+    		id: create_if_block$i.name,
     		type: "if",
     		source: "(9:2) {#if icon.badge}",
     		ctx
@@ -44618,13 +44436,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (10:4) <Badge {...icon.badge.props}>
-    function create_default_slot_1$6(ctx) {
+    function create_default_slot_1$5(ctx) {
     	let t_value = /*icon*/ ctx[0].badge.content + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -44639,7 +44457,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_1$6.name,
+    		id: create_default_slot_1$5.name,
     		type: "slot",
     		source: "(10:4) <Badge {...icon.badge.props}>",
     		ctx
@@ -44649,10 +44467,10 @@ var MultiRoomAudio = (function () {
     }
 
     // (8:0) <Icon {...icon.props}>
-    function create_default_slot$c(ctx) {
+    function create_default_slot$b(ctx) {
     	let if_block_anchor;
     	let current;
-    	let if_block = /*icon*/ ctx[0].badge && create_if_block$k(ctx);
+    	let if_block = /*icon*/ ctx[0].badge && create_if_block$i(ctx);
 
     	const block = {
     		c: function create() {
@@ -44673,7 +44491,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block, 1);
     					}
     				} else {
-    					if_block = create_if_block$k(ctx);
+    					if_block = create_if_block$i(ctx);
     					if_block.c();
     					transition_in(if_block, 1);
     					if_block.m(if_block_anchor.parentNode, if_block_anchor);
@@ -44705,7 +44523,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$c.name,
+    		id: create_default_slot$b.name,
     		type: "slot",
     		source: "(8:0) <Icon {...icon.props}>",
     		ctx
@@ -44714,13 +44532,13 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$t(ctx) {
+    function create_fragment$q(ctx) {
     	let icon_1;
     	let current;
     	const icon_1_spread_levels = [/*icon*/ ctx[0].props];
 
     	let icon_1_props = {
-    		$$slots: { default: [create_default_slot$c] },
+    		$$slots: { default: [create_default_slot$b] },
     		$$scope: { ctx }
     	};
 
@@ -44768,7 +44586,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$t.name,
+    		id: create_fragment$q.name,
     		type: "component",
     		source: "",
     		ctx
@@ -44777,7 +44595,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$p($$self, $$props, $$invalidate) {
+    function instance$n($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Use_icon', slots, []);
     	let { icon = undefined } = $$props;
@@ -44807,13 +44625,13 @@ var MultiRoomAudio = (function () {
     class Use_icon extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$p, create_fragment$t, safe_not_equal, { icon: 0 });
+    		init(this, options, instance$n, create_fragment$q, safe_not_equal, { icon: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Use_icon",
     			options,
-    			id: create_fragment$t.name
+    			id: create_fragment$q.name
     		});
     	}
 
@@ -44827,7 +44645,7 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\preloader.svelte generated by Svelte v3.44.0 */
-    const file$q = "node_modules\\framework7-svelte\\esm\\svelte\\preloader.svelte";
+    const file$o = "node_modules\\framework7-svelte\\esm\\svelte\\preloader.svelte";
 
     // (50:2) {:else}
     function create_else_block$9(ctx) {
@@ -44837,7 +44655,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			span = element("span");
     			attr_dev(span, "class", "preloader-inner");
-    			add_location(span, file$q, 49, 9, 1589);
+    			add_location(span, file$o, 49, 9, 1589);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -44859,7 +44677,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (48:34) 
-    function create_if_block_2$d(ctx) {
+    function create_if_block_2$a(ctx) {
     	let span1;
     	let span0;
 
@@ -44868,9 +44686,9 @@ var MultiRoomAudio = (function () {
     			span1 = element("span");
     			span0 = element("span");
     			attr_dev(span0, "class", "preloader-inner-circle");
-    			add_location(span0, file$q, 48, 35, 1532);
+    			add_location(span0, file$o, 48, 35, 1532);
     			attr_dev(span1, "class", "preloader-inner");
-    			add_location(span1, file$q, 48, 4, 1501);
+    			add_location(span1, file$o, 48, 4, 1501);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span1, anchor);
@@ -44883,7 +44701,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$d.name,
+    		id: create_if_block_2$a.name,
     		type: "if",
     		source: "(48:34) ",
     		ctx
@@ -44893,7 +44711,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (37:31) 
-    function create_if_block_1$e(ctx) {
+    function create_if_block_1$b(ctx) {
     	let span8;
     	let span0;
     	let t0;
@@ -44930,23 +44748,23 @@ var MultiRoomAudio = (function () {
     			t6 = space();
     			span7 = element("span");
     			attr_dev(span0, "class", "preloader-inner-line");
-    			add_location(span0, file$q, 38, 6, 1104);
+    			add_location(span0, file$o, 38, 6, 1104);
     			attr_dev(span1, "class", "preloader-inner-line");
-    			add_location(span1, file$q, 39, 6, 1148);
+    			add_location(span1, file$o, 39, 6, 1148);
     			attr_dev(span2, "class", "preloader-inner-line");
-    			add_location(span2, file$q, 40, 6, 1192);
+    			add_location(span2, file$o, 40, 6, 1192);
     			attr_dev(span3, "class", "preloader-inner-line");
-    			add_location(span3, file$q, 41, 6, 1236);
+    			add_location(span3, file$o, 41, 6, 1236);
     			attr_dev(span4, "class", "preloader-inner-line");
-    			add_location(span4, file$q, 42, 6, 1280);
+    			add_location(span4, file$o, 42, 6, 1280);
     			attr_dev(span5, "class", "preloader-inner-line");
-    			add_location(span5, file$q, 43, 6, 1324);
+    			add_location(span5, file$o, 43, 6, 1324);
     			attr_dev(span6, "class", "preloader-inner-line");
-    			add_location(span6, file$q, 44, 6, 1368);
+    			add_location(span6, file$o, 44, 6, 1368);
     			attr_dev(span7, "class", "preloader-inner-line");
-    			add_location(span7, file$q, 45, 6, 1412);
+    			add_location(span7, file$o, 45, 6, 1412);
     			attr_dev(span8, "class", "preloader-inner");
-    			add_location(span8, file$q, 37, 4, 1067);
+    			add_location(span8, file$o, 37, 4, 1067);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span8, anchor);
@@ -44973,7 +44791,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$e.name,
+    		id: create_if_block_1$b.name,
     		type: "if",
     		source: "(37:31) ",
     		ctx
@@ -44983,7 +44801,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (31:2) {#if theme && theme.md}
-    function create_if_block$j(ctx) {
+    function create_if_block$h(ctx) {
     	let span;
     	let svg;
     	let circle;
@@ -44996,11 +44814,11 @@ var MultiRoomAudio = (function () {
     			attr_dev(circle, "cx", "18");
     			attr_dev(circle, "cy", "18");
     			attr_dev(circle, "r", "16");
-    			add_location(circle, file$q, 33, 8, 972);
+    			add_location(circle, file$o, 33, 8, 972);
     			attr_dev(svg, "viewBox", "0 0 36 36");
-    			add_location(svg, file$q, 32, 6, 938);
+    			add_location(svg, file$o, 32, 6, 938);
     			attr_dev(span, "class", "preloader-inner");
-    			add_location(span, file$q, 31, 4, 901);
+    			add_location(span, file$o, 31, 4, 901);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -45014,7 +44832,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$j.name,
+    		id: create_if_block$h.name,
     		type: "if",
     		source: "(31:2) {#if theme && theme.md}",
     		ctx
@@ -45023,13 +44841,13 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$s(ctx) {
+    function create_fragment$p(ctx) {
     	let span;
 
     	function select_block_type(ctx, dirty) {
-    		if (/*theme*/ ctx[0] && /*theme*/ ctx[0].md) return create_if_block$j;
-    		if (/*theme*/ ctx[0] && /*theme*/ ctx[0].ios) return create_if_block_1$e;
-    		if (/*theme*/ ctx[0] && /*theme*/ ctx[0].aurora) return create_if_block_2$d;
+    		if (/*theme*/ ctx[0] && /*theme*/ ctx[0].md) return create_if_block$h;
+    		if (/*theme*/ ctx[0] && /*theme*/ ctx[0].ios) return create_if_block_1$b;
+    		if (/*theme*/ ctx[0] && /*theme*/ ctx[0].aurora) return create_if_block_2$a;
     		return create_else_block$9;
     	}
 
@@ -45053,7 +44871,7 @@ var MultiRoomAudio = (function () {
     			span = element("span");
     			if_block.c();
     			set_attributes(span, span_data);
-    			add_location(span, file$q, 29, 0, 797);
+    			add_location(span, file$o, 29, 0, 797);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -45089,7 +44907,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$s.name,
+    		id: create_fragment$p.name,
     		type: "component",
     		source: "",
     		ctx
@@ -45098,7 +44916,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$o($$self, $$props, $$invalidate) {
+    function instance$m($$self, $$props, $$invalidate) {
     	let sizeComputed;
     	let preloaderStyle;
     	let classes;
@@ -45184,13 +45002,13 @@ var MultiRoomAudio = (function () {
     class Preloader extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$o, create_fragment$s, safe_not_equal, { style: 4, class: 5, size: 6 });
+    		init(this, options, instance$m, create_fragment$p, safe_not_equal, { style: 4, class: 5, size: 6 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Preloader",
     			options,
-    			id: create_fragment$s.name
+    			id: create_fragment$p.name
     		});
     	}
 
@@ -45220,10 +45038,10 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\button.svelte generated by Svelte v3.44.0 */
-    const file$p = "node_modules\\framework7-svelte\\esm\\svelte\\button.svelte";
+    const file$n = "node_modules\\framework7-svelte\\esm\\svelte\\button.svelte";
 
     // (163:0) {:else}
-    function create_else_block_1$4(ctx) {
+    function create_else_block_1$3(ctx) {
     	let a;
     	let current_block_type_index;
     	let if_block;
@@ -45232,7 +45050,7 @@ var MultiRoomAudio = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	const if_block_creators = [create_if_block_6$2, create_else_block_2$4];
+    	const if_block_creators = [create_if_block_6$1, create_else_block_2$3];
     	const if_blocks = [];
 
     	function select_block_type_2(ctx, dirty) {
@@ -45254,7 +45072,7 @@ var MultiRoomAudio = (function () {
     			a = element("a");
     			if_block.c();
     			set_attributes(a, a_data);
-    			add_location(a, file$p, 163, 2, 4437);
+    			add_location(a, file$n, 163, 2, 4437);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
@@ -45334,7 +45152,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1$4.name,
+    		id: create_else_block_1$3.name,
     		type: "else",
     		source: "(163:0) {:else}",
     		ctx
@@ -45344,7 +45162,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (132:0) {#if tagName === 'button'}
-    function create_if_block$i(ctx) {
+    function create_if_block$g(ctx) {
     	let button;
     	let current_block_type_index;
     	let if_block;
@@ -45353,7 +45171,7 @@ var MultiRoomAudio = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	const if_block_creators = [create_if_block_1$d, create_else_block$8];
+    	const if_block_creators = [create_if_block_1$a, create_else_block$8];
     	const if_blocks = [];
 
     	function select_block_type_1(ctx, dirty) {
@@ -45375,7 +45193,7 @@ var MultiRoomAudio = (function () {
     			button = element("button");
     			if_block.c();
     			set_attributes(button, button_data);
-    			add_location(button, file$p, 132, 2, 3770);
+    			add_location(button, file$n, 132, 2, 3770);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, button, anchor);
@@ -45456,7 +45274,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$i.name,
+    		id: create_if_block$g.name,
     		type: "if",
     		source: "(132:0) {#if tagName === 'button'}",
     		ctx
@@ -45466,12 +45284,12 @@ var MultiRoomAudio = (function () {
     }
 
     // (183:4) {:else}
-    function create_else_block_2$4(ctx) {
+    function create_else_block_2$3(ctx) {
     	let t0;
     	let t1;
     	let current;
-    	let if_block0 = /*icon*/ ctx[8] && create_if_block_10$2(ctx);
-    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_9$2(ctx);
+    	let if_block0 = /*icon*/ ctx[8] && create_if_block_10$1(ctx);
+    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_9$1(ctx);
     	const default_slot_template = /*#slots*/ ctx[48].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[47], null);
 
@@ -45504,7 +45322,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_10$2(ctx);
+    					if_block0 = create_if_block_10$1(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(t0.parentNode, t0);
@@ -45523,7 +45341,7 @@ var MultiRoomAudio = (function () {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
     				} else {
-    					if_block1 = create_if_block_9$2(ctx);
+    					if_block1 = create_if_block_9$1(ctx);
     					if_block1.c();
     					if_block1.m(t1.parentNode, t1);
     				}
@@ -45569,7 +45387,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_2$4.name,
+    		id: create_else_block_2$3.name,
     		type: "else",
     		source: "(183:4) {:else}",
     		ctx
@@ -45579,7 +45397,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (172:4) {#if preloader}
-    function create_if_block_6$2(ctx) {
+    function create_if_block_6$1(ctx) {
     	let preloader_1;
     	let t0;
     	let span;
@@ -45595,8 +45413,8 @@ var MultiRoomAudio = (function () {
     			$$inline: true
     		});
 
-    	let if_block0 = /*icon*/ ctx[8] && create_if_block_8$2(ctx);
-    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_7$2(ctx);
+    	let if_block0 = /*icon*/ ctx[8] && create_if_block_8$1(ctx);
+    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_7$1(ctx);
     	const default_slot_template = /*#slots*/ ctx[48].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[47], null);
 
@@ -45610,7 +45428,7 @@ var MultiRoomAudio = (function () {
     			if (if_block1) if_block1.c();
     			t2 = space();
     			if (default_slot) default_slot.c();
-    			add_location(span, file$p, 173, 6, 4695);
+    			add_location(span, file$n, 173, 6, 4695);
     		},
     		m: function mount(target, anchor) {
     			mount_component(preloader_1, target, anchor);
@@ -45641,7 +45459,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_8$2(ctx);
+    					if_block0 = create_if_block_8$1(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(span, t1);
@@ -45660,7 +45478,7 @@ var MultiRoomAudio = (function () {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
     				} else {
-    					if_block1 = create_if_block_7$2(ctx);
+    					if_block1 = create_if_block_7$1(ctx);
     					if_block1.c();
     					if_block1.m(span, t2);
     				}
@@ -45709,7 +45527,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_6$2.name,
+    		id: create_if_block_6$1.name,
     		type: "if",
     		source: "(172:4) {#if preloader}",
     		ctx
@@ -45719,7 +45537,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (184:6) {#if icon}
-    function create_if_block_10$2(ctx) {
+    function create_if_block_10$1(ctx) {
     	let useicon;
     	let current;
 
@@ -45757,7 +45575,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_10$2.name,
+    		id: create_if_block_10$1.name,
     		type: "if",
     		source: "(184:6) {#if icon}",
     		ctx
@@ -45767,7 +45585,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (187:6) {#if typeof text !== 'undefined'}
-    function create_if_block_9$2(ctx) {
+    function create_if_block_9$1(ctx) {
     	let span;
     	let t_value = plainText(/*text*/ ctx[0]) + "";
     	let t;
@@ -45775,8 +45593,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$p, 187, 8, 5008);
+    			t = text(t_value);
+    			add_location(span, file$n, 187, 8, 5008);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -45792,7 +45610,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_9$2.name,
+    		id: create_if_block_9$1.name,
     		type: "if",
     		source: "(187:6) {#if typeof text !== 'undefined'}",
     		ctx
@@ -45802,7 +45620,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (175:8) {#if icon}
-    function create_if_block_8$2(ctx) {
+    function create_if_block_8$1(ctx) {
     	let useicon;
     	let current;
 
@@ -45840,7 +45658,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_8$2.name,
+    		id: create_if_block_8$1.name,
     		type: "if",
     		source: "(175:8) {#if icon}",
     		ctx
@@ -45850,7 +45668,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (178:8) {#if typeof text !== 'undefined'}
-    function create_if_block_7$2(ctx) {
+    function create_if_block_7$1(ctx) {
     	let span;
     	let t_value = plainText(/*text*/ ctx[0]) + "";
     	let t;
@@ -45858,8 +45676,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$p, 178, 10, 4816);
+    			t = text(t_value);
+    			add_location(span, file$n, 178, 10, 4816);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -45875,7 +45693,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_7$2.name,
+    		id: create_if_block_7$1.name,
     		type: "if",
     		source: "(178:8) {#if typeof text !== 'undefined'}",
     		ctx
@@ -45889,8 +45707,8 @@ var MultiRoomAudio = (function () {
     	let t0;
     	let t1;
     	let current;
-    	let if_block0 = /*icon*/ ctx[8] && create_if_block_5$3(ctx);
-    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_4$3(ctx);
+    	let if_block0 = /*icon*/ ctx[8] && create_if_block_5$2(ctx);
+    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_4$2(ctx);
     	const default_slot_template = /*#slots*/ ctx[48].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[47], null);
 
@@ -45923,7 +45741,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_5$3(ctx);
+    					if_block0 = create_if_block_5$2(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(t0.parentNode, t0);
@@ -45942,7 +45760,7 @@ var MultiRoomAudio = (function () {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
     				} else {
-    					if_block1 = create_if_block_4$3(ctx);
+    					if_block1 = create_if_block_4$2(ctx);
     					if_block1.c();
     					if_block1.m(t1.parentNode, t1);
     				}
@@ -45998,7 +45816,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (141:4) {#if preloader}
-    function create_if_block_1$d(ctx) {
+    function create_if_block_1$a(ctx) {
     	let preloader_1;
     	let t0;
     	let span;
@@ -46014,8 +45832,8 @@ var MultiRoomAudio = (function () {
     			$$inline: true
     		});
 
-    	let if_block0 = /*icon*/ ctx[8] && create_if_block_3$a(ctx);
-    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_2$c(ctx);
+    	let if_block0 = /*icon*/ ctx[8] && create_if_block_3$6(ctx);
+    	let if_block1 = typeof /*text*/ ctx[0] !== 'undefined' && create_if_block_2$9(ctx);
     	const default_slot_template = /*#slots*/ ctx[48].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[47], null);
 
@@ -46029,7 +45847,7 @@ var MultiRoomAudio = (function () {
     			if (if_block1) if_block1.c();
     			t2 = space();
     			if (default_slot) default_slot.c();
-    			add_location(span, file$p, 142, 6, 4033);
+    			add_location(span, file$n, 142, 6, 4033);
     		},
     		m: function mount(target, anchor) {
     			mount_component(preloader_1, target, anchor);
@@ -46060,7 +45878,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_3$a(ctx);
+    					if_block0 = create_if_block_3$6(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(span, t1);
@@ -46079,7 +45897,7 @@ var MultiRoomAudio = (function () {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
     				} else {
-    					if_block1 = create_if_block_2$c(ctx);
+    					if_block1 = create_if_block_2$9(ctx);
     					if_block1.c();
     					if_block1.m(span, t2);
     				}
@@ -46128,7 +45946,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$d.name,
+    		id: create_if_block_1$a.name,
     		type: "if",
     		source: "(141:4) {#if preloader}",
     		ctx
@@ -46138,7 +45956,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (153:6) {#if icon}
-    function create_if_block_5$3(ctx) {
+    function create_if_block_5$2(ctx) {
     	let useicon;
     	let current;
 
@@ -46176,7 +45994,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_5$3.name,
+    		id: create_if_block_5$2.name,
     		type: "if",
     		source: "(153:6) {#if icon}",
     		ctx
@@ -46186,7 +46004,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (156:6) {#if typeof text !== 'undefined'}
-    function create_if_block_4$3(ctx) {
+    function create_if_block_4$2(ctx) {
     	let span;
     	let t_value = plainText(/*text*/ ctx[0]) + "";
     	let t;
@@ -46194,8 +46012,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$p, 156, 8, 4346);
+    			t = text(t_value);
+    			add_location(span, file$n, 156, 8, 4346);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -46211,7 +46029,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_4$3.name,
+    		id: create_if_block_4$2.name,
     		type: "if",
     		source: "(156:6) {#if typeof text !== 'undefined'}",
     		ctx
@@ -46221,7 +46039,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (144:8) {#if icon}
-    function create_if_block_3$a(ctx) {
+    function create_if_block_3$6(ctx) {
     	let useicon;
     	let current;
 
@@ -46259,7 +46077,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3$a.name,
+    		id: create_if_block_3$6.name,
     		type: "if",
     		source: "(144:8) {#if icon}",
     		ctx
@@ -46269,7 +46087,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (147:8) {#if typeof text !== 'undefined'}
-    function create_if_block_2$c(ctx) {
+    function create_if_block_2$9(ctx) {
     	let span;
     	let t_value = plainText(/*text*/ ctx[0]) + "";
     	let t;
@@ -46277,8 +46095,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$p, 147, 10, 4154);
+    			t = text(t_value);
+    			add_location(span, file$n, 147, 10, 4154);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -46294,7 +46112,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$c.name,
+    		id: create_if_block_2$9.name,
     		type: "if",
     		source: "(147:8) {#if typeof text !== 'undefined'}",
     		ctx
@@ -46303,12 +46121,12 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$r(ctx) {
+    function create_fragment$o(ctx) {
     	let current_block_type_index;
     	let if_block;
     	let if_block_anchor;
     	let current;
-    	const if_block_creators = [create_if_block$i, create_else_block_1$4];
+    	const if_block_creators = [create_if_block$g, create_else_block_1$3];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -46376,7 +46194,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$r.name,
+    		id: create_fragment$o.name,
     		type: "component",
     		source: "",
     		ctx
@@ -46385,7 +46203,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$n($$self, $$props, $$invalidate) {
+    function instance$l($$self, $$props, $$invalidate) {
     	let hrefComputed;
     	let attrs;
     	let classes;
@@ -46758,8 +46576,8 @@ var MultiRoomAudio = (function () {
     		init(
     			this,
     			options,
-    			instance$n,
-    			create_fragment$r,
+    			instance$l,
+    			create_fragment$o,
     			safe_not_equal,
     			{
     				class: 13,
@@ -46811,7 +46629,7 @@ var MultiRoomAudio = (function () {
     			component: this,
     			tagName: "Button",
     			options,
-    			id: create_fragment$r.name
+    			id: create_fragment$o.name
     		});
     	}
 
@@ -47137,34 +46955,34 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\chip.svelte generated by Svelte v3.44.0 */
-    const file$o = "node_modules\\framework7-svelte\\esm\\svelte\\chip.svelte";
+    const file$m = "node_modules\\framework7-svelte\\esm\\svelte\\chip.svelte";
     const get_text_slot_changes$2 = dirty => ({});
     const get_text_slot_context$2 = ctx => ({});
-    const get_media_slot_changes$2 = dirty => ({});
-    const get_media_slot_context$2 = ctx => ({});
+    const get_media_slot_changes$1 = dirty => ({});
+    const get_media_slot_context$1 = ctx => ({});
 
     // (70:2) {#if media || hasMediaSlots || icon}
-    function create_if_block_2$b(ctx) {
+    function create_if_block_2$8(ctx) {
     	let div;
     	let t0;
     	let t1_value = plainText(/*media*/ ctx[0]) + "";
     	let t1;
     	let t2;
     	let current;
-    	let if_block = /*icon*/ ctx[6] && create_if_block_3$9(ctx);
+    	let if_block = /*icon*/ ctx[6] && create_if_block_3$5(ctx);
     	const media_slot_template = /*#slots*/ ctx[20].media;
-    	const media_slot = create_slot(media_slot_template, ctx, /*$$scope*/ ctx[19], get_media_slot_context$2);
+    	const media_slot = create_slot(media_slot_template, ctx, /*$$scope*/ ctx[19], get_media_slot_context$1);
 
     	const block = {
     		c: function create() {
     			div = element("div");
     			if (if_block) if_block.c();
     			t0 = space();
-    			t1 = text$1(t1_value);
+    			t1 = text(t1_value);
     			t2 = space();
     			if (media_slot) media_slot.c();
     			attr_dev(div, "class", /*mediaClasses*/ ctx[10]);
-    			add_location(div, file$o, 70, 4, 1728);
+    			add_location(div, file$m, 70, 4, 1728);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -47188,7 +47006,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block, 1);
     					}
     				} else {
-    					if_block = create_if_block_3$9(ctx);
+    					if_block = create_if_block_3$5(ctx);
     					if_block.c();
     					transition_in(if_block, 1);
     					if_block.m(div, t0);
@@ -47214,8 +47032,8 @@ var MultiRoomAudio = (function () {
     						/*$$scope*/ ctx[19],
     						!current
     						? get_all_dirty_from_scope(/*$$scope*/ ctx[19])
-    						: get_slot_changes(media_slot_template, /*$$scope*/ ctx[19], dirty, get_media_slot_changes$2),
-    						get_media_slot_context$2
+    						: get_slot_changes(media_slot_template, /*$$scope*/ ctx[19], dirty, get_media_slot_changes$1),
+    						get_media_slot_context$1
     					);
     				}
     			}
@@ -47244,7 +47062,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$b.name,
+    		id: create_if_block_2$8.name,
     		type: "if",
     		source: "(70:2) {#if media || hasMediaSlots || icon}",
     		ctx
@@ -47254,7 +47072,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (72:6) {#if icon}
-    function create_if_block_3$9(ctx) {
+    function create_if_block_3$5(ctx) {
     	let useicon;
     	let current;
 
@@ -47292,7 +47110,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3$9.name,
+    		id: create_if_block_3$5.name,
     		type: "if",
     		source: "(72:6) {#if icon}",
     		ctx
@@ -47302,7 +47120,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (79:2) {#if text || hasTextSlots || hasDefaultSlots}
-    function create_if_block_1$c(ctx) {
+    function create_if_block_1$9(ctx) {
     	let div;
     	let t0_value = plainText(/*text*/ ctx[1]) + "";
     	let t0;
@@ -47317,13 +47135,13 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			t2 = space();
     			if (default_slot) default_slot.c();
     			attr_dev(div, "class", "chip-label");
-    			add_location(div, file$o, 79, 4, 1935);
+    			add_location(div, file$m, 79, 4, 1935);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -47395,7 +47213,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$c.name,
+    		id: create_if_block_1$9.name,
     		type: "if",
     		source: "(79:2) {#if text || hasTextSlots || hasDefaultSlots}",
     		ctx
@@ -47405,7 +47223,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (86:2) {#if deleteable}
-    function create_if_block$h(ctx) {
+    function create_if_block$f(ctx) {
     	let a;
     	let mounted;
     	let dispose;
@@ -47414,7 +47232,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			a = element("a");
     			attr_dev(a, "class", "chip-delete");
-    			add_location(a, file$o, 85, 18, 2063);
+    			add_location(a, file$m, 85, 18, 2063);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
@@ -47434,7 +47252,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$h.name,
+    		id: create_if_block$f.name,
     		type: "if",
     		source: "(86:2) {#if deleteable}",
     		ctx
@@ -47443,7 +47261,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$q(ctx) {
+    function create_fragment$n(ctx) {
     	let div;
     	let t0;
     	let t1;
@@ -47451,9 +47269,9 @@ var MultiRoomAudio = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	let if_block0 = (/*media*/ ctx[0] || /*hasMediaSlots*/ ctx[9] || /*icon*/ ctx[6]) && create_if_block_2$b(ctx);
-    	let if_block1 = (/*text*/ ctx[1] || /*hasTextSlots*/ ctx[8] || /*hasDefaultSlots*/ ctx[7]) && create_if_block_1$c(ctx);
-    	let if_block2 = /*deleteable*/ ctx[2] && create_if_block$h(ctx);
+    	let if_block0 = (/*media*/ ctx[0] || /*hasMediaSlots*/ ctx[9] || /*icon*/ ctx[6]) && create_if_block_2$8(ctx);
+    	let if_block1 = (/*text*/ ctx[1] || /*hasTextSlots*/ ctx[8] || /*hasDefaultSlots*/ ctx[7]) && create_if_block_1$9(ctx);
+    	let if_block2 = /*deleteable*/ ctx[2] && create_if_block$f(ctx);
     	let div_levels = [{ class: /*classes*/ ctx[11] }, restProps(/*$$restProps*/ ctx[14])];
     	let div_data = {};
 
@@ -47470,7 +47288,7 @@ var MultiRoomAudio = (function () {
     			t1 = space();
     			if (if_block2) if_block2.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$o, 62, 0, 1545);
+    			add_location(div, file$m, 62, 0, 1545);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -47506,7 +47324,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_2$b(ctx);
+    					if_block0 = create_if_block_2$8(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(div, t0);
@@ -47529,7 +47347,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block1, 1);
     					}
     				} else {
-    					if_block1 = create_if_block_1$c(ctx);
+    					if_block1 = create_if_block_1$9(ctx);
     					if_block1.c();
     					transition_in(if_block1, 1);
     					if_block1.m(div, t1);
@@ -47548,7 +47366,7 @@ var MultiRoomAudio = (function () {
     				if (if_block2) {
     					if_block2.p(ctx, dirty);
     				} else {
-    					if_block2 = create_if_block$h(ctx);
+    					if_block2 = create_if_block$f(ctx);
     					if_block2.c();
     					if_block2.m(div, null);
     				}
@@ -47591,7 +47409,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$q.name,
+    		id: create_fragment$n.name,
     		type: "component",
     		source: "",
     		ctx
@@ -47600,7 +47418,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$m($$self, $$props, $$invalidate) {
+    function instance$k($$self, $$props, $$invalidate) {
     	let classes;
     	let mediaClasses;
     	let hasMediaSlots;
@@ -47763,7 +47581,7 @@ var MultiRoomAudio = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$m, create_fragment$q, safe_not_equal, {
+    		init(this, options, instance$k, create_fragment$n, safe_not_equal, {
     			class: 15,
     			media: 0,
     			text: 1,
@@ -47779,7 +47597,7 @@ var MultiRoomAudio = (function () {
     			component: this,
     			tagName: "Chip",
     			options,
-    			id: create_fragment$q.name
+    			id: create_fragment$n.name
     		});
     	}
 
@@ -47856,684 +47674,17 @@ var MultiRoomAudio = (function () {
     	}
     }
 
-    /* node_modules\framework7-svelte\esm\svelte\col.svelte generated by Svelte v3.44.0 */
-    const file$n = "node_modules\\framework7-svelte\\esm\\svelte\\col.svelte";
-
-    // (68:25) 
-    function create_if_block_2$a(ctx) {
-    	let span;
-    	let t;
-    	let current;
-    	let mounted;
-    	let dispose;
-    	const default_slot_template = /*#slots*/ ctx[17].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
-    	let if_block = /*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2] && create_if_block_3$8(ctx);
-    	let span_levels = [{ class: /*classes*/ ctx[4] }, restProps(/*$$restProps*/ ctx[6])];
-    	let span_data = {};
-
-    	for (let i = 0; i < span_levels.length; i += 1) {
-    		span_data = assign(span_data, span_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			if (default_slot) default_slot.c();
-    			t = space();
-    			if (if_block) if_block.c();
-    			set_attributes(span, span_data);
-    			add_location(span, file$n, 68, 2, 1801);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(span, null);
-    			}
-
-    			append_dev(span, t);
-    			if (if_block) if_block.m(span, null);
-    			/*span_binding*/ ctx[19](span);
-    			current = true;
-
-    			if (!mounted) {
-    				dispose = listen_dev(span, "click", /*onClick*/ ctx[5], false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[16],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
-    						null
-    					);
-    				}
-    			}
-
-    			if (/*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2]) {
-    				if (if_block) ; else {
-    					if_block = create_if_block_3$8(ctx);
-    					if_block.c();
-    					if_block.m(span, null);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
-
-    			set_attributes(span, span_data = get_spread_update(span_levels, [
-    				(!current || dirty & /*classes*/ 16) && { class: /*classes*/ ctx[4] },
-    				dirty & /*$$restProps*/ 64 && restProps(/*$$restProps*/ ctx[6])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    			if (default_slot) default_slot.d(detaching);
-    			if (if_block) if_block.d();
-    			/*span_binding*/ ctx[19](null);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_2$a.name,
-    		type: "if",
-    		source: "(68:25) ",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (63:0) {#if tag === 'div'}
-    function create_if_block$g(ctx) {
-    	let div;
-    	let t;
-    	let current;
-    	let mounted;
-    	let dispose;
-    	const default_slot_template = /*#slots*/ ctx[17].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
-    	let if_block = /*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2] && create_if_block_1$b(ctx);
-    	let div_levels = [{ class: /*classes*/ ctx[4] }, restProps(/*$$restProps*/ ctx[6])];
-    	let div_data = {};
-
-    	for (let i = 0; i < div_levels.length; i += 1) {
-    		div_data = assign(div_data, div_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (default_slot) default_slot.c();
-    			t = space();
-    			if (if_block) if_block.c();
-    			set_attributes(div, div_data);
-    			add_location(div, file$n, 63, 2, 1591);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(div, null);
-    			}
-
-    			append_dev(div, t);
-    			if (if_block) if_block.m(div, null);
-    			/*div_binding*/ ctx[18](div);
-    			current = true;
-
-    			if (!mounted) {
-    				dispose = listen_dev(div, "click", /*onClick*/ ctx[5], false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[16],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
-    						null
-    					);
-    				}
-    			}
-
-    			if (/*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2]) {
-    				if (if_block) ; else {
-    					if_block = create_if_block_1$b(ctx);
-    					if_block.c();
-    					if_block.m(div, null);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
-
-    			set_attributes(div, div_data = get_spread_update(div_levels, [
-    				(!current || dirty & /*classes*/ 16) && { class: /*classes*/ ctx[4] },
-    				dirty & /*$$restProps*/ 64 && restProps(/*$$restProps*/ ctx[6])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (default_slot) default_slot.d(detaching);
-    			if (if_block) if_block.d();
-    			/*div_binding*/ ctx[18](null);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block$g.name,
-    		type: "if",
-    		source: "(63:0) {#if tag === 'div'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (71:4) {#if resizable && resizableHandler}
-    function create_if_block_3$8(ctx) {
-    	let span;
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			attr_dev(span, "class", "resize-handler");
-    			add_location(span, file$n, 70, 39, 1938);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_3$8.name,
-    		type: "if",
-    		source: "(71:4) {#if resizable && resizableHandler}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (66:4) {#if resizable && resizableHandler}
-    function create_if_block_1$b(ctx) {
-    	let span;
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			attr_dev(span, "class", "resize-handler");
-    			add_location(span, file$n, 65, 39, 1727);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_1$b.name,
-    		type: "if",
-    		source: "(66:4) {#if resizable && resizableHandler}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function create_fragment$p(ctx) {
-    	let current_block_type_index;
-    	let if_block;
-    	let if_block_anchor;
-    	let current;
-    	const if_block_creators = [create_if_block$g, create_if_block_2$a];
-    	const if_blocks = [];
-
-    	function select_block_type(ctx, dirty) {
-    		if (/*tag*/ ctx[0] === 'div') return 0;
-    		if (/*tag*/ ctx[0] === 'span') return 1;
-    		return -1;
-    	}
-
-    	if (~(current_block_type_index = select_block_type(ctx))) {
-    		if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			if (if_block) if_block.c();
-    			if_block_anchor = empty();
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			if (~current_block_type_index) {
-    				if_blocks[current_block_type_index].m(target, anchor);
-    			}
-
-    			insert_dev(target, if_block_anchor, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, [dirty]) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type(ctx);
-
-    			if (current_block_type_index === previous_block_index) {
-    				if (~current_block_type_index) {
-    					if_blocks[current_block_type_index].p(ctx, dirty);
-    				}
-    			} else {
-    				if (if_block) {
-    					group_outros();
-
-    					transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    						if_blocks[previous_block_index] = null;
-    					});
-
-    					check_outros();
-    				}
-
-    				if (~current_block_type_index) {
-    					if_block = if_blocks[current_block_type_index];
-
-    					if (!if_block) {
-    						if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    						if_block.c();
-    					} else {
-    						if_block.p(ctx, dirty);
-    					}
-
-    					transition_in(if_block, 1);
-    					if_block.m(if_block_anchor.parentNode, if_block_anchor);
-    				} else {
-    					if_block = null;
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(if_block);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(if_block);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (~current_block_type_index) {
-    				if_blocks[current_block_type_index].d(detaching);
-    			}
-
-    			if (detaching) detach_dev(if_block_anchor);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$p.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$l($$self, $$props, $$invalidate) {
-    	let classes;
-
-    	const omit_props_names = [
-    		"class","tag","width","xsmall","small","medium","large","xlarge","resizable","resizableFixed","resizableAbsolute","resizableHandler"
-    	];
-
-    	let $$restProps = compute_rest_props($$props, omit_props_names);
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('Col', slots, ['default']);
-    	const emit = createEmitter(createEventDispatcher, $$props);
-    	let { class: className = undefined } = $$props;
-    	let { tag = 'div' } = $$props;
-    	let { width = 'auto' } = $$props;
-    	let { xsmall = undefined } = $$props;
-    	let { small = undefined } = $$props;
-    	let { medium = undefined } = $$props;
-    	let { large = undefined } = $$props;
-    	let { xlarge = undefined } = $$props;
-    	let { resizable = false } = $$props;
-    	let { resizableFixed = false } = $$props;
-    	let { resizableAbsolute = false } = $$props;
-    	let { resizableHandler = true } = $$props;
-    	let el;
-
-    	function onClick() {
-    		emit('click');
-    	}
-
-    	function onResize(targetEl) {
-    		if (el !== targetEl) return;
-    		emit('gridResize');
-    	}
-
-    	onMount(() => {
-    		f7ready(() => {
-    			app$1.f7.on('gridResize', onResize);
-    		});
-    	});
-
-    	onDestroy(() => {
-    		if (!app$1.f7) return;
-    		app$1.f7.off('gridResize', onResize);
-    	});
-
-    	function div_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			el = $$value;
-    			$$invalidate(3, el);
-    		});
-    	}
-
-    	function span_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			el = $$value;
-    			$$invalidate(3, el);
-    		});
-    	}
-
-    	$$self.$$set = $$new_props => {
-    		$$invalidate(22, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
-    		$$invalidate(6, $$restProps = compute_rest_props($$props, omit_props_names));
-    		if ('class' in $$new_props) $$invalidate(7, className = $$new_props.class);
-    		if ('tag' in $$new_props) $$invalidate(0, tag = $$new_props.tag);
-    		if ('width' in $$new_props) $$invalidate(8, width = $$new_props.width);
-    		if ('xsmall' in $$new_props) $$invalidate(9, xsmall = $$new_props.xsmall);
-    		if ('small' in $$new_props) $$invalidate(10, small = $$new_props.small);
-    		if ('medium' in $$new_props) $$invalidate(11, medium = $$new_props.medium);
-    		if ('large' in $$new_props) $$invalidate(12, large = $$new_props.large);
-    		if ('xlarge' in $$new_props) $$invalidate(13, xlarge = $$new_props.xlarge);
-    		if ('resizable' in $$new_props) $$invalidate(1, resizable = $$new_props.resizable);
-    		if ('resizableFixed' in $$new_props) $$invalidate(14, resizableFixed = $$new_props.resizableFixed);
-    		if ('resizableAbsolute' in $$new_props) $$invalidate(15, resizableAbsolute = $$new_props.resizableAbsolute);
-    		if ('resizableHandler' in $$new_props) $$invalidate(2, resizableHandler = $$new_props.resizableHandler);
-    		if ('$$scope' in $$new_props) $$invalidate(16, $$scope = $$new_props.$$scope);
-    	};
-
-    	$$self.$capture_state = () => ({
-    		createEventDispatcher,
-    		onMount,
-    		onDestroy,
-    		colorClasses,
-    		classNames,
-    		createEmitter,
-    		restProps,
-    		app: app$1,
-    		f7ready,
-    		emit,
-    		className,
-    		tag,
-    		width,
-    		xsmall,
-    		small,
-    		medium,
-    		large,
-    		xlarge,
-    		resizable,
-    		resizableFixed,
-    		resizableAbsolute,
-    		resizableHandler,
-    		el,
-    		onClick,
-    		onResize,
-    		classes
-    	});
-
-    	$$self.$inject_state = $$new_props => {
-    		$$invalidate(22, $$props = assign(assign({}, $$props), $$new_props));
-    		if ('className' in $$props) $$invalidate(7, className = $$new_props.className);
-    		if ('tag' in $$props) $$invalidate(0, tag = $$new_props.tag);
-    		if ('width' in $$props) $$invalidate(8, width = $$new_props.width);
-    		if ('xsmall' in $$props) $$invalidate(9, xsmall = $$new_props.xsmall);
-    		if ('small' in $$props) $$invalidate(10, small = $$new_props.small);
-    		if ('medium' in $$props) $$invalidate(11, medium = $$new_props.medium);
-    		if ('large' in $$props) $$invalidate(12, large = $$new_props.large);
-    		if ('xlarge' in $$props) $$invalidate(13, xlarge = $$new_props.xlarge);
-    		if ('resizable' in $$props) $$invalidate(1, resizable = $$new_props.resizable);
-    		if ('resizableFixed' in $$props) $$invalidate(14, resizableFixed = $$new_props.resizableFixed);
-    		if ('resizableAbsolute' in $$props) $$invalidate(15, resizableAbsolute = $$new_props.resizableAbsolute);
-    		if ('resizableHandler' in $$props) $$invalidate(2, resizableHandler = $$new_props.resizableHandler);
-    		if ('el' in $$props) $$invalidate(3, el = $$new_props.el);
-    		if ('classes' in $$props) $$invalidate(4, classes = $$new_props.classes);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	$$self.$$.update = () => {
-    		$$invalidate(4, classes = classNames(
-    			className,
-    			{
-    				col: width === 'auto',
-    				[`col-${width}`]: width !== 'auto',
-    				[`xsmall-${xsmall}`]: xsmall,
-    				[`small-${small}`]: small,
-    				[`medium-${medium}`]: medium,
-    				[`large-${large}`]: large,
-    				[`xlarge-${xlarge}`]: xlarge,
-    				resizable,
-    				'resizable-fixed': resizableFixed,
-    				'resizable-absolute': resizableAbsolute
-    			},
-    			colorClasses($$props)
-    		));
-    	};
-
-    	$$props = exclude_internal_props($$props);
-
-    	return [
-    		tag,
-    		resizable,
-    		resizableHandler,
-    		el,
-    		classes,
-    		onClick,
-    		$$restProps,
-    		className,
-    		width,
-    		xsmall,
-    		small,
-    		medium,
-    		large,
-    		xlarge,
-    		resizableFixed,
-    		resizableAbsolute,
-    		$$scope,
-    		slots,
-    		div_binding,
-    		span_binding
-    	];
-    }
-
-    class Col extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-
-    		init(this, options, instance$l, create_fragment$p, safe_not_equal, {
-    			class: 7,
-    			tag: 0,
-    			width: 8,
-    			xsmall: 9,
-    			small: 10,
-    			medium: 11,
-    			large: 12,
-    			xlarge: 13,
-    			resizable: 1,
-    			resizableFixed: 14,
-    			resizableAbsolute: 15,
-    			resizableHandler: 2
-    		});
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "Col",
-    			options,
-    			id: create_fragment$p.name
-    		});
-    	}
-
-    	get class() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set class(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get tag() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set tag(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get width() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set width(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get xsmall() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set xsmall(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get small() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set small(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get medium() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set medium(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get large() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set large(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get xlarge() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set xlarge(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizable() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizable(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizableFixed() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizableFixed(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizableAbsolute() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizableAbsolute(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizableHandler() {
-    		throw new Error("<Col>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizableHandler(value) {
-    		throw new Error("<Col>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
-
     /* node_modules\framework7-svelte\esm\svelte\fab.svelte generated by Svelte v3.44.0 */
-    const file$m = "node_modules\\framework7-svelte\\esm\\svelte\\fab.svelte";
-    const get_root_slot_changes$3 = dirty => ({});
-    const get_root_slot_context$3 = ctx => ({});
+    const file$l = "node_modules\\framework7-svelte\\esm\\svelte\\fab.svelte";
+    const get_root_slot_changes$1 = dirty => ({});
+    const get_root_slot_context$1 = ctx => ({});
     const get_link_slot_changes = dirty => ({});
     const get_link_slot_context = ctx => ({});
     const get_text_slot_changes$1 = dirty => ({});
     const get_text_slot_context$1 = ctx => ({});
 
     // (81:4) {#if typeof text !== 'undefined' || hasTextSlots}
-    function create_if_block$f(ctx) {
+    function create_if_block$e(ctx) {
     	let div;
     	let t0_value = plainText(/*text*/ ctx[2]) + "";
     	let t0;
@@ -48545,11 +47696,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			attr_dev(div, "class", "fab-text");
-    			add_location(div, file$m, 81, 6, 1964);
+    			add_location(div, file$l, 81, 6, 1964);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -48599,7 +47750,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$f.name,
+    		id: create_if_block$e.name,
     		type: "if",
     		source: "(81:4) {#if typeof text !== 'undefined' || hasTextSlots}",
     		ctx
@@ -48608,7 +47759,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$o(ctx) {
+    function create_fragment$m(ctx) {
     	let div;
     	let a;
     	let t0;
@@ -48620,11 +47771,11 @@ var MultiRoomAudio = (function () {
     	let dispose;
     	const default_slot_template = /*#slots*/ ctx[18].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[17], null);
-    	let if_block = (typeof /*text*/ ctx[2] !== 'undefined' || /*hasTextSlots*/ ctx[7]) && create_if_block$f(ctx);
+    	let if_block = (typeof /*text*/ ctx[2] !== 'undefined' || /*hasTextSlots*/ ctx[7]) && create_if_block$e(ctx);
     	const link_slot_template = /*#slots*/ ctx[18].link;
     	const link_slot = create_slot(link_slot_template, ctx, /*$$scope*/ ctx[17], get_link_slot_context);
     	const root_slot_template = /*#slots*/ ctx[18].root;
-    	const root_slot = create_slot(root_slot_template, ctx, /*$$scope*/ ctx[17], get_root_slot_context$3);
+    	const root_slot = create_slot(root_slot_template, ctx, /*$$scope*/ ctx[17], get_root_slot_context$1);
 
     	let div_levels = [
     		{ class: /*classes*/ ctx[10] },
@@ -48652,9 +47803,9 @@ var MultiRoomAudio = (function () {
     			if (root_slot) root_slot.c();
     			attr_dev(a, "target", /*target*/ ctx[1]);
     			attr_dev(a, "href", /*hrefComputed*/ ctx[11]);
-    			add_location(a, file$m, 72, 2, 1752);
+    			add_location(a, file$l, 72, 2, 1752);
     			set_attributes(div, div_data);
-    			add_location(div, file$m, 65, 0, 1628);
+    			add_location(div, file$l, 65, 0, 1628);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -48721,7 +47872,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block, 1);
     					}
     				} else {
-    					if_block = create_if_block$f(ctx);
+    					if_block = create_if_block$e(ctx);
     					if_block.c();
     					transition_in(if_block, 1);
     					if_block.m(a, t1);
@@ -48773,8 +47924,8 @@ var MultiRoomAudio = (function () {
     						/*$$scope*/ ctx[17],
     						!current
     						? get_all_dirty_from_scope(/*$$scope*/ ctx[17])
-    						: get_slot_changes(root_slot_template, /*$$scope*/ ctx[17], dirty, get_root_slot_changes$3),
-    						get_root_slot_context$3
+    						: get_slot_changes(root_slot_template, /*$$scope*/ ctx[17], dirty, get_root_slot_changes$1),
+    						get_root_slot_context$1
     					);
     				}
     			}
@@ -48816,7 +47967,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$o.name,
+    		id: create_fragment$m.name,
     		type: "component",
     		source: "",
     		ctx
@@ -48825,7 +47976,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$k($$self, $$props, $$invalidate) {
+    function instance$j($$self, $$props, $$invalidate) {
     	let hrefComputed;
     	let hasTextSlots;
     	let classes;
@@ -49017,7 +48168,7 @@ var MultiRoomAudio = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$k, create_fragment$o, safe_not_equal, {
+    		init(this, options, instance$j, create_fragment$m, safe_not_equal, {
     			class: 14,
     			morphTo: 0,
     			href: 15,
@@ -49033,7 +48184,7 @@ var MultiRoomAudio = (function () {
     			component: this,
     			tagName: "Fab",
     			options,
-    			id: create_fragment$o.name
+    			id: create_fragment$m.name
     		});
     	}
 
@@ -49111,12 +48262,12 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\range.svelte generated by Svelte v3.44.0 */
-    const file$l = "node_modules\\framework7-svelte\\esm\\svelte\\range.svelte";
-    const get_default_slot_changes$3 = dirty => ({ range: dirty[0] & /*f7Range*/ 16 });
-    const get_default_slot_context$3 = ctx => ({ range: /*f7Range*/ ctx[4] });
+    const file$k = "node_modules\\framework7-svelte\\esm\\svelte\\range.svelte";
+    const get_default_slot_changes$2 = dirty => ({ range: dirty[0] & /*f7Range*/ 16 });
+    const get_default_slot_context$2 = ctx => ({ range: /*f7Range*/ ctx[4] });
 
     // (104:2) {#if input}
-    function create_if_block$e(ctx) {
+    function create_if_block$d(ctx) {
     	let input_1;
 
     	const block = {
@@ -49125,7 +48276,7 @@ var MultiRoomAudio = (function () {
     			attr_dev(input_1, "type", "range");
     			attr_dev(input_1, "name", /*name*/ ctx[0]);
     			attr_dev(input_1, "id", /*inputId*/ ctx[2]);
-    			add_location(input_1, file$l, 103, 13, 2468);
+    			add_location(input_1, file$k, 103, 13, 2468);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, input_1, anchor);
@@ -49146,7 +48297,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$e.name,
+    		id: create_if_block$d.name,
     		type: "if",
     		source: "(104:2) {#if input}",
     		ctx
@@ -49155,13 +48306,13 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$n(ctx) {
+    function create_fragment$l(ctx) {
     	let div;
     	let t;
     	let current;
-    	let if_block = /*input*/ ctx[1] && create_if_block$e(ctx);
+    	let if_block = /*input*/ ctx[1] && create_if_block$d(ctx);
     	const default_slot_template = /*#slots*/ ctx[27].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[26], get_default_slot_context$3);
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[26], get_default_slot_context$2);
     	let div_levels = [{ class: /*classes*/ ctx[5] }, restProps(/*$$restProps*/ ctx[6])];
     	let div_data = {};
 
@@ -49176,7 +48327,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (default_slot) default_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$l, 102, 0, 2390);
+    			add_location(div, file$k, 102, 0, 2390);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -49198,7 +48349,7 @@ var MultiRoomAudio = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
-    					if_block = create_if_block$e(ctx);
+    					if_block = create_if_block$d(ctx);
     					if_block.c();
     					if_block.m(div, t);
     				}
@@ -49216,8 +48367,8 @@ var MultiRoomAudio = (function () {
     						/*$$scope*/ ctx[26],
     						!current
     						? get_all_dirty_from_scope(/*$$scope*/ ctx[26])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[26], dirty, get_default_slot_changes$3),
-    						get_default_slot_context$3
+    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[26], dirty, get_default_slot_changes$2),
+    						get_default_slot_context$2
     					);
     				}
     			}
@@ -49246,7 +48397,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$n.name,
+    		id: create_fragment$l.name,
     		type: "component",
     		source: "",
     		ctx
@@ -49255,7 +48406,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance_1$3($$self, $$props, $$invalidate) {
+    function instance_1$2($$self, $$props, $$invalidate) {
     	let classes;
 
     	const omit_props_names = [
@@ -49506,8 +48657,8 @@ var MultiRoomAudio = (function () {
     		init(
     			this,
     			options,
-    			instance_1$3,
-    			create_fragment$n,
+    			instance_1$2,
+    			create_fragment$l,
     			safe_not_equal,
     			{
     				class: 8,
@@ -49541,7 +48692,7 @@ var MultiRoomAudio = (function () {
     			component: this,
     			tagName: "Range",
     			options,
-    			id: create_fragment$n.name
+    			id: create_fragment$l.name
     		});
     	}
 
@@ -49722,577 +48873,6 @@ var MultiRoomAudio = (function () {
     	}
     }
 
-    /* node_modules\framework7-svelte\esm\svelte\text-editor.svelte generated by Svelte v3.44.0 */
-    const file$k = "node_modules\\framework7-svelte\\esm\\svelte\\text-editor.svelte";
-
-    const get_root_slot_changes$2 = dirty => ({
-    	textEditor: dirty[0] & /*f7TextEditor*/ 2
-    });
-
-    const get_root_slot_context$2 = ctx => ({ textEditor: /*f7TextEditor*/ ctx[1] });
-
-    const get_root_end_slot_changes$2 = dirty => ({
-    	textEditor: dirty[0] & /*f7TextEditor*/ 2
-    });
-
-    const get_root_end_slot_context$2 = ctx => ({ textEditor: /*f7TextEditor*/ ctx[1] });
-
-    const get_default_slot_changes$2 = dirty => ({
-    	textEditor: dirty[0] & /*f7TextEditor*/ 2
-    });
-
-    const get_default_slot_context$2 = ctx => ({ textEditor: /*f7TextEditor*/ ctx[1] });
-
-    const get_root_start_slot_changes$2 = dirty => ({
-    	textEditor: dirty[0] & /*f7TextEditor*/ 2
-    });
-
-    const get_root_start_slot_context$2 = ctx => ({ textEditor: /*f7TextEditor*/ ctx[1] });
-
-    function create_fragment$m(ctx) {
-    	let div1;
-    	let t0;
-    	let div0;
-    	let t1;
-    	let t2;
-    	let current;
-    	const root_start_slot_template = /*#slots*/ ctx[17]["root-start"];
-    	const root_start_slot = create_slot(root_start_slot_template, ctx, /*$$scope*/ ctx[16], get_root_start_slot_context$2);
-    	const default_slot_template = /*#slots*/ ctx[17].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], get_default_slot_context$2);
-    	const root_end_slot_template = /*#slots*/ ctx[17]["root-end"];
-    	const root_end_slot = create_slot(root_end_slot_template, ctx, /*$$scope*/ ctx[16], get_root_end_slot_context$2);
-    	const root_slot_template = /*#slots*/ ctx[17].root;
-    	const root_slot = create_slot(root_slot_template, ctx, /*$$scope*/ ctx[16], get_root_slot_context$2);
-    	let div1_levels = [{ class: /*classes*/ ctx[2] }, restProps(/*$$restProps*/ ctx[3])];
-    	let div1_data = {};
-
-    	for (let i = 0; i < div1_levels.length; i += 1) {
-    		div1_data = assign(div1_data, div1_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			div1 = element("div");
-    			if (root_start_slot) root_start_slot.c();
-    			t0 = space();
-    			div0 = element("div");
-    			if (default_slot) default_slot.c();
-    			t1 = space();
-    			if (root_end_slot) root_end_slot.c();
-    			t2 = space();
-    			if (root_slot) root_slot.c();
-    			attr_dev(div0, "class", "text-editor-content");
-    			attr_dev(div0, "contenteditable", "");
-    			add_location(div0, file$k, 120, 2, 2984);
-    			set_attributes(div1, div1_data);
-    			add_location(div1, file$k, 118, 0, 2862);
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div1, anchor);
-
-    			if (root_start_slot) {
-    				root_start_slot.m(div1, null);
-    			}
-
-    			append_dev(div1, t0);
-    			append_dev(div1, div0);
-
-    			if (default_slot) {
-    				default_slot.m(div0, null);
-    			}
-
-    			append_dev(div1, t1);
-
-    			if (root_end_slot) {
-    				root_end_slot.m(div1, null);
-    			}
-
-    			append_dev(div1, t2);
-
-    			if (root_slot) {
-    				root_slot.m(div1, null);
-    			}
-
-    			/*div1_binding*/ ctx[18](div1);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (root_start_slot) {
-    				if (root_start_slot.p && (!current || dirty[0] & /*$$scope, f7TextEditor*/ 65538)) {
-    					update_slot_base(
-    						root_start_slot,
-    						root_start_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[16],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-    						: get_slot_changes(root_start_slot_template, /*$$scope*/ ctx[16], dirty, get_root_start_slot_changes$2),
-    						get_root_start_slot_context$2
-    					);
-    				}
-    			}
-
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty[0] & /*$$scope, f7TextEditor*/ 65538)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[16],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, get_default_slot_changes$2),
-    						get_default_slot_context$2
-    					);
-    				}
-    			}
-
-    			if (root_end_slot) {
-    				if (root_end_slot.p && (!current || dirty[0] & /*$$scope, f7TextEditor*/ 65538)) {
-    					update_slot_base(
-    						root_end_slot,
-    						root_end_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[16],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-    						: get_slot_changes(root_end_slot_template, /*$$scope*/ ctx[16], dirty, get_root_end_slot_changes$2),
-    						get_root_end_slot_context$2
-    					);
-    				}
-    			}
-
-    			if (root_slot) {
-    				if (root_slot.p && (!current || dirty[0] & /*$$scope, f7TextEditor*/ 65538)) {
-    					update_slot_base(
-    						root_slot,
-    						root_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[16],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-    						: get_slot_changes(root_slot_template, /*$$scope*/ ctx[16], dirty, get_root_slot_changes$2),
-    						get_root_slot_context$2
-    					);
-    				}
-    			}
-
-    			set_attributes(div1, div1_data = get_spread_update(div1_levels, [
-    				(!current || dirty[0] & /*classes*/ 4) && { class: /*classes*/ ctx[2] },
-    				dirty[0] & /*$$restProps*/ 8 && restProps(/*$$restProps*/ ctx[3])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(root_start_slot, local);
-    			transition_in(default_slot, local);
-    			transition_in(root_end_slot, local);
-    			transition_in(root_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(root_start_slot, local);
-    			transition_out(default_slot, local);
-    			transition_out(root_end_slot, local);
-    			transition_out(root_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div1);
-    			if (root_start_slot) root_start_slot.d(detaching);
-    			if (default_slot) default_slot.d(detaching);
-    			if (root_end_slot) root_end_slot.d(detaching);
-    			if (root_slot) root_slot.d(detaching);
-    			/*div1_binding*/ ctx[18](null);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$m.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance_1$2($$self, $$props, $$invalidate) {
-    	let classes;
-
-    	const omit_props_names = [
-    		"class","mode","value","buttons","customButtons","dividers","imageUrlText","linkUrlText","placeholder","clearFormattingOnPaste","resizable","instance"
-    	];
-
-    	let $$restProps = compute_rest_props($$props, omit_props_names);
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('Text_editor', slots, ['root-start','default','root-end','root']);
-    	const emit = createEmitter(createEventDispatcher, $$props);
-    	let { class: className = undefined } = $$props;
-    	let { mode = undefined } = $$props;
-    	let { value = undefined } = $$props;
-    	let { buttons = undefined } = $$props;
-    	let { customButtons = undefined } = $$props;
-    	let { dividers = undefined } = $$props;
-    	let { imageUrlText = undefined } = $$props;
-    	let { linkUrlText = undefined } = $$props;
-    	let { placeholder = undefined } = $$props;
-    	let { clearFormattingOnPaste = undefined } = $$props;
-    	let { resizable = false } = $$props;
-    	let el;
-    	let f7TextEditor;
-
-    	function instance() {
-    		return f7TextEditor;
-    	}
-
-    	function watchValue(newValue) {
-    		if (f7TextEditor) {
-    			f7TextEditor.setValue(newValue);
-    		}
-    	}
-
-    	function onChange(editor, editorValue) {
-    		emit('textEditorChange', [editorValue]);
-    	}
-
-    	function onInput(editor, editorValue) {
-    		emit('textEditorInput', [editorValue]);
-    	}
-
-    	function onFocus() {
-    		emit('textEditorFocus');
-    	}
-
-    	function onBlur() {
-    		emit('textEditorBlur');
-    	}
-
-    	function onButtonClick(editor, button) {
-    		emit('textEditorButtonClick', [button]);
-    	}
-
-    	function onKeyboardOpen() {
-    		emit('textEditorKeyboardOpen');
-    	}
-
-    	function onKeyboardClose() {
-    		emit('textEditorKeyboardClose');
-    	}
-
-    	function onPopoverOpen() {
-    		emit('textEditorPopoverOpen');
-    	}
-
-    	function onPopoverClose() {
-    		emit('textEditorPopoverClose');
-    	}
-
-    	const onInsertLink = (editor, url) => {
-    		emit('textEditorInsertLink', [url]);
-    	};
-
-    	const onInsertImage = (editor, url) => {
-    		emit('textEditorInsertImage', [url]);
-    	};
-
-    	onMount(() => {
-    		const params = noUndefinedProps({
-    			el,
-    			mode,
-    			value,
-    			buttons,
-    			customButtons,
-    			dividers,
-    			imageUrlText,
-    			linkUrlText,
-    			placeholder,
-    			clearFormattingOnPaste,
-    			on: {
-    				change: onChange,
-    				input: onInput,
-    				focus: onFocus,
-    				blur: onBlur,
-    				buttonClick: onButtonClick,
-    				keyboardOpen: onKeyboardOpen,
-    				keyboardClose: onKeyboardClose,
-    				popoverOpen: onPopoverOpen,
-    				popoverClose: onPopoverClose,
-    				insertLink: onInsertLink,
-    				insertImage: onInsertImage
-    			}
-    		});
-
-    		f7ready(() => {
-    			$$invalidate(1, f7TextEditor = app$1.f7.textEditor.create(params));
-    		});
-    	});
-
-    	onDestroy(() => {
-    		if (f7TextEditor && f7TextEditor.destroy) {
-    			f7TextEditor.destroy();
-    			$$invalidate(1, f7TextEditor = null);
-    		}
-    	});
-
-    	function div1_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			el = $$value;
-    			$$invalidate(0, el);
-    		});
-    	}
-
-    	$$self.$$set = $$new_props => {
-    		$$invalidate(32, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
-    		$$invalidate(3, $$restProps = compute_rest_props($$props, omit_props_names));
-    		if ('class' in $$new_props) $$invalidate(4, className = $$new_props.class);
-    		if ('mode' in $$new_props) $$invalidate(5, mode = $$new_props.mode);
-    		if ('value' in $$new_props) $$invalidate(6, value = $$new_props.value);
-    		if ('buttons' in $$new_props) $$invalidate(7, buttons = $$new_props.buttons);
-    		if ('customButtons' in $$new_props) $$invalidate(8, customButtons = $$new_props.customButtons);
-    		if ('dividers' in $$new_props) $$invalidate(9, dividers = $$new_props.dividers);
-    		if ('imageUrlText' in $$new_props) $$invalidate(10, imageUrlText = $$new_props.imageUrlText);
-    		if ('linkUrlText' in $$new_props) $$invalidate(11, linkUrlText = $$new_props.linkUrlText);
-    		if ('placeholder' in $$new_props) $$invalidate(12, placeholder = $$new_props.placeholder);
-    		if ('clearFormattingOnPaste' in $$new_props) $$invalidate(13, clearFormattingOnPaste = $$new_props.clearFormattingOnPaste);
-    		if ('resizable' in $$new_props) $$invalidate(14, resizable = $$new_props.resizable);
-    		if ('$$scope' in $$new_props) $$invalidate(16, $$scope = $$new_props.$$scope);
-    	};
-
-    	$$self.$capture_state = () => ({
-    		createEventDispatcher,
-    		onMount,
-    		onDestroy,
-    		colorClasses,
-    		classNames,
-    		noUndefinedProps,
-    		createEmitter,
-    		restProps,
-    		app: app$1,
-    		f7ready,
-    		emit,
-    		className,
-    		mode,
-    		value,
-    		buttons,
-    		customButtons,
-    		dividers,
-    		imageUrlText,
-    		linkUrlText,
-    		placeholder,
-    		clearFormattingOnPaste,
-    		resizable,
-    		el,
-    		f7TextEditor,
-    		instance,
-    		watchValue,
-    		onChange,
-    		onInput,
-    		onFocus,
-    		onBlur,
-    		onButtonClick,
-    		onKeyboardOpen,
-    		onKeyboardClose,
-    		onPopoverOpen,
-    		onPopoverClose,
-    		onInsertLink,
-    		onInsertImage,
-    		classes
-    	});
-
-    	$$self.$inject_state = $$new_props => {
-    		$$invalidate(32, $$props = assign(assign({}, $$props), $$new_props));
-    		if ('className' in $$props) $$invalidate(4, className = $$new_props.className);
-    		if ('mode' in $$props) $$invalidate(5, mode = $$new_props.mode);
-    		if ('value' in $$props) $$invalidate(6, value = $$new_props.value);
-    		if ('buttons' in $$props) $$invalidate(7, buttons = $$new_props.buttons);
-    		if ('customButtons' in $$props) $$invalidate(8, customButtons = $$new_props.customButtons);
-    		if ('dividers' in $$props) $$invalidate(9, dividers = $$new_props.dividers);
-    		if ('imageUrlText' in $$props) $$invalidate(10, imageUrlText = $$new_props.imageUrlText);
-    		if ('linkUrlText' in $$props) $$invalidate(11, linkUrlText = $$new_props.linkUrlText);
-    		if ('placeholder' in $$props) $$invalidate(12, placeholder = $$new_props.placeholder);
-    		if ('clearFormattingOnPaste' in $$props) $$invalidate(13, clearFormattingOnPaste = $$new_props.clearFormattingOnPaste);
-    		if ('resizable' in $$props) $$invalidate(14, resizable = $$new_props.resizable);
-    		if ('el' in $$props) $$invalidate(0, el = $$new_props.el);
-    		if ('f7TextEditor' in $$props) $$invalidate(1, f7TextEditor = $$new_props.f7TextEditor);
-    		if ('classes' in $$props) $$invalidate(2, classes = $$new_props.classes);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	$$self.$$.update = () => {
-    		$$invalidate(2, classes = classNames(className, 'text-editor', resizable && 'text-editor-resizable', colorClasses($$props)));
-
-    		if ($$self.$$.dirty[0] & /*value*/ 64) {
-    			watchValue(value);
-    		}
-    	};
-
-    	$$props = exclude_internal_props($$props);
-
-    	return [
-    		el,
-    		f7TextEditor,
-    		classes,
-    		$$restProps,
-    		className,
-    		mode,
-    		value,
-    		buttons,
-    		customButtons,
-    		dividers,
-    		imageUrlText,
-    		linkUrlText,
-    		placeholder,
-    		clearFormattingOnPaste,
-    		resizable,
-    		instance,
-    		$$scope,
-    		slots,
-    		div1_binding
-    	];
-    }
-
-    class Text_editor extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-
-    		init(
-    			this,
-    			options,
-    			instance_1$2,
-    			create_fragment$m,
-    			safe_not_equal,
-    			{
-    				class: 4,
-    				mode: 5,
-    				value: 6,
-    				buttons: 7,
-    				customButtons: 8,
-    				dividers: 9,
-    				imageUrlText: 10,
-    				linkUrlText: 11,
-    				placeholder: 12,
-    				clearFormattingOnPaste: 13,
-    				resizable: 14,
-    				instance: 15
-    			},
-    			null,
-    			[-1, -1]
-    		);
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "Text_editor",
-    			options,
-    			id: create_fragment$m.name
-    		});
-    	}
-
-    	get class() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set class(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get mode() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set mode(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get value() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set value(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get buttons() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set buttons(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get customButtons() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set customButtons(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get dividers() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set dividers(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get imageUrlText() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set imageUrlText(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get linkUrlText() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set linkUrlText(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get placeholder() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set placeholder(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get clearFormattingOnPaste() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set clearFormattingOnPaste(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizable() {
-    		throw new Error("<Text_editor>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizable(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get instance() {
-    		return this.$$.ctx[15];
-    	}
-
-    	set instance(value) {
-    		throw new Error("<Text_editor>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
-
     // eslint-disable-next-line
     var useSmartSelect = function useSmartSelect(props, setInstance, getEl) {
       var f7SmartSelect;
@@ -50335,7 +48915,7 @@ var MultiRoomAudio = (function () {
     const file$j = "node_modules\\framework7-svelte\\esm\\svelte\\link.svelte";
 
     // (110:2) {#if icon}
-    function create_if_block_2$9(ctx) {
+    function create_if_block_2$7(ctx) {
     	let useicon;
     	let current;
 
@@ -50373,7 +48953,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$9.name,
+    		id: create_if_block_2$7.name,
     		type: "if",
     		source: "(110:2) {#if icon}",
     		ctx
@@ -50383,18 +48963,18 @@ var MultiRoomAudio = (function () {
     }
 
     // (114:2) {#if typeof text !== 'undefined' || typeof badge !== 'undefined'}
-    function create_if_block$d(ctx) {
+    function create_if_block$c(ctx) {
     	let span;
     	let t0_value = plainText(/*text*/ ctx[0]) + "";
     	let t0;
     	let t1;
     	let current;
-    	let if_block = typeof /*badge*/ ctx[1] !== 'undefined' && create_if_block_1$a(ctx);
+    	let if_block = typeof /*badge*/ ctx[1] !== 'undefined' && create_if_block_1$8(ctx);
 
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (if_block) if_block.c();
     			toggle_class(span, "tabbar-label", /*isTabbarLabel*/ ctx[6]);
@@ -50418,7 +48998,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block, 1);
     					}
     				} else {
-    					if_block = create_if_block_1$a(ctx);
+    					if_block = create_if_block_1$8(ctx);
     					if_block.c();
     					transition_in(if_block, 1);
     					if_block.m(span, null);
@@ -50454,7 +49034,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$d.name,
+    		id: create_if_block$c.name,
     		type: "if",
     		source: "(114:2) {#if typeof text !== 'undefined' || typeof badge !== 'undefined'}",
     		ctx
@@ -50464,14 +49044,14 @@ var MultiRoomAudio = (function () {
     }
 
     // (117:6) {#if typeof badge !== 'undefined'}
-    function create_if_block_1$a(ctx) {
+    function create_if_block_1$8(ctx) {
     	let badge_1;
     	let current;
 
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[2],
-    				$$slots: { default: [create_default_slot$b] },
+    				$$slots: { default: [create_default_slot$a] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -50511,7 +49091,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$a.name,
+    		id: create_if_block_1$8.name,
     		type: "if",
     		source: "(117:6) {#if typeof badge !== 'undefined'}",
     		ctx
@@ -50521,13 +49101,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (117:40) <Badge color={badgeColor}>
-    function create_default_slot$b(ctx) {
+    function create_default_slot$a(ctx) {
     	let t_value = plainText(/*badge*/ ctx[1]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -50542,7 +49122,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$b.name,
+    		id: create_default_slot$a.name,
     		type: "slot",
     		source: "(117:40) <Badge color={badgeColor}>",
     		ctx
@@ -50551,7 +49131,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$l(ctx) {
+    function create_fragment$k(ctx) {
     	let a;
     	let t0;
     	let t1;
@@ -50560,10 +49140,10 @@ var MultiRoomAudio = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	let if_block0 = /*icon*/ ctx[8] && create_if_block_2$9(ctx);
+    	let if_block0 = /*icon*/ ctx[8] && create_if_block_2$7(ctx);
     	const default_slot_template = /*#slots*/ ctx[26].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[28], null);
-    	let if_block1 = (typeof /*text*/ ctx[0] !== 'undefined' || typeof /*badge*/ ctx[1] !== 'undefined') && create_if_block$d(ctx);
+    	let if_block1 = (typeof /*text*/ ctx[0] !== 'undefined' || typeof /*badge*/ ctx[1] !== 'undefined') && create_if_block$c(ctx);
     	let a_levels = [{ class: /*classes*/ ctx[9] }, /*attrs*/ ctx[10]];
     	let a_data = {};
 
@@ -50621,7 +49201,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_2$9(ctx);
+    					if_block0 = create_if_block_2$7(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(a, t0);
@@ -50659,7 +49239,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block1, 1);
     					}
     				} else {
-    					if_block1 = create_if_block$d(ctx);
+    					if_block1 = create_if_block$c(ctx);
     					if_block1.c();
     					transition_in(if_block1, 1);
     					if_block1.m(a, null);
@@ -50712,7 +49292,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$l.name,
+    		id: create_fragment$k.name,
     		type: "component",
     		source: "",
     		ctx
@@ -50721,7 +49301,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$j($$self, $$props, $$invalidate) {
+    function instance$i($$self, $$props, $$invalidate) {
     	let isTabbarLabel;
     	let hrefComputed;
     	let attrs;
@@ -50971,8 +49551,8 @@ var MultiRoomAudio = (function () {
     		init(
     			this,
     			options,
-    			instance$j,
-    			create_fragment$l,
+    			instance$i,
+    			create_fragment$k,
     			safe_not_equal,
     			{
     				class: 12,
@@ -51000,7 +49580,7 @@ var MultiRoomAudio = (function () {
     			component: this,
     			tagName: "Link",
     			options,
-    			id: create_fragment$l.name
+    			id: create_fragment$k.name
     		});
     	}
 
@@ -51163,5074 +49743,8 @@ var MultiRoomAudio = (function () {
       });
     };
 
-    /* node_modules\framework7-svelte\esm\svelte\list-input.svelte generated by Svelte v3.44.0 */
-    const file$i = "node_modules\\framework7-svelte\\esm\\svelte\\list-input.svelte";
-    const get_content_end_slot_changes_1$1 = dirty => ({});
-    const get_content_end_slot_context_1$1 = ctx => ({});
-    const get_content_slot_changes_1$1 = dirty => ({});
-    const get_content_slot_context_1$1 = ctx => ({});
-    const get_inner_end_slot_changes_1$1 = dirty => ({});
-    const get_inner_end_slot_context_1$1 = ctx => ({});
-    const get_inner_slot_changes_1$1 = dirty => ({});
-    const get_inner_slot_context_1$1 = ctx => ({});
-    const get_info_slot_changes_1 = dirty => ({});
-    const get_info_slot_context_1 = ctx => ({});
-    const get_error_message_slot_changes_1 = dirty => ({});
-    const get_error_message_slot_context_1 = ctx => ({});
-    const get_input_slot_changes_1 = dirty => ({});
-    const get_input_slot_context_1 = ctx => ({});
-    const get_label_slot_changes_1 = dirty => ({});
-    const get_label_slot_context_1 = ctx => ({});
-    const get_inner_start_slot_changes_1$1 = dirty => ({});
-    const get_inner_start_slot_context_1$1 = ctx => ({});
-    const get_media_slot_changes_1$1 = dirty => ({});
-    const get_media_slot_context_1$1 = ctx => ({});
-    const get_content_start_slot_changes_1$1 = dirty => ({});
-    const get_content_start_slot_context_1$1 = ctx => ({});
-    const get_root_end_slot_changes$1 = dirty => ({});
-    const get_root_end_slot_context$1 = ctx => ({});
-    const get_root_slot_changes$1 = dirty => ({});
-    const get_root_slot_context$1 = ctx => ({});
-    const get_content_end_slot_changes$1 = dirty => ({});
-    const get_content_end_slot_context$1 = ctx => ({});
-    const get_content_slot_changes$1 = dirty => ({});
-    const get_content_slot_context$1 = ctx => ({});
-    const get_inner_end_slot_changes$1 = dirty => ({});
-    const get_inner_end_slot_context$1 = ctx => ({});
-    const get_inner_slot_changes$1 = dirty => ({});
-    const get_inner_slot_context$1 = ctx => ({});
-    const get_info_slot_changes = dirty => ({});
-    const get_info_slot_context = ctx => ({});
-    const get_error_message_slot_changes = dirty => ({});
-    const get_error_message_slot_context = ctx => ({});
-    const get_input_slot_changes = dirty => ({});
-    const get_input_slot_context = ctx => ({});
-    const get_label_slot_changes = dirty => ({});
-    const get_label_slot_context = ctx => ({});
-    const get_inner_start_slot_changes$1 = dirty => ({});
-    const get_inner_start_slot_context$1 = ctx => ({});
-    const get_media_slot_changes$1 = dirty => ({});
-    const get_media_slot_context$1 = ctx => ({});
-    const get_content_start_slot_changes$1 = dirty => ({});
-    const get_content_start_slot_context$1 = ctx => ({});
-    const get_root_start_slot_changes$1 = dirty => ({});
-    const get_root_start_slot_context$1 = ctx => ({});
-
-    // (577:0) {:else}
-    function create_else_block_1$3(ctx) {
-    	let div2;
-    	let t0;
-    	let t1;
-    	let t2;
-    	let div1;
-    	let t3;
-    	let t4;
-    	let div0;
-    	let t5;
-    	let t6;
-    	let t7;
-    	let t8;
-    	let t9;
-    	let t10;
-    	let t11;
-    	let t12;
-    	let current;
-    	const content_start_slot_template = /*#slots*/ ctx[77]["content-start"];
-    	const content_start_slot = create_slot(content_start_slot_template, ctx, /*$$scope*/ ctx[76], get_content_start_slot_context_1$1);
-    	let if_block0 = /*isSortable*/ ctx[51] && /*isSortableOpposite*/ ctx[50] && create_if_block_23$1(ctx);
-    	let if_block1 = (/*media*/ ctx[1] || /*hasMediaSlots*/ ctx[48]) && create_if_block_21$1(ctx);
-    	const inner_start_slot_template = /*#slots*/ ctx[77]["inner-start"];
-    	const inner_start_slot = create_slot(inner_start_slot_template, ctx, /*$$scope*/ ctx[76], get_inner_start_slot_context_1$1);
-    	let if_block2 = (typeof /*label*/ ctx[36] !== 'undefined' || /*hasLabelSlots*/ ctx[47]) && create_if_block_20$1(ctx);
-    	let if_block3 = /*input*/ ctx[3] && create_if_block_16$1(ctx);
-    	const input_slot_template = /*#slots*/ ctx[77].input;
-    	const input_slot = create_slot(input_slot_template, ctx, /*$$scope*/ ctx[76], get_input_slot_context_1);
-    	let if_block4 = /*hasErrorMessage*/ ctx[38] && /*errorMessageForce*/ ctx[34] && create_if_block_15$1(ctx);
-    	let if_block5 = /*clearButton*/ ctx[32] && create_if_block_14$1(ctx);
-    	let if_block6 = (typeof /*info*/ ctx[35] !== 'undefined' || /*hasInfoSlots*/ ctx[39]) && create_if_block_13$1(ctx);
-    	const inner_slot_template = /*#slots*/ ctx[77].inner;
-    	const inner_slot = create_slot(inner_slot_template, ctx, /*$$scope*/ ctx[76], get_inner_slot_context_1$1);
-    	const inner_end_slot_template = /*#slots*/ ctx[77]["inner-end"];
-    	const inner_end_slot = create_slot(inner_end_slot_template, ctx, /*$$scope*/ ctx[76], get_inner_end_slot_context_1$1);
-    	const content_slot_template = /*#slots*/ ctx[77].content;
-    	const content_slot = create_slot(content_slot_template, ctx, /*$$scope*/ ctx[76], get_content_slot_context_1$1);
-    	const content_end_slot_template = /*#slots*/ ctx[77]["content-end"];
-    	const content_end_slot = create_slot(content_end_slot_template, ctx, /*$$scope*/ ctx[76], get_content_end_slot_context_1$1);
-    	let div2_levels = [{ class: /*itemContentClasses*/ ctx[45] }, restProps(/*$$restProps*/ ctx[56])];
-    	let div2_data = {};
-
-    	for (let i = 0; i < div2_levels.length; i += 1) {
-    		div2_data = assign(div2_data, div2_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			div2 = element("div");
-    			if (content_start_slot) content_start_slot.c();
-    			t0 = space();
-    			if (if_block0) if_block0.c();
-    			t1 = space();
-    			if (if_block1) if_block1.c();
-    			t2 = space();
-    			div1 = element("div");
-    			if (inner_start_slot) inner_start_slot.c();
-    			t3 = space();
-    			if (if_block2) if_block2.c();
-    			t4 = space();
-    			div0 = element("div");
-    			if (if_block3) if_block3.c();
-    			t5 = space();
-    			if (input_slot) input_slot.c();
-    			t6 = space();
-    			if (if_block4) if_block4.c();
-    			t7 = space();
-    			if (if_block5) if_block5.c();
-    			t8 = space();
-    			if (if_block6) if_block6.c();
-    			t9 = space();
-    			if (inner_slot) inner_slot.c();
-    			t10 = space();
-    			if (inner_end_slot) inner_end_slot.c();
-    			t11 = space();
-    			if (content_slot) content_slot.c();
-    			t12 = space();
-    			if (content_end_slot) content_end_slot.c();
-    			attr_dev(div0, "class", /*inputWrapClasses*/ ctx[43]);
-    			add_location(div0, file$i, 597, 6, 17800);
-    			attr_dev(div1, "class", "item-inner");
-    			add_location(div1, file$i, 589, 4, 17554);
-    			set_attributes(div2, div2_data);
-    			add_location(div2, file$i, 577, 2, 17178);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div2, anchor);
-
-    			if (content_start_slot) {
-    				content_start_slot.m(div2, null);
-    			}
-
-    			append_dev(div2, t0);
-    			if (if_block0) if_block0.m(div2, null);
-    			append_dev(div2, t1);
-    			if (if_block1) if_block1.m(div2, null);
-    			append_dev(div2, t2);
-    			append_dev(div2, div1);
-
-    			if (inner_start_slot) {
-    				inner_start_slot.m(div1, null);
-    			}
-
-    			append_dev(div1, t3);
-    			if (if_block2) if_block2.m(div1, null);
-    			append_dev(div1, t4);
-    			append_dev(div1, div0);
-    			if (if_block3) if_block3.m(div0, null);
-    			append_dev(div0, t5);
-
-    			if (input_slot) {
-    				input_slot.m(div0, null);
-    			}
-
-    			append_dev(div0, t6);
-    			if (if_block4) if_block4.m(div0, null);
-    			append_dev(div0, t7);
-    			if (if_block5) if_block5.m(div0, null);
-    			append_dev(div0, t8);
-    			if (if_block6) if_block6.m(div0, null);
-    			append_dev(div1, t9);
-
-    			if (inner_slot) {
-    				inner_slot.m(div1, null);
-    			}
-
-    			append_dev(div1, t10);
-
-    			if (inner_end_slot) {
-    				inner_end_slot.m(div1, null);
-    			}
-
-    			append_dev(div2, t11);
-
-    			if (content_slot) {
-    				content_slot.m(div2, null);
-    			}
-
-    			append_dev(div2, t12);
-
-    			if (content_end_slot) {
-    				content_end_slot.m(div2, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (content_start_slot) {
-    				if (content_start_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						content_start_slot,
-    						content_start_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(content_start_slot_template, /*$$scope*/ ctx[76], dirty, get_content_start_slot_changes_1$1),
-    						get_content_start_slot_context_1$1
-    					);
-    				}
-    			}
-
-    			if (/*isSortable*/ ctx[51] && /*isSortableOpposite*/ ctx[50]) {
-    				if (if_block0) ; else {
-    					if_block0 = create_if_block_23$1(ctx);
-    					if_block0.c();
-    					if_block0.m(div2, t1);
-    				}
-    			} else if (if_block0) {
-    				if_block0.d(1);
-    				if_block0 = null;
-    			}
-
-    			if (/*media*/ ctx[1] || /*hasMediaSlots*/ ctx[48]) {
-    				if (if_block1) {
-    					if_block1.p(ctx, dirty);
-
-    					if (dirty[0] & /*media*/ 2 | dirty[1] & /*hasMediaSlots*/ 131072) {
-    						transition_in(if_block1, 1);
-    					}
-    				} else {
-    					if_block1 = create_if_block_21$1(ctx);
-    					if_block1.c();
-    					transition_in(if_block1, 1);
-    					if_block1.m(div2, t2);
-    				}
-    			} else if (if_block1) {
-    				group_outros();
-
-    				transition_out(if_block1, 1, 1, () => {
-    					if_block1 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (inner_start_slot) {
-    				if (inner_start_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						inner_start_slot,
-    						inner_start_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(inner_start_slot_template, /*$$scope*/ ctx[76], dirty, get_inner_start_slot_changes_1$1),
-    						get_inner_start_slot_context_1$1
-    					);
-    				}
-    			}
-
-    			if (typeof /*label*/ ctx[36] !== 'undefined' || /*hasLabelSlots*/ ctx[47]) {
-    				if (if_block2) {
-    					if_block2.p(ctx, dirty);
-
-    					if (dirty[1] & /*label, hasLabelSlots*/ 65568) {
-    						transition_in(if_block2, 1);
-    					}
-    				} else {
-    					if_block2 = create_if_block_20$1(ctx);
-    					if_block2.c();
-    					transition_in(if_block2, 1);
-    					if_block2.m(div1, t4);
-    				}
-    			} else if (if_block2) {
-    				group_outros();
-
-    				transition_out(if_block2, 1, 1, () => {
-    					if_block2 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (/*input*/ ctx[3]) {
-    				if (if_block3) {
-    					if_block3.p(ctx, dirty);
-
-    					if (dirty[0] & /*input*/ 8) {
-    						transition_in(if_block3, 1);
-    					}
-    				} else {
-    					if_block3 = create_if_block_16$1(ctx);
-    					if_block3.c();
-    					transition_in(if_block3, 1);
-    					if_block3.m(div0, t5);
-    				}
-    			} else if (if_block3) {
-    				group_outros();
-
-    				transition_out(if_block3, 1, 1, () => {
-    					if_block3 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (input_slot) {
-    				if (input_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						input_slot,
-    						input_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(input_slot_template, /*$$scope*/ ctx[76], dirty, get_input_slot_changes_1),
-    						get_input_slot_context_1
-    					);
-    				}
-    			}
-
-    			if (/*hasErrorMessage*/ ctx[38] && /*errorMessageForce*/ ctx[34]) {
-    				if (if_block4) {
-    					if_block4.p(ctx, dirty);
-
-    					if (dirty[1] & /*hasErrorMessage, errorMessageForce*/ 136) {
-    						transition_in(if_block4, 1);
-    					}
-    				} else {
-    					if_block4 = create_if_block_15$1(ctx);
-    					if_block4.c();
-    					transition_in(if_block4, 1);
-    					if_block4.m(div0, t7);
-    				}
-    			} else if (if_block4) {
-    				group_outros();
-
-    				transition_out(if_block4, 1, 1, () => {
-    					if_block4 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (/*clearButton*/ ctx[32]) {
-    				if (if_block5) ; else {
-    					if_block5 = create_if_block_14$1(ctx);
-    					if_block5.c();
-    					if_block5.m(div0, t8);
-    				}
-    			} else if (if_block5) {
-    				if_block5.d(1);
-    				if_block5 = null;
-    			}
-
-    			if (typeof /*info*/ ctx[35] !== 'undefined' || /*hasInfoSlots*/ ctx[39]) {
-    				if (if_block6) {
-    					if_block6.p(ctx, dirty);
-
-    					if (dirty[1] & /*info, hasInfoSlots*/ 272) {
-    						transition_in(if_block6, 1);
-    					}
-    				} else {
-    					if_block6 = create_if_block_13$1(ctx);
-    					if_block6.c();
-    					transition_in(if_block6, 1);
-    					if_block6.m(div0, null);
-    				}
-    			} else if (if_block6) {
-    				group_outros();
-
-    				transition_out(if_block6, 1, 1, () => {
-    					if_block6 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (!current || dirty[1] & /*inputWrapClasses*/ 4096) {
-    				attr_dev(div0, "class", /*inputWrapClasses*/ ctx[43]);
-    			}
-
-    			if (inner_slot) {
-    				if (inner_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						inner_slot,
-    						inner_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(inner_slot_template, /*$$scope*/ ctx[76], dirty, get_inner_slot_changes_1$1),
-    						get_inner_slot_context_1$1
-    					);
-    				}
-    			}
-
-    			if (inner_end_slot) {
-    				if (inner_end_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						inner_end_slot,
-    						inner_end_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(inner_end_slot_template, /*$$scope*/ ctx[76], dirty, get_inner_end_slot_changes_1$1),
-    						get_inner_end_slot_context_1$1
-    					);
-    				}
-    			}
-
-    			if (content_slot) {
-    				if (content_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						content_slot,
-    						content_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(content_slot_template, /*$$scope*/ ctx[76], dirty, get_content_slot_changes_1$1),
-    						get_content_slot_context_1$1
-    					);
-    				}
-    			}
-
-    			if (content_end_slot) {
-    				if (content_end_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						content_end_slot,
-    						content_end_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(content_end_slot_template, /*$$scope*/ ctx[76], dirty, get_content_end_slot_changes_1$1),
-    						get_content_end_slot_context_1$1
-    					);
-    				}
-    			}
-
-    			set_attributes(div2, div2_data = get_spread_update(div2_levels, [
-    				(!current || dirty[1] & /*itemContentClasses*/ 16384) && { class: /*itemContentClasses*/ ctx[45] },
-    				dirty[1] & /*$$restProps*/ 33554432 && restProps(/*$$restProps*/ ctx[56])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(content_start_slot, local);
-    			transition_in(if_block1);
-    			transition_in(inner_start_slot, local);
-    			transition_in(if_block2);
-    			transition_in(if_block3);
-    			transition_in(input_slot, local);
-    			transition_in(if_block4);
-    			transition_in(if_block6);
-    			transition_in(inner_slot, local);
-    			transition_in(inner_end_slot, local);
-    			transition_in(content_slot, local);
-    			transition_in(content_end_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(content_start_slot, local);
-    			transition_out(if_block1);
-    			transition_out(inner_start_slot, local);
-    			transition_out(if_block2);
-    			transition_out(if_block3);
-    			transition_out(input_slot, local);
-    			transition_out(if_block4);
-    			transition_out(if_block6);
-    			transition_out(inner_slot, local);
-    			transition_out(inner_end_slot, local);
-    			transition_out(content_slot, local);
-    			transition_out(content_end_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div2);
-    			if (content_start_slot) content_start_slot.d(detaching);
-    			if (if_block0) if_block0.d();
-    			if (if_block1) if_block1.d();
-    			if (inner_start_slot) inner_start_slot.d(detaching);
-    			if (if_block2) if_block2.d();
-    			if (if_block3) if_block3.d();
-    			if (input_slot) input_slot.d(detaching);
-    			if (if_block4) if_block4.d();
-    			if (if_block5) if_block5.d();
-    			if (if_block6) if_block6.d();
-    			if (inner_slot) inner_slot.d(detaching);
-    			if (inner_end_slot) inner_end_slot.d(detaching);
-    			if (content_slot) content_slot.d(detaching);
-    			if (content_end_slot) content_end_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block_1$3.name,
-    		type: "else",
-    		source: "(577:0) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (373:0) {#if wrap}
-    function create_if_block$c(ctx) {
-    	let li;
-    	let t0;
-    	let div2;
-    	let t1;
-    	let t2;
-    	let t3;
-    	let div1;
-    	let t4;
-    	let t5;
-    	let div0;
-    	let t6;
-    	let t7;
-    	let t8;
-    	let t9;
-    	let t10;
-    	let t11;
-    	let t12;
-    	let t13;
-    	let t14;
-    	let t15;
-    	let t16;
-    	let current;
-    	const root_start_slot_template = /*#slots*/ ctx[77]["root-start"];
-    	const root_start_slot = create_slot(root_start_slot_template, ctx, /*$$scope*/ ctx[76], get_root_start_slot_context$1);
-    	const content_start_slot_template = /*#slots*/ ctx[77]["content-start"];
-    	const content_start_slot = create_slot(content_start_slot_template, ctx, /*$$scope*/ ctx[76], get_content_start_slot_context$1);
-    	let if_block0 = /*isSortable*/ ctx[51] && /*isSortableOpposite*/ ctx[50] && create_if_block_12$1(ctx);
-    	let if_block1 = (/*media*/ ctx[1] || /*hasMediaSlots*/ ctx[48]) && create_if_block_10$1(ctx);
-    	const inner_start_slot_template = /*#slots*/ ctx[77]["inner-start"];
-    	const inner_start_slot = create_slot(inner_start_slot_template, ctx, /*$$scope*/ ctx[76], get_inner_start_slot_context$1);
-    	let if_block2 = (typeof /*label*/ ctx[36] !== 'undefined' || /*hasLabelSlots*/ ctx[47]) && create_if_block_9$1(ctx);
-    	let if_block3 = /*input*/ ctx[3] && create_if_block_5$2(ctx);
-    	const input_slot_template = /*#slots*/ ctx[77].input;
-    	const input_slot = create_slot(input_slot_template, ctx, /*$$scope*/ ctx[76], get_input_slot_context);
-    	let if_block4 = /*hasErrorMessage*/ ctx[38] && /*errorMessageForce*/ ctx[34] && create_if_block_4$2(ctx);
-    	let if_block5 = /*clearButton*/ ctx[32] && create_if_block_3$7(ctx);
-    	let if_block6 = (typeof /*info*/ ctx[35] !== 'undefined' || /*hasInfoSlots*/ ctx[39]) && create_if_block_2$8(ctx);
-    	const inner_slot_template = /*#slots*/ ctx[77].inner;
-    	const inner_slot = create_slot(inner_slot_template, ctx, /*$$scope*/ ctx[76], get_inner_slot_context$1);
-    	const inner_end_slot_template = /*#slots*/ ctx[77]["inner-end"];
-    	const inner_end_slot = create_slot(inner_end_slot_template, ctx, /*$$scope*/ ctx[76], get_inner_end_slot_context$1);
-    	const content_slot_template = /*#slots*/ ctx[77].content;
-    	const content_slot = create_slot(content_slot_template, ctx, /*$$scope*/ ctx[76], get_content_slot_context$1);
-    	const content_end_slot_template = /*#slots*/ ctx[77]["content-end"];
-    	const content_end_slot = create_slot(content_end_slot_template, ctx, /*$$scope*/ ctx[76], get_content_end_slot_context$1);
-    	let if_block7 = /*isSortable*/ ctx[51] && !/*isSortableOpposite*/ ctx[50] && create_if_block_1$9(ctx);
-    	const root_slot_template = /*#slots*/ ctx[77].root;
-    	const root_slot = create_slot(root_slot_template, ctx, /*$$scope*/ ctx[76], get_root_slot_context$1);
-    	const root_end_slot_template = /*#slots*/ ctx[77]["root-end"];
-    	const root_end_slot = create_slot(root_end_slot_template, ctx, /*$$scope*/ ctx[76], get_root_end_slot_context$1);
-    	let li_levels = [{ class: /*classes*/ ctx[42] }, restProps(/*$$restProps*/ ctx[56])];
-    	let li_data = {};
-
-    	for (let i = 0; i < li_levels.length; i += 1) {
-    		li_data = assign(li_data, li_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			li = element("li");
-    			if (root_start_slot) root_start_slot.c();
-    			t0 = space();
-    			div2 = element("div");
-    			if (content_start_slot) content_start_slot.c();
-    			t1 = space();
-    			if (if_block0) if_block0.c();
-    			t2 = space();
-    			if (if_block1) if_block1.c();
-    			t3 = space();
-    			div1 = element("div");
-    			if (inner_start_slot) inner_start_slot.c();
-    			t4 = space();
-    			if (if_block2) if_block2.c();
-    			t5 = space();
-    			div0 = element("div");
-    			if (if_block3) if_block3.c();
-    			t6 = space();
-    			if (input_slot) input_slot.c();
-    			t7 = space();
-    			if (if_block4) if_block4.c();
-    			t8 = space();
-    			if (if_block5) if_block5.c();
-    			t9 = space();
-    			if (if_block6) if_block6.c();
-    			t10 = space();
-    			if (inner_slot) inner_slot.c();
-    			t11 = space();
-    			if (inner_end_slot) inner_end_slot.c();
-    			t12 = space();
-    			if (content_slot) content_slot.c();
-    			t13 = space();
-    			if (content_end_slot) content_end_slot.c();
-    			t14 = space();
-    			if (if_block7) if_block7.c();
-    			t15 = space();
-    			if (root_slot) root_slot.c();
-    			t16 = space();
-    			if (root_end_slot) root_end_slot.c();
-    			attr_dev(div0, "class", /*inputWrapClasses*/ ctx[43]);
-    			add_location(div0, file$i, 395, 8, 11064);
-    			attr_dev(div1, "class", "item-inner");
-    			add_location(div1, file$i, 387, 6, 10802);
-    			attr_dev(div2, "class", /*itemContentClasses*/ ctx[45]);
-    			add_location(div2, file$i, 375, 4, 10432);
-    			set_attributes(li, li_data);
-    			add_location(li, file$i, 373, 2, 10348);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, li, anchor);
-
-    			if (root_start_slot) {
-    				root_start_slot.m(li, null);
-    			}
-
-    			append_dev(li, t0);
-    			append_dev(li, div2);
-
-    			if (content_start_slot) {
-    				content_start_slot.m(div2, null);
-    			}
-
-    			append_dev(div2, t1);
-    			if (if_block0) if_block0.m(div2, null);
-    			append_dev(div2, t2);
-    			if (if_block1) if_block1.m(div2, null);
-    			append_dev(div2, t3);
-    			append_dev(div2, div1);
-
-    			if (inner_start_slot) {
-    				inner_start_slot.m(div1, null);
-    			}
-
-    			append_dev(div1, t4);
-    			if (if_block2) if_block2.m(div1, null);
-    			append_dev(div1, t5);
-    			append_dev(div1, div0);
-    			if (if_block3) if_block3.m(div0, null);
-    			append_dev(div0, t6);
-
-    			if (input_slot) {
-    				input_slot.m(div0, null);
-    			}
-
-    			append_dev(div0, t7);
-    			if (if_block4) if_block4.m(div0, null);
-    			append_dev(div0, t8);
-    			if (if_block5) if_block5.m(div0, null);
-    			append_dev(div0, t9);
-    			if (if_block6) if_block6.m(div0, null);
-    			append_dev(div1, t10);
-
-    			if (inner_slot) {
-    				inner_slot.m(div1, null);
-    			}
-
-    			append_dev(div1, t11);
-
-    			if (inner_end_slot) {
-    				inner_end_slot.m(div1, null);
-    			}
-
-    			append_dev(div2, t12);
-
-    			if (content_slot) {
-    				content_slot.m(div2, null);
-    			}
-
-    			append_dev(div2, t13);
-
-    			if (content_end_slot) {
-    				content_end_slot.m(div2, null);
-    			}
-
-    			append_dev(li, t14);
-    			if (if_block7) if_block7.m(li, null);
-    			append_dev(li, t15);
-
-    			if (root_slot) {
-    				root_slot.m(li, null);
-    			}
-
-    			append_dev(li, t16);
-
-    			if (root_end_slot) {
-    				root_end_slot.m(li, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (root_start_slot) {
-    				if (root_start_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						root_start_slot,
-    						root_start_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(root_start_slot_template, /*$$scope*/ ctx[76], dirty, get_root_start_slot_changes$1),
-    						get_root_start_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (content_start_slot) {
-    				if (content_start_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						content_start_slot,
-    						content_start_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(content_start_slot_template, /*$$scope*/ ctx[76], dirty, get_content_start_slot_changes$1),
-    						get_content_start_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (/*isSortable*/ ctx[51] && /*isSortableOpposite*/ ctx[50]) {
-    				if (if_block0) ; else {
-    					if_block0 = create_if_block_12$1(ctx);
-    					if_block0.c();
-    					if_block0.m(div2, t2);
-    				}
-    			} else if (if_block0) {
-    				if_block0.d(1);
-    				if_block0 = null;
-    			}
-
-    			if (/*media*/ ctx[1] || /*hasMediaSlots*/ ctx[48]) {
-    				if (if_block1) {
-    					if_block1.p(ctx, dirty);
-
-    					if (dirty[0] & /*media*/ 2 | dirty[1] & /*hasMediaSlots*/ 131072) {
-    						transition_in(if_block1, 1);
-    					}
-    				} else {
-    					if_block1 = create_if_block_10$1(ctx);
-    					if_block1.c();
-    					transition_in(if_block1, 1);
-    					if_block1.m(div2, t3);
-    				}
-    			} else if (if_block1) {
-    				group_outros();
-
-    				transition_out(if_block1, 1, 1, () => {
-    					if_block1 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (inner_start_slot) {
-    				if (inner_start_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						inner_start_slot,
-    						inner_start_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(inner_start_slot_template, /*$$scope*/ ctx[76], dirty, get_inner_start_slot_changes$1),
-    						get_inner_start_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (typeof /*label*/ ctx[36] !== 'undefined' || /*hasLabelSlots*/ ctx[47]) {
-    				if (if_block2) {
-    					if_block2.p(ctx, dirty);
-
-    					if (dirty[1] & /*label, hasLabelSlots*/ 65568) {
-    						transition_in(if_block2, 1);
-    					}
-    				} else {
-    					if_block2 = create_if_block_9$1(ctx);
-    					if_block2.c();
-    					transition_in(if_block2, 1);
-    					if_block2.m(div1, t5);
-    				}
-    			} else if (if_block2) {
-    				group_outros();
-
-    				transition_out(if_block2, 1, 1, () => {
-    					if_block2 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (/*input*/ ctx[3]) {
-    				if (if_block3) {
-    					if_block3.p(ctx, dirty);
-
-    					if (dirty[0] & /*input*/ 8) {
-    						transition_in(if_block3, 1);
-    					}
-    				} else {
-    					if_block3 = create_if_block_5$2(ctx);
-    					if_block3.c();
-    					transition_in(if_block3, 1);
-    					if_block3.m(div0, t6);
-    				}
-    			} else if (if_block3) {
-    				group_outros();
-
-    				transition_out(if_block3, 1, 1, () => {
-    					if_block3 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (input_slot) {
-    				if (input_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						input_slot,
-    						input_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(input_slot_template, /*$$scope*/ ctx[76], dirty, get_input_slot_changes),
-    						get_input_slot_context
-    					);
-    				}
-    			}
-
-    			if (/*hasErrorMessage*/ ctx[38] && /*errorMessageForce*/ ctx[34]) {
-    				if (if_block4) {
-    					if_block4.p(ctx, dirty);
-
-    					if (dirty[1] & /*hasErrorMessage, errorMessageForce*/ 136) {
-    						transition_in(if_block4, 1);
-    					}
-    				} else {
-    					if_block4 = create_if_block_4$2(ctx);
-    					if_block4.c();
-    					transition_in(if_block4, 1);
-    					if_block4.m(div0, t8);
-    				}
-    			} else if (if_block4) {
-    				group_outros();
-
-    				transition_out(if_block4, 1, 1, () => {
-    					if_block4 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (/*clearButton*/ ctx[32]) {
-    				if (if_block5) ; else {
-    					if_block5 = create_if_block_3$7(ctx);
-    					if_block5.c();
-    					if_block5.m(div0, t9);
-    				}
-    			} else if (if_block5) {
-    				if_block5.d(1);
-    				if_block5 = null;
-    			}
-
-    			if (typeof /*info*/ ctx[35] !== 'undefined' || /*hasInfoSlots*/ ctx[39]) {
-    				if (if_block6) {
-    					if_block6.p(ctx, dirty);
-
-    					if (dirty[1] & /*info, hasInfoSlots*/ 272) {
-    						transition_in(if_block6, 1);
-    					}
-    				} else {
-    					if_block6 = create_if_block_2$8(ctx);
-    					if_block6.c();
-    					transition_in(if_block6, 1);
-    					if_block6.m(div0, null);
-    				}
-    			} else if (if_block6) {
-    				group_outros();
-
-    				transition_out(if_block6, 1, 1, () => {
-    					if_block6 = null;
-    				});
-
-    				check_outros();
-    			}
-
-    			if (!current || dirty[1] & /*inputWrapClasses*/ 4096) {
-    				attr_dev(div0, "class", /*inputWrapClasses*/ ctx[43]);
-    			}
-
-    			if (inner_slot) {
-    				if (inner_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						inner_slot,
-    						inner_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(inner_slot_template, /*$$scope*/ ctx[76], dirty, get_inner_slot_changes$1),
-    						get_inner_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (inner_end_slot) {
-    				if (inner_end_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						inner_end_slot,
-    						inner_end_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(inner_end_slot_template, /*$$scope*/ ctx[76], dirty, get_inner_end_slot_changes$1),
-    						get_inner_end_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (content_slot) {
-    				if (content_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						content_slot,
-    						content_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(content_slot_template, /*$$scope*/ ctx[76], dirty, get_content_slot_changes$1),
-    						get_content_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (content_end_slot) {
-    				if (content_end_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						content_end_slot,
-    						content_end_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(content_end_slot_template, /*$$scope*/ ctx[76], dirty, get_content_end_slot_changes$1),
-    						get_content_end_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (!current || dirty[1] & /*itemContentClasses*/ 16384) {
-    				attr_dev(div2, "class", /*itemContentClasses*/ ctx[45]);
-    			}
-
-    			if (/*isSortable*/ ctx[51] && !/*isSortableOpposite*/ ctx[50]) {
-    				if (if_block7) ; else {
-    					if_block7 = create_if_block_1$9(ctx);
-    					if_block7.c();
-    					if_block7.m(li, t15);
-    				}
-    			} else if (if_block7) {
-    				if_block7.d(1);
-    				if_block7 = null;
-    			}
-
-    			if (root_slot) {
-    				if (root_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						root_slot,
-    						root_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(root_slot_template, /*$$scope*/ ctx[76], dirty, get_root_slot_changes$1),
-    						get_root_slot_context$1
-    					);
-    				}
-    			}
-
-    			if (root_end_slot) {
-    				if (root_end_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						root_end_slot,
-    						root_end_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(root_end_slot_template, /*$$scope*/ ctx[76], dirty, get_root_end_slot_changes$1),
-    						get_root_end_slot_context$1
-    					);
-    				}
-    			}
-
-    			set_attributes(li, li_data = get_spread_update(li_levels, [
-    				(!current || dirty[1] & /*classes*/ 2048) && { class: /*classes*/ ctx[42] },
-    				dirty[1] & /*$$restProps*/ 33554432 && restProps(/*$$restProps*/ ctx[56])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(root_start_slot, local);
-    			transition_in(content_start_slot, local);
-    			transition_in(if_block1);
-    			transition_in(inner_start_slot, local);
-    			transition_in(if_block2);
-    			transition_in(if_block3);
-    			transition_in(input_slot, local);
-    			transition_in(if_block4);
-    			transition_in(if_block6);
-    			transition_in(inner_slot, local);
-    			transition_in(inner_end_slot, local);
-    			transition_in(content_slot, local);
-    			transition_in(content_end_slot, local);
-    			transition_in(root_slot, local);
-    			transition_in(root_end_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(root_start_slot, local);
-    			transition_out(content_start_slot, local);
-    			transition_out(if_block1);
-    			transition_out(inner_start_slot, local);
-    			transition_out(if_block2);
-    			transition_out(if_block3);
-    			transition_out(input_slot, local);
-    			transition_out(if_block4);
-    			transition_out(if_block6);
-    			transition_out(inner_slot, local);
-    			transition_out(inner_end_slot, local);
-    			transition_out(content_slot, local);
-    			transition_out(content_end_slot, local);
-    			transition_out(root_slot, local);
-    			transition_out(root_end_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(li);
-    			if (root_start_slot) root_start_slot.d(detaching);
-    			if (content_start_slot) content_start_slot.d(detaching);
-    			if (if_block0) if_block0.d();
-    			if (if_block1) if_block1.d();
-    			if (inner_start_slot) inner_start_slot.d(detaching);
-    			if (if_block2) if_block2.d();
-    			if (if_block3) if_block3.d();
-    			if (input_slot) input_slot.d(detaching);
-    			if (if_block4) if_block4.d();
-    			if (if_block5) if_block5.d();
-    			if (if_block6) if_block6.d();
-    			if (inner_slot) inner_slot.d(detaching);
-    			if (inner_end_slot) inner_end_slot.d(detaching);
-    			if (content_slot) content_slot.d(detaching);
-    			if (content_end_slot) content_end_slot.d(detaching);
-    			if (if_block7) if_block7.d();
-    			if (root_slot) root_slot.d(detaching);
-    			if (root_end_slot) root_end_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block$c.name,
-    		type: "if",
-    		source: "(373:0) {#if wrap}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (580:4) {#if isSortable && isSortableOpposite}
-    function create_if_block_23$1(ctx) {
-    	let div;
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$i, 580, 6, 17322);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_23$1.name,
-    		type: "if",
-    		source: "(580:4) {#if isSortable && isSortableOpposite}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (584:4) {#if media || hasMediaSlots}
-    function create_if_block_21$1(ctx) {
-    	let div;
-    	let t;
-    	let current;
-    	let if_block = typeof /*media*/ ctx[1] !== 'undefined' && create_if_block_22$1(ctx);
-    	const media_slot_template = /*#slots*/ ctx[77].media;
-    	const media_slot = create_slot(media_slot_template, ctx, /*$$scope*/ ctx[76], get_media_slot_context_1$1);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (if_block) if_block.c();
-    			t = space();
-    			if (media_slot) media_slot.c();
-    			attr_dev(div, "class", "item-media");
-    			add_location(div, file$i, 584, 6, 17405);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			if (if_block) if_block.m(div, null);
-    			append_dev(div, t);
-
-    			if (media_slot) {
-    				media_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (typeof /*media*/ ctx[1] !== 'undefined') {
-    				if (if_block) {
-    					if_block.p(ctx, dirty);
-    				} else {
-    					if_block = create_if_block_22$1(ctx);
-    					if_block.c();
-    					if_block.m(div, t);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
-
-    			if (media_slot) {
-    				if (media_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						media_slot,
-    						media_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(media_slot_template, /*$$scope*/ ctx[76], dirty, get_media_slot_changes_1$1),
-    						get_media_slot_context_1$1
-    					);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(media_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(media_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (if_block) if_block.d();
-    			if (media_slot) media_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_21$1.name,
-    		type: "if",
-    		source: "(584:4) {#if media || hasMediaSlots}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (586:8) {#if typeof media !== 'undefined'}
-    function create_if_block_22$1(ctx) {
-    	let img;
-    	let img_src_value;
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[1])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$i, 585, 42, 17472);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*media*/ 2 && !src_url_equal(img.src, img_src_value = /*media*/ ctx[1])) {
-    				attr_dev(img, "src", img_src_value);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_22$1.name,
-    		type: "if",
-    		source: "(586:8) {#if typeof media !== 'undefined'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (592:6) {#if typeof label !== 'undefined' || hasLabelSlots}
-    function create_if_block_20$1(ctx) {
-    	let div;
-    	let t0_value = plainText(/*label*/ ctx[36]) + "";
-    	let t0;
-    	let t1;
-    	let current;
-    	const label_slot_template = /*#slots*/ ctx[77].label;
-    	const label_slot = create_slot(label_slot_template, ctx, /*$$scope*/ ctx[76], get_label_slot_context_1);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			t0 = text$1(t0_value);
-    			t1 = space();
-    			if (label_slot) label_slot.c();
-    			attr_dev(div, "class", /*labelClasses*/ ctx[44]);
-    			add_location(div, file$i, 592, 8, 17679);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, t0);
-    			append_dev(div, t1);
-
-    			if (label_slot) {
-    				label_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if ((!current || dirty[1] & /*label*/ 32) && t0_value !== (t0_value = plainText(/*label*/ ctx[36]) + "")) set_data_dev(t0, t0_value);
-
-    			if (label_slot) {
-    				if (label_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						label_slot,
-    						label_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(label_slot_template, /*$$scope*/ ctx[76], dirty, get_label_slot_changes_1),
-    						get_label_slot_context_1
-    					);
-    				}
-    			}
-
-    			if (!current || dirty[1] & /*labelClasses*/ 8192) {
-    				attr_dev(div, "class", /*labelClasses*/ ctx[44]);
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(label_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(label_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (label_slot) label_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_20$1.name,
-    		type: "if",
-    		source: "(592:6) {#if typeof label !== 'undefined' || hasLabelSlots}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (599:8) {#if input}
-    function create_if_block_16$1(ctx) {
-    	let current_block_type_index;
-    	let if_block;
-    	let if_block_anchor;
-    	let current;
-
-    	const if_block_creators = [
-    		create_if_block_17$1,
-    		create_if_block_18$1,
-    		create_if_block_19$1,
-    		create_else_block_2$3
-    	];
-
-    	const if_blocks = [];
-
-    	function select_block_type_2(ctx, dirty) {
-    		if (/*type*/ ctx[4] === 'select') return 0;
-    		if (/*type*/ ctx[4] === 'textarea') return 1;
-    		if (/*type*/ ctx[4] === 'texteditor') return 2;
-    		return 3;
-    	}
-
-    	current_block_type_index = select_block_type_2(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-
-    	const block = {
-    		c: function create() {
-    			if_block.c();
-    			if_block_anchor = empty();
-    		},
-    		m: function mount(target, anchor) {
-    			if_blocks[current_block_type_index].m(target, anchor);
-    			insert_dev(target, if_block_anchor, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type_2(ctx);
-
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
-    				group_outros();
-
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
-    				});
-
-    				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(if_block_anchor.parentNode, if_block_anchor);
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(if_block);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(if_block);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if_blocks[current_block_type_index].d(detaching);
-    			if (detaching) detach_dev(if_block_anchor);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_16$1.name,
-    		type: "if",
-    		source: "(599:8) {#if input}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (702:10) {:else}
-    function create_else_block_2$3(ctx) {
-    	let input_1;
-    	let input_1_validate_value;
-    	let input_1_data_validate_value;
-    	let input_1_data_validate_on_blur_value;
-    	let input_1_data_error_message_value;
-    	let input_1_value_value;
-    	let mounted;
-    	let dispose;
-
-    	const block = {
-    		c: function create() {
-    			input_1 = element("input");
-    			attr_dev(input_1, "style", /*inputStyle*/ ctx[26]);
-    			attr_dev(input_1, "name", /*name*/ ctx[5]);
-    			attr_dev(input_1, "type", /*inputType*/ ctx[40]);
-    			attr_dev(input_1, "inputmode", /*inputmode*/ ctx[6]);
-    			attr_dev(input_1, "placeholder", /*placeholder*/ ctx[10]);
-    			attr_dev(input_1, "id", /*inputId*/ ctx[11]);
-    			attr_dev(input_1, "size", /*size*/ ctx[12]);
-    			attr_dev(input_1, "accept", /*accept*/ ctx[13]);
-    			attr_dev(input_1, "autocomplete", /*autocomplete*/ ctx[14]);
-    			attr_dev(input_1, "autocorrect", /*autocorrect*/ ctx[15]);
-    			attr_dev(input_1, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			attr_dev(input_1, "spellcheck", /*spellcheck*/ ctx[17]);
-    			input_1.autofocus = /*autofocus*/ ctx[18];
-    			attr_dev(input_1, "autosave", /*autosave*/ ctx[19]);
-    			input_1.disabled = /*disabled*/ ctx[9];
-    			attr_dev(input_1, "max", /*max*/ ctx[20]);
-    			attr_dev(input_1, "maxlength", /*maxlength*/ ctx[23]);
-    			attr_dev(input_1, "min", /*min*/ ctx[21]);
-    			attr_dev(input_1, "minlength", /*minlength*/ ctx[24]);
-    			attr_dev(input_1, "step", /*step*/ ctx[22]);
-    			input_1.multiple = /*multiple*/ ctx[25];
-    			input_1.readOnly = /*readonly*/ ctx[7];
-    			input_1.required = /*required*/ ctx[8];
-    			attr_dev(input_1, "pattern", /*pattern*/ ctx[27]);
-
-    			attr_dev(input_1, "validate", input_1_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined);
-
-    			attr_dev(input_1, "data-validate", input_1_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(input_1, "data-validate-on-blur", input_1_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(input_1, "tabindex", /*tabindex*/ ctx[30]);
-
-    			attr_dev(input_1, "data-error-message", input_1_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33]);
-
-    			attr_dev(input_1, "class", /*inputClasses*/ ctx[46]);
-
-    			input_1.value = input_1_value_value = /*type*/ ctx[4] === 'datepicker' || /*type*/ ctx[4] === 'colorpicker' || /*type*/ ctx[4] === 'file'
-    			? ''
-    			: /*inputValue*/ ctx[49];
-
-    			add_location(input_1, file$i, 702, 12, 21184);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, input_1, anchor);
-    			/*input_1_binding_1*/ ctx[83](input_1);
-    			if (/*autofocus*/ ctx[18]) input_1.focus();
-
-    			if (!mounted) {
-    				dispose = [
-    					listen_dev(input_1, "focus", /*onFocus*/ ctx[53], false, false, false),
-    					listen_dev(input_1, "blur", /*onBlur*/ ctx[54], false, false, false),
-    					listen_dev(input_1, "input", /*onInput*/ ctx[52], false, false, false),
-    					listen_dev(input_1, "change", /*onChange*/ ctx[55], false, false, false)
-    				];
-
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*inputStyle*/ 67108864) {
-    				attr_dev(input_1, "style", /*inputStyle*/ ctx[26]);
-    			}
-
-    			if (dirty[0] & /*name*/ 32) {
-    				attr_dev(input_1, "name", /*name*/ ctx[5]);
-    			}
-
-    			if (dirty[1] & /*inputType*/ 512) {
-    				attr_dev(input_1, "type", /*inputType*/ ctx[40]);
-    			}
-
-    			if (dirty[0] & /*inputmode*/ 64) {
-    				attr_dev(input_1, "inputmode", /*inputmode*/ ctx[6]);
-    			}
-
-    			if (dirty[0] & /*placeholder*/ 1024) {
-    				attr_dev(input_1, "placeholder", /*placeholder*/ ctx[10]);
-    			}
-
-    			if (dirty[0] & /*inputId*/ 2048) {
-    				attr_dev(input_1, "id", /*inputId*/ ctx[11]);
-    			}
-
-    			if (dirty[0] & /*size*/ 4096) {
-    				attr_dev(input_1, "size", /*size*/ ctx[12]);
-    			}
-
-    			if (dirty[0] & /*accept*/ 8192) {
-    				attr_dev(input_1, "accept", /*accept*/ ctx[13]);
-    			}
-
-    			if (dirty[0] & /*autocomplete*/ 16384) {
-    				attr_dev(input_1, "autocomplete", /*autocomplete*/ ctx[14]);
-    			}
-
-    			if (dirty[0] & /*autocorrect*/ 32768) {
-    				attr_dev(input_1, "autocorrect", /*autocorrect*/ ctx[15]);
-    			}
-
-    			if (dirty[0] & /*autocapitalize*/ 65536) {
-    				attr_dev(input_1, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			}
-
-    			if (dirty[0] & /*spellcheck*/ 131072) {
-    				attr_dev(input_1, "spellcheck", /*spellcheck*/ ctx[17]);
-    			}
-
-    			if (dirty[0] & /*autofocus*/ 262144) {
-    				prop_dev(input_1, "autofocus", /*autofocus*/ ctx[18]);
-    			}
-
-    			if (dirty[0] & /*autosave*/ 524288) {
-    				attr_dev(input_1, "autosave", /*autosave*/ ctx[19]);
-    			}
-
-    			if (dirty[0] & /*disabled*/ 512) {
-    				prop_dev(input_1, "disabled", /*disabled*/ ctx[9]);
-    			}
-
-    			if (dirty[0] & /*max*/ 1048576) {
-    				attr_dev(input_1, "max", /*max*/ ctx[20]);
-    			}
-
-    			if (dirty[0] & /*maxlength*/ 8388608) {
-    				attr_dev(input_1, "maxlength", /*maxlength*/ ctx[23]);
-    			}
-
-    			if (dirty[0] & /*min*/ 2097152) {
-    				attr_dev(input_1, "min", /*min*/ ctx[21]);
-    			}
-
-    			if (dirty[0] & /*minlength*/ 16777216) {
-    				attr_dev(input_1, "minlength", /*minlength*/ ctx[24]);
-    			}
-
-    			if (dirty[0] & /*step*/ 4194304) {
-    				attr_dev(input_1, "step", /*step*/ ctx[22]);
-    			}
-
-    			if (dirty[0] & /*multiple*/ 33554432) {
-    				prop_dev(input_1, "multiple", /*multiple*/ ctx[25]);
-    			}
-
-    			if (dirty[0] & /*readonly*/ 128) {
-    				prop_dev(input_1, "readOnly", /*readonly*/ ctx[7]);
-    			}
-
-    			if (dirty[0] & /*required*/ 256) {
-    				prop_dev(input_1, "required", /*required*/ ctx[8]);
-    			}
-
-    			if (dirty[0] & /*pattern*/ 134217728) {
-    				attr_dev(input_1, "pattern", /*pattern*/ ctx[27]);
-    			}
-
-    			if (dirty[0] & /*validate*/ 268435456 && input_1_validate_value !== (input_1_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined)) {
-    				attr_dev(input_1, "validate", input_1_validate_value);
-    			}
-
-    			if (dirty[0] & /*validate, validateOnBlur*/ 805306368 && input_1_data_validate_value !== (input_1_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(input_1, "data-validate", input_1_data_validate_value);
-    			}
-
-    			if (dirty[0] & /*validateOnBlur*/ 536870912 && input_1_data_validate_on_blur_value !== (input_1_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(input_1, "data-validate-on-blur", input_1_data_validate_on_blur_value);
-    			}
-
-    			if (dirty[0] & /*tabindex*/ 1073741824) {
-    				attr_dev(input_1, "tabindex", /*tabindex*/ ctx[30]);
-    			}
-
-    			if (dirty[1] & /*errorMessageForce, errorMessage*/ 12 && input_1_data_error_message_value !== (input_1_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33])) {
-    				attr_dev(input_1, "data-error-message", input_1_data_error_message_value);
-    			}
-
-    			if (dirty[1] & /*inputClasses*/ 32768) {
-    				attr_dev(input_1, "class", /*inputClasses*/ ctx[46]);
-    			}
-
-    			if (dirty[0] & /*type*/ 16 | dirty[1] & /*inputValue*/ 262144 && input_1_value_value !== (input_1_value_value = /*type*/ ctx[4] === 'datepicker' || /*type*/ ctx[4] === 'colorpicker' || /*type*/ ctx[4] === 'file'
-    			? ''
-    			: /*inputValue*/ ctx[49]) && input_1.value !== input_1_value_value) {
-    				prop_dev(input_1, "value", input_1_value_value);
-    			}
-    		},
-    		i: noop,
-    		o: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(input_1);
-    			/*input_1_binding_1*/ ctx[83](null);
-    			mounted = false;
-    			run_all(dispose);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block_2$3.name,
-    		type: "else",
-    		source: "(702:10) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (691:42) 
-    function create_if_block_19$1(ctx) {
-    	let texteditor;
-    	let current;
-
-    	const texteditor_spread_levels = [
-    		{
-    			value: typeof /*value*/ ctx[0] === 'undefined'
-    			? ''
-    			: /*value*/ ctx[0]
-    		},
-    		{ resizable: /*resizable*/ ctx[31] },
-    		{ placeholder: /*placeholder*/ ctx[10] },
-    		{ onTextEditorFocus: /*onFocus*/ ctx[53] },
-    		{ onTextEditorBlur: /*onBlur*/ ctx[54] },
-    		{ onTextEditorInput: /*onInput*/ ctx[52] },
-    		{ onTextEditorChange: /*onChange*/ ctx[55] },
-    		/*textEditorParams*/ ctx[37]
-    	];
-
-    	let texteditor_props = {};
-
-    	for (let i = 0; i < texteditor_spread_levels.length; i += 1) {
-    		texteditor_props = assign(texteditor_props, texteditor_spread_levels[i]);
-    	}
-
-    	texteditor = new Text_editor({ props: texteditor_props, $$inline: true });
-
-    	const block = {
-    		c: function create() {
-    			create_component(texteditor.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(texteditor, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const texteditor_changes = (dirty[0] & /*value, placeholder*/ 1025 | dirty[1] & /*resizable, onFocus, onBlur, onInput, onChange, textEditorParams*/ 31457345)
-    			? get_spread_update(texteditor_spread_levels, [
-    					dirty[0] & /*value*/ 1 && {
-    						value: typeof /*value*/ ctx[0] === 'undefined'
-    						? ''
-    						: /*value*/ ctx[0]
-    					},
-    					dirty[1] & /*resizable*/ 1 && { resizable: /*resizable*/ ctx[31] },
-    					dirty[0] & /*placeholder*/ 1024 && { placeholder: /*placeholder*/ ctx[10] },
-    					dirty[1] & /*onFocus*/ 4194304 && { onTextEditorFocus: /*onFocus*/ ctx[53] },
-    					dirty[1] & /*onBlur*/ 8388608 && { onTextEditorBlur: /*onBlur*/ ctx[54] },
-    					dirty[1] & /*onInput*/ 2097152 && { onTextEditorInput: /*onInput*/ ctx[52] },
-    					dirty[1] & /*onChange*/ 16777216 && { onTextEditorChange: /*onChange*/ ctx[55] },
-    					dirty[1] & /*textEditorParams*/ 64 && get_spread_object(/*textEditorParams*/ ctx[37])
-    				])
-    			: {};
-
-    			texteditor.$set(texteditor_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(texteditor.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(texteditor.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(texteditor, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_19$1.name,
-    		type: "if",
-    		source: "(691:42) ",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (646:40) 
-    function create_if_block_18$1(ctx) {
-    	let textarea;
-    	let textarea_validate_value;
-    	let textarea_data_validate_value;
-    	let textarea_data_validate_on_blur_value;
-    	let textarea_data_error_message_value;
-    	let mounted;
-    	let dispose;
-
-    	const block = {
-    		c: function create() {
-    			textarea = element("textarea");
-    			attr_dev(textarea, "style", /*inputStyle*/ ctx[26]);
-    			attr_dev(textarea, "name", /*name*/ ctx[5]);
-    			attr_dev(textarea, "placeholder", /*placeholder*/ ctx[10]);
-    			attr_dev(textarea, "id", /*inputId*/ ctx[11]);
-    			attr_dev(textarea, "size", /*size*/ ctx[12]);
-    			attr_dev(textarea, "inputmode", /*inputmode*/ ctx[6]);
-    			attr_dev(textarea, "accept", /*accept*/ ctx[13]);
-    			attr_dev(textarea, "autocomplete", /*autocomplete*/ ctx[14]);
-    			attr_dev(textarea, "autocorrect", /*autocorrect*/ ctx[15]);
-    			attr_dev(textarea, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			attr_dev(textarea, "spellcheck", /*spellcheck*/ ctx[17]);
-    			textarea.autofocus = /*autofocus*/ ctx[18];
-    			attr_dev(textarea, "autosave", /*autosave*/ ctx[19]);
-    			textarea.disabled = /*disabled*/ ctx[9];
-    			attr_dev(textarea, "max", /*max*/ ctx[20]);
-    			attr_dev(textarea, "maxlength", /*maxlength*/ ctx[23]);
-    			attr_dev(textarea, "min", /*min*/ ctx[21]);
-    			attr_dev(textarea, "minlength", /*minlength*/ ctx[24]);
-    			attr_dev(textarea, "step", /*step*/ ctx[22]);
-    			attr_dev(textarea, "multiple", /*multiple*/ ctx[25]);
-    			textarea.readOnly = /*readonly*/ ctx[7];
-    			textarea.required = /*required*/ ctx[8];
-    			attr_dev(textarea, "pattern", /*pattern*/ ctx[27]);
-
-    			attr_dev(textarea, "validate", textarea_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined);
-
-    			attr_dev(textarea, "data-validate", textarea_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(textarea, "data-validate-on-blur", textarea_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(textarea, "tabindex", /*tabindex*/ ctx[30]);
-
-    			attr_dev(textarea, "data-error-message", textarea_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33]);
-
-    			attr_dev(textarea, "class", /*inputClasses*/ ctx[46]);
-    			textarea.value = /*inputValue*/ ctx[49];
-    			add_location(textarea, file$i, 646, 12, 19358);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, textarea, anchor);
-    			/*textarea_binding_1*/ ctx[82](textarea);
-    			if (/*autofocus*/ ctx[18]) textarea.focus();
-
-    			if (!mounted) {
-    				dispose = [
-    					listen_dev(textarea, "focus", /*onFocus*/ ctx[53], false, false, false),
-    					listen_dev(textarea, "blur", /*onBlur*/ ctx[54], false, false, false),
-    					listen_dev(textarea, "input", /*onInput*/ ctx[52], false, false, false),
-    					listen_dev(textarea, "change", /*onChange*/ ctx[55], false, false, false)
-    				];
-
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*inputStyle*/ 67108864) {
-    				attr_dev(textarea, "style", /*inputStyle*/ ctx[26]);
-    			}
-
-    			if (dirty[0] & /*name*/ 32) {
-    				attr_dev(textarea, "name", /*name*/ ctx[5]);
-    			}
-
-    			if (dirty[0] & /*placeholder*/ 1024) {
-    				attr_dev(textarea, "placeholder", /*placeholder*/ ctx[10]);
-    			}
-
-    			if (dirty[0] & /*inputId*/ 2048) {
-    				attr_dev(textarea, "id", /*inputId*/ ctx[11]);
-    			}
-
-    			if (dirty[0] & /*size*/ 4096) {
-    				attr_dev(textarea, "size", /*size*/ ctx[12]);
-    			}
-
-    			if (dirty[0] & /*inputmode*/ 64) {
-    				attr_dev(textarea, "inputmode", /*inputmode*/ ctx[6]);
-    			}
-
-    			if (dirty[0] & /*accept*/ 8192) {
-    				attr_dev(textarea, "accept", /*accept*/ ctx[13]);
-    			}
-
-    			if (dirty[0] & /*autocomplete*/ 16384) {
-    				attr_dev(textarea, "autocomplete", /*autocomplete*/ ctx[14]);
-    			}
-
-    			if (dirty[0] & /*autocorrect*/ 32768) {
-    				attr_dev(textarea, "autocorrect", /*autocorrect*/ ctx[15]);
-    			}
-
-    			if (dirty[0] & /*autocapitalize*/ 65536) {
-    				attr_dev(textarea, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			}
-
-    			if (dirty[0] & /*spellcheck*/ 131072) {
-    				attr_dev(textarea, "spellcheck", /*spellcheck*/ ctx[17]);
-    			}
-
-    			if (dirty[0] & /*autofocus*/ 262144) {
-    				prop_dev(textarea, "autofocus", /*autofocus*/ ctx[18]);
-    			}
-
-    			if (dirty[0] & /*autosave*/ 524288) {
-    				attr_dev(textarea, "autosave", /*autosave*/ ctx[19]);
-    			}
-
-    			if (dirty[0] & /*disabled*/ 512) {
-    				prop_dev(textarea, "disabled", /*disabled*/ ctx[9]);
-    			}
-
-    			if (dirty[0] & /*max*/ 1048576) {
-    				attr_dev(textarea, "max", /*max*/ ctx[20]);
-    			}
-
-    			if (dirty[0] & /*maxlength*/ 8388608) {
-    				attr_dev(textarea, "maxlength", /*maxlength*/ ctx[23]);
-    			}
-
-    			if (dirty[0] & /*min*/ 2097152) {
-    				attr_dev(textarea, "min", /*min*/ ctx[21]);
-    			}
-
-    			if (dirty[0] & /*minlength*/ 16777216) {
-    				attr_dev(textarea, "minlength", /*minlength*/ ctx[24]);
-    			}
-
-    			if (dirty[0] & /*step*/ 4194304) {
-    				attr_dev(textarea, "step", /*step*/ ctx[22]);
-    			}
-
-    			if (dirty[0] & /*multiple*/ 33554432) {
-    				attr_dev(textarea, "multiple", /*multiple*/ ctx[25]);
-    			}
-
-    			if (dirty[0] & /*readonly*/ 128) {
-    				prop_dev(textarea, "readOnly", /*readonly*/ ctx[7]);
-    			}
-
-    			if (dirty[0] & /*required*/ 256) {
-    				prop_dev(textarea, "required", /*required*/ ctx[8]);
-    			}
-
-    			if (dirty[0] & /*pattern*/ 134217728) {
-    				attr_dev(textarea, "pattern", /*pattern*/ ctx[27]);
-    			}
-
-    			if (dirty[0] & /*validate*/ 268435456 && textarea_validate_value !== (textarea_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined)) {
-    				attr_dev(textarea, "validate", textarea_validate_value);
-    			}
-
-    			if (dirty[0] & /*validate, validateOnBlur*/ 805306368 && textarea_data_validate_value !== (textarea_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(textarea, "data-validate", textarea_data_validate_value);
-    			}
-
-    			if (dirty[0] & /*validateOnBlur*/ 536870912 && textarea_data_validate_on_blur_value !== (textarea_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(textarea, "data-validate-on-blur", textarea_data_validate_on_blur_value);
-    			}
-
-    			if (dirty[0] & /*tabindex*/ 1073741824) {
-    				attr_dev(textarea, "tabindex", /*tabindex*/ ctx[30]);
-    			}
-
-    			if (dirty[1] & /*errorMessageForce, errorMessage*/ 12 && textarea_data_error_message_value !== (textarea_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33])) {
-    				attr_dev(textarea, "data-error-message", textarea_data_error_message_value);
-    			}
-
-    			if (dirty[1] & /*inputClasses*/ 32768) {
-    				attr_dev(textarea, "class", /*inputClasses*/ ctx[46]);
-    			}
-
-    			if (dirty[1] & /*inputValue*/ 262144) {
-    				prop_dev(textarea, "value", /*inputValue*/ ctx[49]);
-    			}
-    		},
-    		i: noop,
-    		o: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(textarea);
-    			/*textarea_binding_1*/ ctx[82](null);
-    			mounted = false;
-    			run_all(dispose);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_18$1.name,
-    		type: "if",
-    		source: "(646:40) ",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (600:10) {#if type === 'select'}
-    function create_if_block_17$1(ctx) {
-    	let select;
-    	let select_validate_value;
-    	let select_data_validate_value;
-    	let select_data_validate_on_blur_value;
-    	let select_data_error_message_value;
-    	let current;
-    	let mounted;
-    	let dispose;
-    	const default_slot_template = /*#slots*/ ctx[77].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[76], null);
-
-    	const block = {
-    		c: function create() {
-    			select = element("select");
-    			if (default_slot) default_slot.c();
-    			attr_dev(select, "style", /*inputStyle*/ ctx[26]);
-    			attr_dev(select, "name", /*name*/ ctx[5]);
-    			attr_dev(select, "placeholder", /*placeholder*/ ctx[10]);
-    			attr_dev(select, "id", /*inputId*/ ctx[11]);
-    			attr_dev(select, "size", /*size*/ ctx[12]);
-    			attr_dev(select, "accept", /*accept*/ ctx[13]);
-    			attr_dev(select, "autocomplete", /*autocomplete*/ ctx[14]);
-    			attr_dev(select, "autocorrect", /*autocorrect*/ ctx[15]);
-    			attr_dev(select, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			attr_dev(select, "spellcheck", /*spellcheck*/ ctx[17]);
-    			select.autofocus = /*autofocus*/ ctx[18];
-    			attr_dev(select, "autosave", /*autosave*/ ctx[19]);
-    			select.disabled = /*disabled*/ ctx[9];
-    			attr_dev(select, "max", /*max*/ ctx[20]);
-    			attr_dev(select, "maxlength", /*maxlength*/ ctx[23]);
-    			attr_dev(select, "min", /*min*/ ctx[21]);
-    			attr_dev(select, "minlength", /*minlength*/ ctx[24]);
-    			attr_dev(select, "step", /*step*/ ctx[22]);
-    			select.multiple = /*multiple*/ ctx[25];
-    			attr_dev(select, "readonly", /*readonly*/ ctx[7]);
-    			select.required = /*required*/ ctx[8];
-    			attr_dev(select, "pattern", /*pattern*/ ctx[27]);
-
-    			attr_dev(select, "validate", select_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined);
-
-    			attr_dev(select, "data-validate", select_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(select, "data-validate-on-blur", select_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(select, "tabindex", /*tabindex*/ ctx[30]);
-
-    			attr_dev(select, "data-error-message", select_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33]);
-
-    			attr_dev(select, "class", /*inputClasses*/ ctx[46]);
-    			add_location(select, file$i, 600, 12, 17897);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, select, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(select, null);
-    			}
-
-    			select_option(select, /*inputValue*/ ctx[49]);
-    			/*select_binding_1*/ ctx[81](select);
-    			current = true;
-    			if (/*autofocus*/ ctx[18]) select.focus();
-
-    			if (!mounted) {
-    				dispose = [
-    					listen_dev(select, "focus", /*onFocus*/ ctx[53], false, false, false),
-    					listen_dev(select, "blur", /*onBlur*/ ctx[54], false, false, false),
-    					listen_dev(select, "input", /*onInput*/ ctx[52], false, false, false),
-    					listen_dev(select, "change", /*onChange*/ ctx[55], false, false, false)
-    				];
-
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[76], dirty, null),
-    						null
-    					);
-    				}
-    			}
-
-    			if (!current || dirty[0] & /*inputStyle*/ 67108864) {
-    				attr_dev(select, "style", /*inputStyle*/ ctx[26]);
-    			}
-
-    			if (!current || dirty[0] & /*name*/ 32) {
-    				attr_dev(select, "name", /*name*/ ctx[5]);
-    			}
-
-    			if (!current || dirty[0] & /*placeholder*/ 1024) {
-    				attr_dev(select, "placeholder", /*placeholder*/ ctx[10]);
-    			}
-
-    			if (!current || dirty[0] & /*inputId*/ 2048) {
-    				attr_dev(select, "id", /*inputId*/ ctx[11]);
-    			}
-
-    			if (!current || dirty[0] & /*size*/ 4096) {
-    				attr_dev(select, "size", /*size*/ ctx[12]);
-    			}
-
-    			if (!current || dirty[0] & /*accept*/ 8192) {
-    				attr_dev(select, "accept", /*accept*/ ctx[13]);
-    			}
-
-    			if (!current || dirty[0] & /*autocomplete*/ 16384) {
-    				attr_dev(select, "autocomplete", /*autocomplete*/ ctx[14]);
-    			}
-
-    			if (!current || dirty[0] & /*autocorrect*/ 32768) {
-    				attr_dev(select, "autocorrect", /*autocorrect*/ ctx[15]);
-    			}
-
-    			if (!current || dirty[0] & /*autocapitalize*/ 65536) {
-    				attr_dev(select, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			}
-
-    			if (!current || dirty[0] & /*spellcheck*/ 131072) {
-    				attr_dev(select, "spellcheck", /*spellcheck*/ ctx[17]);
-    			}
-
-    			if (!current || dirty[0] & /*autofocus*/ 262144) {
-    				prop_dev(select, "autofocus", /*autofocus*/ ctx[18]);
-    			}
-
-    			if (!current || dirty[0] & /*autosave*/ 524288) {
-    				attr_dev(select, "autosave", /*autosave*/ ctx[19]);
-    			}
-
-    			if (!current || dirty[0] & /*disabled*/ 512) {
-    				prop_dev(select, "disabled", /*disabled*/ ctx[9]);
-    			}
-
-    			if (!current || dirty[0] & /*max*/ 1048576) {
-    				attr_dev(select, "max", /*max*/ ctx[20]);
-    			}
-
-    			if (!current || dirty[0] & /*maxlength*/ 8388608) {
-    				attr_dev(select, "maxlength", /*maxlength*/ ctx[23]);
-    			}
-
-    			if (!current || dirty[0] & /*min*/ 2097152) {
-    				attr_dev(select, "min", /*min*/ ctx[21]);
-    			}
-
-    			if (!current || dirty[0] & /*minlength*/ 16777216) {
-    				attr_dev(select, "minlength", /*minlength*/ ctx[24]);
-    			}
-
-    			if (!current || dirty[0] & /*step*/ 4194304) {
-    				attr_dev(select, "step", /*step*/ ctx[22]);
-    			}
-
-    			if (!current || dirty[0] & /*multiple*/ 33554432) {
-    				prop_dev(select, "multiple", /*multiple*/ ctx[25]);
-    			}
-
-    			if (!current || dirty[0] & /*readonly*/ 128) {
-    				attr_dev(select, "readonly", /*readonly*/ ctx[7]);
-    			}
-
-    			if (!current || dirty[0] & /*required*/ 256) {
-    				prop_dev(select, "required", /*required*/ ctx[8]);
-    			}
-
-    			if (!current || dirty[0] & /*pattern*/ 134217728) {
-    				attr_dev(select, "pattern", /*pattern*/ ctx[27]);
-    			}
-
-    			if (!current || dirty[0] & /*validate*/ 268435456 && select_validate_value !== (select_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined)) {
-    				attr_dev(select, "validate", select_validate_value);
-    			}
-
-    			if (!current || dirty[0] & /*validate, validateOnBlur*/ 805306368 && select_data_validate_value !== (select_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(select, "data-validate", select_data_validate_value);
-    			}
-
-    			if (!current || dirty[0] & /*validateOnBlur*/ 536870912 && select_data_validate_on_blur_value !== (select_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(select, "data-validate-on-blur", select_data_validate_on_blur_value);
-    			}
-
-    			if (!current || dirty[0] & /*tabindex*/ 1073741824) {
-    				attr_dev(select, "tabindex", /*tabindex*/ ctx[30]);
-    			}
-
-    			if (!current || dirty[1] & /*errorMessageForce, errorMessage*/ 12 && select_data_error_message_value !== (select_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33])) {
-    				attr_dev(select, "data-error-message", select_data_error_message_value);
-    			}
-
-    			if (!current || dirty[1] & /*inputClasses*/ 32768) {
-    				attr_dev(select, "class", /*inputClasses*/ ctx[46]);
-    			}
-
-    			if (!current || dirty[1] & /*inputValue*/ 262144) {
-    				select_option(select, /*inputValue*/ ctx[49]);
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(select);
-    			if (default_slot) default_slot.d(detaching);
-    			/*select_binding_1*/ ctx[81](null);
-    			mounted = false;
-    			run_all(dispose);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_17$1.name,
-    		type: "if",
-    		source: "(600:10) {#if type === 'select'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (753:8) {#if hasErrorMessage && errorMessageForce}
-    function create_if_block_15$1(ctx) {
-    	let div;
-    	let t0_value = plainText(/*errorMessage*/ ctx[33]) + "";
-    	let t0;
-    	let t1;
-    	let current;
-    	const error_message_slot_template = /*#slots*/ ctx[77]["error-message"];
-    	const error_message_slot = create_slot(error_message_slot_template, ctx, /*$$scope*/ ctx[76], get_error_message_slot_context_1);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			t0 = text$1(t0_value);
-    			t1 = space();
-    			if (error_message_slot) error_message_slot.c();
-    			attr_dev(div, "class", "item-input-error-message");
-    			add_location(div, file$i, 753, 10, 22840);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, t0);
-    			append_dev(div, t1);
-
-    			if (error_message_slot) {
-    				error_message_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if ((!current || dirty[1] & /*errorMessage*/ 4) && t0_value !== (t0_value = plainText(/*errorMessage*/ ctx[33]) + "")) set_data_dev(t0, t0_value);
-
-    			if (error_message_slot) {
-    				if (error_message_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						error_message_slot,
-    						error_message_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(error_message_slot_template, /*$$scope*/ ctx[76], dirty, get_error_message_slot_changes_1),
-    						get_error_message_slot_context_1
-    					);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(error_message_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(error_message_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (error_message_slot) error_message_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_15$1.name,
-    		type: "if",
-    		source: "(753:8) {#if hasErrorMessage && errorMessageForce}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (759:8) {#if clearButton}
-    function create_if_block_14$1(ctx) {
-    	let span;
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			attr_dev(span, "class", "input-clear-button");
-    			add_location(span, file$i, 758, 25, 23015);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_14$1.name,
-    		type: "if",
-    		source: "(759:8) {#if clearButton}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (760:8) {#if typeof info !== 'undefined' || hasInfoSlots}
-    function create_if_block_13$1(ctx) {
-    	let div;
-    	let t0_value = plainText(/*info*/ ctx[35]) + "";
-    	let t0;
-    	let t1;
-    	let current;
-    	const info_slot_template = /*#slots*/ ctx[77].info;
-    	const info_slot = create_slot(info_slot_template, ctx, /*$$scope*/ ctx[76], get_info_slot_context_1);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			t0 = text$1(t0_value);
-    			t1 = space();
-    			if (info_slot) info_slot.c();
-    			attr_dev(div, "class", "item-input-info");
-    			add_location(div, file$i, 760, 10, 23124);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, t0);
-    			append_dev(div, t1);
-
-    			if (info_slot) {
-    				info_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if ((!current || dirty[1] & /*info*/ 16) && t0_value !== (t0_value = plainText(/*info*/ ctx[35]) + "")) set_data_dev(t0, t0_value);
-
-    			if (info_slot) {
-    				if (info_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						info_slot,
-    						info_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(info_slot_template, /*$$scope*/ ctx[76], dirty, get_info_slot_changes_1),
-    						get_info_slot_context_1
-    					);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(info_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(info_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (info_slot) info_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_13$1.name,
-    		type: "if",
-    		source: "(760:8) {#if typeof info !== 'undefined' || hasInfoSlots}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (378:6) {#if isSortable && isSortableOpposite}
-    function create_if_block_12$1(ctx) {
-    	let div;
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$i, 378, 8, 10554);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_12$1.name,
-    		type: "if",
-    		source: "(378:6) {#if isSortable && isSortableOpposite}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (382:6) {#if media || hasMediaSlots}
-    function create_if_block_10$1(ctx) {
-    	let div;
-    	let t;
-    	let current;
-    	let if_block = typeof /*media*/ ctx[1] !== 'undefined' && create_if_block_11$1(ctx);
-    	const media_slot_template = /*#slots*/ ctx[77].media;
-    	const media_slot = create_slot(media_slot_template, ctx, /*$$scope*/ ctx[76], get_media_slot_context$1);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (if_block) if_block.c();
-    			t = space();
-    			if (media_slot) media_slot.c();
-    			attr_dev(div, "class", "item-media");
-    			add_location(div, file$i, 382, 8, 10643);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			if (if_block) if_block.m(div, null);
-    			append_dev(div, t);
-
-    			if (media_slot) {
-    				media_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (typeof /*media*/ ctx[1] !== 'undefined') {
-    				if (if_block) {
-    					if_block.p(ctx, dirty);
-    				} else {
-    					if_block = create_if_block_11$1(ctx);
-    					if_block.c();
-    					if_block.m(div, t);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
-
-    			if (media_slot) {
-    				if (media_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						media_slot,
-    						media_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(media_slot_template, /*$$scope*/ ctx[76], dirty, get_media_slot_changes$1),
-    						get_media_slot_context$1
-    					);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(media_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(media_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (if_block) if_block.d();
-    			if (media_slot) media_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_10$1.name,
-    		type: "if",
-    		source: "(382:6) {#if media || hasMediaSlots}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (384:10) {#if typeof media !== 'undefined'}
-    function create_if_block_11$1(ctx) {
-    	let img;
-    	let img_src_value;
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[1])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$i, 383, 44, 10712);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*media*/ 2 && !src_url_equal(img.src, img_src_value = /*media*/ ctx[1])) {
-    				attr_dev(img, "src", img_src_value);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_11$1.name,
-    		type: "if",
-    		source: "(384:10) {#if typeof media !== 'undefined'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (390:8) {#if typeof label !== 'undefined' || hasLabelSlots}
-    function create_if_block_9$1(ctx) {
-    	let div;
-    	let t0_value = plainText(/*label*/ ctx[36]) + "";
-    	let t0;
-    	let t1;
-    	let current;
-    	const label_slot_template = /*#slots*/ ctx[77].label;
-    	const label_slot = create_slot(label_slot_template, ctx, /*$$scope*/ ctx[76], get_label_slot_context);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			t0 = text$1(t0_value);
-    			t1 = space();
-    			if (label_slot) label_slot.c();
-    			attr_dev(div, "class", /*labelClasses*/ ctx[44]);
-    			add_location(div, file$i, 390, 10, 10933);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, t0);
-    			append_dev(div, t1);
-
-    			if (label_slot) {
-    				label_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if ((!current || dirty[1] & /*label*/ 32) && t0_value !== (t0_value = plainText(/*label*/ ctx[36]) + "")) set_data_dev(t0, t0_value);
-
-    			if (label_slot) {
-    				if (label_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						label_slot,
-    						label_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(label_slot_template, /*$$scope*/ ctx[76], dirty, get_label_slot_changes),
-    						get_label_slot_context
-    					);
-    				}
-    			}
-
-    			if (!current || dirty[1] & /*labelClasses*/ 8192) {
-    				attr_dev(div, "class", /*labelClasses*/ ctx[44]);
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(label_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(label_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (label_slot) label_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_9$1.name,
-    		type: "if",
-    		source: "(390:8) {#if typeof label !== 'undefined' || hasLabelSlots}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (397:10) {#if input}
-    function create_if_block_5$2(ctx) {
-    	let current_block_type_index;
-    	let if_block;
-    	let if_block_anchor;
-    	let current;
-    	const if_block_creators = [create_if_block_6$1, create_if_block_7$1, create_if_block_8$1, create_else_block$7];
-    	const if_blocks = [];
-
-    	function select_block_type_1(ctx, dirty) {
-    		if (/*type*/ ctx[4] === 'select') return 0;
-    		if (/*type*/ ctx[4] === 'textarea') return 1;
-    		if (/*type*/ ctx[4] === 'texteditor') return 2;
-    		return 3;
-    	}
-
-    	current_block_type_index = select_block_type_1(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-
-    	const block = {
-    		c: function create() {
-    			if_block.c();
-    			if_block_anchor = empty();
-    		},
-    		m: function mount(target, anchor) {
-    			if_blocks[current_block_type_index].m(target, anchor);
-    			insert_dev(target, if_block_anchor, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type_1(ctx);
-
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
-    				group_outros();
-
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
-    				});
-
-    				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(if_block_anchor.parentNode, if_block_anchor);
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(if_block);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(if_block);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if_blocks[current_block_type_index].d(detaching);
-    			if (detaching) detach_dev(if_block_anchor);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_5$2.name,
-    		type: "if",
-    		source: "(397:10) {#if input}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (500:12) {:else}
-    function create_else_block$7(ctx) {
-    	let input_1;
-    	let input_1_validate_value;
-    	let input_1_data_validate_value;
-    	let input_1_data_validate_on_blur_value;
-    	let input_1_data_error_message_value;
-    	let input_1_value_value;
-    	let mounted;
-    	let dispose;
-
-    	const block = {
-    		c: function create() {
-    			input_1 = element("input");
-    			attr_dev(input_1, "style", /*inputStyle*/ ctx[26]);
-    			attr_dev(input_1, "name", /*name*/ ctx[5]);
-    			attr_dev(input_1, "type", /*inputType*/ ctx[40]);
-    			attr_dev(input_1, "inputmode", /*inputmode*/ ctx[6]);
-    			attr_dev(input_1, "placeholder", /*placeholder*/ ctx[10]);
-    			attr_dev(input_1, "id", /*inputId*/ ctx[11]);
-    			attr_dev(input_1, "size", /*size*/ ctx[12]);
-    			attr_dev(input_1, "accept", /*accept*/ ctx[13]);
-    			attr_dev(input_1, "autocomplete", /*autocomplete*/ ctx[14]);
-    			attr_dev(input_1, "autocorrect", /*autocorrect*/ ctx[15]);
-    			attr_dev(input_1, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			attr_dev(input_1, "spellcheck", /*spellcheck*/ ctx[17]);
-    			input_1.autofocus = /*autofocus*/ ctx[18];
-    			attr_dev(input_1, "autosave", /*autosave*/ ctx[19]);
-    			input_1.disabled = /*disabled*/ ctx[9];
-    			attr_dev(input_1, "max", /*max*/ ctx[20]);
-    			attr_dev(input_1, "maxlength", /*maxlength*/ ctx[23]);
-    			attr_dev(input_1, "min", /*min*/ ctx[21]);
-    			attr_dev(input_1, "minlength", /*minlength*/ ctx[24]);
-    			attr_dev(input_1, "step", /*step*/ ctx[22]);
-    			input_1.multiple = /*multiple*/ ctx[25];
-    			input_1.readOnly = /*readonly*/ ctx[7];
-    			input_1.required = /*required*/ ctx[8];
-    			attr_dev(input_1, "pattern", /*pattern*/ ctx[27]);
-
-    			attr_dev(input_1, "validate", input_1_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined);
-
-    			attr_dev(input_1, "data-validate", input_1_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(input_1, "data-validate-on-blur", input_1_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(input_1, "tabindex", /*tabindex*/ ctx[30]);
-
-    			attr_dev(input_1, "data-error-message", input_1_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33]);
-
-    			attr_dev(input_1, "class", /*inputClasses*/ ctx[46]);
-
-    			input_1.value = input_1_value_value = /*type*/ ctx[4] === 'datepicker' || /*type*/ ctx[4] === 'colorpicker' || /*type*/ ctx[4] === 'file'
-    			? ''
-    			: /*inputValue*/ ctx[49];
-
-    			add_location(input_1, file$i, 500, 14, 14658);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, input_1, anchor);
-    			/*input_1_binding*/ ctx[80](input_1);
-    			if (/*autofocus*/ ctx[18]) input_1.focus();
-
-    			if (!mounted) {
-    				dispose = [
-    					listen_dev(input_1, "focus", /*onFocus*/ ctx[53], false, false, false),
-    					listen_dev(input_1, "blur", /*onBlur*/ ctx[54], false, false, false),
-    					listen_dev(input_1, "input", /*onInput*/ ctx[52], false, false, false),
-    					listen_dev(input_1, "change", /*onChange*/ ctx[55], false, false, false)
-    				];
-
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*inputStyle*/ 67108864) {
-    				attr_dev(input_1, "style", /*inputStyle*/ ctx[26]);
-    			}
-
-    			if (dirty[0] & /*name*/ 32) {
-    				attr_dev(input_1, "name", /*name*/ ctx[5]);
-    			}
-
-    			if (dirty[1] & /*inputType*/ 512) {
-    				attr_dev(input_1, "type", /*inputType*/ ctx[40]);
-    			}
-
-    			if (dirty[0] & /*inputmode*/ 64) {
-    				attr_dev(input_1, "inputmode", /*inputmode*/ ctx[6]);
-    			}
-
-    			if (dirty[0] & /*placeholder*/ 1024) {
-    				attr_dev(input_1, "placeholder", /*placeholder*/ ctx[10]);
-    			}
-
-    			if (dirty[0] & /*inputId*/ 2048) {
-    				attr_dev(input_1, "id", /*inputId*/ ctx[11]);
-    			}
-
-    			if (dirty[0] & /*size*/ 4096) {
-    				attr_dev(input_1, "size", /*size*/ ctx[12]);
-    			}
-
-    			if (dirty[0] & /*accept*/ 8192) {
-    				attr_dev(input_1, "accept", /*accept*/ ctx[13]);
-    			}
-
-    			if (dirty[0] & /*autocomplete*/ 16384) {
-    				attr_dev(input_1, "autocomplete", /*autocomplete*/ ctx[14]);
-    			}
-
-    			if (dirty[0] & /*autocorrect*/ 32768) {
-    				attr_dev(input_1, "autocorrect", /*autocorrect*/ ctx[15]);
-    			}
-
-    			if (dirty[0] & /*autocapitalize*/ 65536) {
-    				attr_dev(input_1, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			}
-
-    			if (dirty[0] & /*spellcheck*/ 131072) {
-    				attr_dev(input_1, "spellcheck", /*spellcheck*/ ctx[17]);
-    			}
-
-    			if (dirty[0] & /*autofocus*/ 262144) {
-    				prop_dev(input_1, "autofocus", /*autofocus*/ ctx[18]);
-    			}
-
-    			if (dirty[0] & /*autosave*/ 524288) {
-    				attr_dev(input_1, "autosave", /*autosave*/ ctx[19]);
-    			}
-
-    			if (dirty[0] & /*disabled*/ 512) {
-    				prop_dev(input_1, "disabled", /*disabled*/ ctx[9]);
-    			}
-
-    			if (dirty[0] & /*max*/ 1048576) {
-    				attr_dev(input_1, "max", /*max*/ ctx[20]);
-    			}
-
-    			if (dirty[0] & /*maxlength*/ 8388608) {
-    				attr_dev(input_1, "maxlength", /*maxlength*/ ctx[23]);
-    			}
-
-    			if (dirty[0] & /*min*/ 2097152) {
-    				attr_dev(input_1, "min", /*min*/ ctx[21]);
-    			}
-
-    			if (dirty[0] & /*minlength*/ 16777216) {
-    				attr_dev(input_1, "minlength", /*minlength*/ ctx[24]);
-    			}
-
-    			if (dirty[0] & /*step*/ 4194304) {
-    				attr_dev(input_1, "step", /*step*/ ctx[22]);
-    			}
-
-    			if (dirty[0] & /*multiple*/ 33554432) {
-    				prop_dev(input_1, "multiple", /*multiple*/ ctx[25]);
-    			}
-
-    			if (dirty[0] & /*readonly*/ 128) {
-    				prop_dev(input_1, "readOnly", /*readonly*/ ctx[7]);
-    			}
-
-    			if (dirty[0] & /*required*/ 256) {
-    				prop_dev(input_1, "required", /*required*/ ctx[8]);
-    			}
-
-    			if (dirty[0] & /*pattern*/ 134217728) {
-    				attr_dev(input_1, "pattern", /*pattern*/ ctx[27]);
-    			}
-
-    			if (dirty[0] & /*validate*/ 268435456 && input_1_validate_value !== (input_1_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined)) {
-    				attr_dev(input_1, "validate", input_1_validate_value);
-    			}
-
-    			if (dirty[0] & /*validate, validateOnBlur*/ 805306368 && input_1_data_validate_value !== (input_1_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(input_1, "data-validate", input_1_data_validate_value);
-    			}
-
-    			if (dirty[0] & /*validateOnBlur*/ 536870912 && input_1_data_validate_on_blur_value !== (input_1_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(input_1, "data-validate-on-blur", input_1_data_validate_on_blur_value);
-    			}
-
-    			if (dirty[0] & /*tabindex*/ 1073741824) {
-    				attr_dev(input_1, "tabindex", /*tabindex*/ ctx[30]);
-    			}
-
-    			if (dirty[1] & /*errorMessageForce, errorMessage*/ 12 && input_1_data_error_message_value !== (input_1_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33])) {
-    				attr_dev(input_1, "data-error-message", input_1_data_error_message_value);
-    			}
-
-    			if (dirty[1] & /*inputClasses*/ 32768) {
-    				attr_dev(input_1, "class", /*inputClasses*/ ctx[46]);
-    			}
-
-    			if (dirty[0] & /*type*/ 16 | dirty[1] & /*inputValue*/ 262144 && input_1_value_value !== (input_1_value_value = /*type*/ ctx[4] === 'datepicker' || /*type*/ ctx[4] === 'colorpicker' || /*type*/ ctx[4] === 'file'
-    			? ''
-    			: /*inputValue*/ ctx[49]) && input_1.value !== input_1_value_value) {
-    				prop_dev(input_1, "value", input_1_value_value);
-    			}
-    		},
-    		i: noop,
-    		o: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(input_1);
-    			/*input_1_binding*/ ctx[80](null);
-    			mounted = false;
-    			run_all(dispose);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block$7.name,
-    		type: "else",
-    		source: "(500:12) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (489:44) 
-    function create_if_block_8$1(ctx) {
-    	let texteditor;
-    	let current;
-
-    	const texteditor_spread_levels = [
-    		{
-    			value: typeof /*value*/ ctx[0] === 'undefined'
-    			? ''
-    			: /*value*/ ctx[0]
-    		},
-    		{ resizable: /*resizable*/ ctx[31] },
-    		{ placeholder: /*placeholder*/ ctx[10] },
-    		{ onTextEditorFocus: /*onFocus*/ ctx[53] },
-    		{ onTextEditorBlur: /*onBlur*/ ctx[54] },
-    		{ onTextEditorInput: /*onInput*/ ctx[52] },
-    		{ onTextEditorChange: /*onChange*/ ctx[55] },
-    		/*textEditorParams*/ ctx[37]
-    	];
-
-    	let texteditor_props = {};
-
-    	for (let i = 0; i < texteditor_spread_levels.length; i += 1) {
-    		texteditor_props = assign(texteditor_props, texteditor_spread_levels[i]);
-    	}
-
-    	texteditor = new Text_editor({ props: texteditor_props, $$inline: true });
-
-    	const block = {
-    		c: function create() {
-    			create_component(texteditor.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(texteditor, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const texteditor_changes = (dirty[0] & /*value, placeholder*/ 1025 | dirty[1] & /*resizable, onFocus, onBlur, onInput, onChange, textEditorParams*/ 31457345)
-    			? get_spread_update(texteditor_spread_levels, [
-    					dirty[0] & /*value*/ 1 && {
-    						value: typeof /*value*/ ctx[0] === 'undefined'
-    						? ''
-    						: /*value*/ ctx[0]
-    					},
-    					dirty[1] & /*resizable*/ 1 && { resizable: /*resizable*/ ctx[31] },
-    					dirty[0] & /*placeholder*/ 1024 && { placeholder: /*placeholder*/ ctx[10] },
-    					dirty[1] & /*onFocus*/ 4194304 && { onTextEditorFocus: /*onFocus*/ ctx[53] },
-    					dirty[1] & /*onBlur*/ 8388608 && { onTextEditorBlur: /*onBlur*/ ctx[54] },
-    					dirty[1] & /*onInput*/ 2097152 && { onTextEditorInput: /*onInput*/ ctx[52] },
-    					dirty[1] & /*onChange*/ 16777216 && { onTextEditorChange: /*onChange*/ ctx[55] },
-    					dirty[1] & /*textEditorParams*/ 64 && get_spread_object(/*textEditorParams*/ ctx[37])
-    				])
-    			: {};
-
-    			texteditor.$set(texteditor_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(texteditor.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(texteditor.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(texteditor, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_8$1.name,
-    		type: "if",
-    		source: "(489:44) ",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (444:42) 
-    function create_if_block_7$1(ctx) {
-    	let textarea;
-    	let textarea_validate_value;
-    	let textarea_data_validate_value;
-    	let textarea_data_validate_on_blur_value;
-    	let textarea_data_error_message_value;
-    	let mounted;
-    	let dispose;
-
-    	const block = {
-    		c: function create() {
-    			textarea = element("textarea");
-    			attr_dev(textarea, "style", /*inputStyle*/ ctx[26]);
-    			attr_dev(textarea, "name", /*name*/ ctx[5]);
-    			attr_dev(textarea, "placeholder", /*placeholder*/ ctx[10]);
-    			attr_dev(textarea, "id", /*inputId*/ ctx[11]);
-    			attr_dev(textarea, "size", /*size*/ ctx[12]);
-    			attr_dev(textarea, "inputmode", /*inputmode*/ ctx[6]);
-    			attr_dev(textarea, "accept", /*accept*/ ctx[13]);
-    			attr_dev(textarea, "autocomplete", /*autocomplete*/ ctx[14]);
-    			attr_dev(textarea, "autocorrect", /*autocorrect*/ ctx[15]);
-    			attr_dev(textarea, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			attr_dev(textarea, "spellcheck", /*spellcheck*/ ctx[17]);
-    			textarea.autofocus = /*autofocus*/ ctx[18];
-    			attr_dev(textarea, "autosave", /*autosave*/ ctx[19]);
-    			textarea.disabled = /*disabled*/ ctx[9];
-    			attr_dev(textarea, "max", /*max*/ ctx[20]);
-    			attr_dev(textarea, "maxlength", /*maxlength*/ ctx[23]);
-    			attr_dev(textarea, "min", /*min*/ ctx[21]);
-    			attr_dev(textarea, "minlength", /*minlength*/ ctx[24]);
-    			attr_dev(textarea, "step", /*step*/ ctx[22]);
-    			attr_dev(textarea, "multiple", /*multiple*/ ctx[25]);
-    			textarea.readOnly = /*readonly*/ ctx[7];
-    			textarea.required = /*required*/ ctx[8];
-    			attr_dev(textarea, "pattern", /*pattern*/ ctx[27]);
-
-    			attr_dev(textarea, "validate", textarea_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined);
-
-    			attr_dev(textarea, "data-validate", textarea_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(textarea, "data-validate-on-blur", textarea_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(textarea, "tabindex", /*tabindex*/ ctx[30]);
-
-    			attr_dev(textarea, "data-error-message", textarea_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33]);
-
-    			attr_dev(textarea, "class", /*inputClasses*/ ctx[46]);
-    			textarea.value = /*inputValue*/ ctx[49];
-    			add_location(textarea, file$i, 444, 14, 12720);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, textarea, anchor);
-    			/*textarea_binding*/ ctx[79](textarea);
-    			if (/*autofocus*/ ctx[18]) textarea.focus();
-
-    			if (!mounted) {
-    				dispose = [
-    					listen_dev(textarea, "focus", /*onFocus*/ ctx[53], false, false, false),
-    					listen_dev(textarea, "blur", /*onBlur*/ ctx[54], false, false, false),
-    					listen_dev(textarea, "input", /*onInput*/ ctx[52], false, false, false),
-    					listen_dev(textarea, "change", /*onChange*/ ctx[55], false, false, false)
-    				];
-
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*inputStyle*/ 67108864) {
-    				attr_dev(textarea, "style", /*inputStyle*/ ctx[26]);
-    			}
-
-    			if (dirty[0] & /*name*/ 32) {
-    				attr_dev(textarea, "name", /*name*/ ctx[5]);
-    			}
-
-    			if (dirty[0] & /*placeholder*/ 1024) {
-    				attr_dev(textarea, "placeholder", /*placeholder*/ ctx[10]);
-    			}
-
-    			if (dirty[0] & /*inputId*/ 2048) {
-    				attr_dev(textarea, "id", /*inputId*/ ctx[11]);
-    			}
-
-    			if (dirty[0] & /*size*/ 4096) {
-    				attr_dev(textarea, "size", /*size*/ ctx[12]);
-    			}
-
-    			if (dirty[0] & /*inputmode*/ 64) {
-    				attr_dev(textarea, "inputmode", /*inputmode*/ ctx[6]);
-    			}
-
-    			if (dirty[0] & /*accept*/ 8192) {
-    				attr_dev(textarea, "accept", /*accept*/ ctx[13]);
-    			}
-
-    			if (dirty[0] & /*autocomplete*/ 16384) {
-    				attr_dev(textarea, "autocomplete", /*autocomplete*/ ctx[14]);
-    			}
-
-    			if (dirty[0] & /*autocorrect*/ 32768) {
-    				attr_dev(textarea, "autocorrect", /*autocorrect*/ ctx[15]);
-    			}
-
-    			if (dirty[0] & /*autocapitalize*/ 65536) {
-    				attr_dev(textarea, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			}
-
-    			if (dirty[0] & /*spellcheck*/ 131072) {
-    				attr_dev(textarea, "spellcheck", /*spellcheck*/ ctx[17]);
-    			}
-
-    			if (dirty[0] & /*autofocus*/ 262144) {
-    				prop_dev(textarea, "autofocus", /*autofocus*/ ctx[18]);
-    			}
-
-    			if (dirty[0] & /*autosave*/ 524288) {
-    				attr_dev(textarea, "autosave", /*autosave*/ ctx[19]);
-    			}
-
-    			if (dirty[0] & /*disabled*/ 512) {
-    				prop_dev(textarea, "disabled", /*disabled*/ ctx[9]);
-    			}
-
-    			if (dirty[0] & /*max*/ 1048576) {
-    				attr_dev(textarea, "max", /*max*/ ctx[20]);
-    			}
-
-    			if (dirty[0] & /*maxlength*/ 8388608) {
-    				attr_dev(textarea, "maxlength", /*maxlength*/ ctx[23]);
-    			}
-
-    			if (dirty[0] & /*min*/ 2097152) {
-    				attr_dev(textarea, "min", /*min*/ ctx[21]);
-    			}
-
-    			if (dirty[0] & /*minlength*/ 16777216) {
-    				attr_dev(textarea, "minlength", /*minlength*/ ctx[24]);
-    			}
-
-    			if (dirty[0] & /*step*/ 4194304) {
-    				attr_dev(textarea, "step", /*step*/ ctx[22]);
-    			}
-
-    			if (dirty[0] & /*multiple*/ 33554432) {
-    				attr_dev(textarea, "multiple", /*multiple*/ ctx[25]);
-    			}
-
-    			if (dirty[0] & /*readonly*/ 128) {
-    				prop_dev(textarea, "readOnly", /*readonly*/ ctx[7]);
-    			}
-
-    			if (dirty[0] & /*required*/ 256) {
-    				prop_dev(textarea, "required", /*required*/ ctx[8]);
-    			}
-
-    			if (dirty[0] & /*pattern*/ 134217728) {
-    				attr_dev(textarea, "pattern", /*pattern*/ ctx[27]);
-    			}
-
-    			if (dirty[0] & /*validate*/ 268435456 && textarea_validate_value !== (textarea_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined)) {
-    				attr_dev(textarea, "validate", textarea_validate_value);
-    			}
-
-    			if (dirty[0] & /*validate, validateOnBlur*/ 805306368 && textarea_data_validate_value !== (textarea_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(textarea, "data-validate", textarea_data_validate_value);
-    			}
-
-    			if (dirty[0] & /*validateOnBlur*/ 536870912 && textarea_data_validate_on_blur_value !== (textarea_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(textarea, "data-validate-on-blur", textarea_data_validate_on_blur_value);
-    			}
-
-    			if (dirty[0] & /*tabindex*/ 1073741824) {
-    				attr_dev(textarea, "tabindex", /*tabindex*/ ctx[30]);
-    			}
-
-    			if (dirty[1] & /*errorMessageForce, errorMessage*/ 12 && textarea_data_error_message_value !== (textarea_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33])) {
-    				attr_dev(textarea, "data-error-message", textarea_data_error_message_value);
-    			}
-
-    			if (dirty[1] & /*inputClasses*/ 32768) {
-    				attr_dev(textarea, "class", /*inputClasses*/ ctx[46]);
-    			}
-
-    			if (dirty[1] & /*inputValue*/ 262144) {
-    				prop_dev(textarea, "value", /*inputValue*/ ctx[49]);
-    			}
-    		},
-    		i: noop,
-    		o: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(textarea);
-    			/*textarea_binding*/ ctx[79](null);
-    			mounted = false;
-    			run_all(dispose);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_7$1.name,
-    		type: "if",
-    		source: "(444:42) ",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (398:12) {#if type === 'select'}
-    function create_if_block_6$1(ctx) {
-    	let select;
-    	let select_validate_value;
-    	let select_data_validate_value;
-    	let select_data_validate_on_blur_value;
-    	let select_data_error_message_value;
-    	let current;
-    	let mounted;
-    	let dispose;
-    	const default_slot_template = /*#slots*/ ctx[77].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[76], null);
-
-    	const block = {
-    		c: function create() {
-    			select = element("select");
-    			if (default_slot) default_slot.c();
-    			attr_dev(select, "style", /*inputStyle*/ ctx[26]);
-    			attr_dev(select, "name", /*name*/ ctx[5]);
-    			attr_dev(select, "placeholder", /*placeholder*/ ctx[10]);
-    			attr_dev(select, "id", /*inputId*/ ctx[11]);
-    			attr_dev(select, "size", /*size*/ ctx[12]);
-    			attr_dev(select, "accept", /*accept*/ ctx[13]);
-    			attr_dev(select, "autocomplete", /*autocomplete*/ ctx[14]);
-    			attr_dev(select, "autocorrect", /*autocorrect*/ ctx[15]);
-    			attr_dev(select, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			attr_dev(select, "spellcheck", /*spellcheck*/ ctx[17]);
-    			select.autofocus = /*autofocus*/ ctx[18];
-    			attr_dev(select, "autosave", /*autosave*/ ctx[19]);
-    			select.disabled = /*disabled*/ ctx[9];
-    			attr_dev(select, "max", /*max*/ ctx[20]);
-    			attr_dev(select, "maxlength", /*maxlength*/ ctx[23]);
-    			attr_dev(select, "min", /*min*/ ctx[21]);
-    			attr_dev(select, "minlength", /*minlength*/ ctx[24]);
-    			attr_dev(select, "step", /*step*/ ctx[22]);
-    			select.multiple = /*multiple*/ ctx[25];
-    			attr_dev(select, "readonly", /*readonly*/ ctx[7]);
-    			select.required = /*required*/ ctx[8];
-    			attr_dev(select, "pattern", /*pattern*/ ctx[27]);
-
-    			attr_dev(select, "validate", select_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined);
-
-    			attr_dev(select, "data-validate", select_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(select, "data-validate-on-blur", select_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined);
-
-    			attr_dev(select, "tabindex", /*tabindex*/ ctx[30]);
-
-    			attr_dev(select, "data-error-message", select_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33]);
-
-    			attr_dev(select, "class", /*inputClasses*/ ctx[46]);
-    			add_location(select, file$i, 398, 14, 11167);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, select, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(select, null);
-    			}
-
-    			select_option(select, /*inputValue*/ ctx[49]);
-    			/*select_binding*/ ctx[78](select);
-    			current = true;
-    			if (/*autofocus*/ ctx[18]) select.focus();
-
-    			if (!mounted) {
-    				dispose = [
-    					listen_dev(select, "focus", /*onFocus*/ ctx[53], false, false, false),
-    					listen_dev(select, "blur", /*onBlur*/ ctx[54], false, false, false),
-    					listen_dev(select, "input", /*onInput*/ ctx[52], false, false, false),
-    					listen_dev(select, "change", /*onChange*/ ctx[55], false, false, false)
-    				];
-
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[76], dirty, null),
-    						null
-    					);
-    				}
-    			}
-
-    			if (!current || dirty[0] & /*inputStyle*/ 67108864) {
-    				attr_dev(select, "style", /*inputStyle*/ ctx[26]);
-    			}
-
-    			if (!current || dirty[0] & /*name*/ 32) {
-    				attr_dev(select, "name", /*name*/ ctx[5]);
-    			}
-
-    			if (!current || dirty[0] & /*placeholder*/ 1024) {
-    				attr_dev(select, "placeholder", /*placeholder*/ ctx[10]);
-    			}
-
-    			if (!current || dirty[0] & /*inputId*/ 2048) {
-    				attr_dev(select, "id", /*inputId*/ ctx[11]);
-    			}
-
-    			if (!current || dirty[0] & /*size*/ 4096) {
-    				attr_dev(select, "size", /*size*/ ctx[12]);
-    			}
-
-    			if (!current || dirty[0] & /*accept*/ 8192) {
-    				attr_dev(select, "accept", /*accept*/ ctx[13]);
-    			}
-
-    			if (!current || dirty[0] & /*autocomplete*/ 16384) {
-    				attr_dev(select, "autocomplete", /*autocomplete*/ ctx[14]);
-    			}
-
-    			if (!current || dirty[0] & /*autocorrect*/ 32768) {
-    				attr_dev(select, "autocorrect", /*autocorrect*/ ctx[15]);
-    			}
-
-    			if (!current || dirty[0] & /*autocapitalize*/ 65536) {
-    				attr_dev(select, "autocapitalize", /*autocapitalize*/ ctx[16]);
-    			}
-
-    			if (!current || dirty[0] & /*spellcheck*/ 131072) {
-    				attr_dev(select, "spellcheck", /*spellcheck*/ ctx[17]);
-    			}
-
-    			if (!current || dirty[0] & /*autofocus*/ 262144) {
-    				prop_dev(select, "autofocus", /*autofocus*/ ctx[18]);
-    			}
-
-    			if (!current || dirty[0] & /*autosave*/ 524288) {
-    				attr_dev(select, "autosave", /*autosave*/ ctx[19]);
-    			}
-
-    			if (!current || dirty[0] & /*disabled*/ 512) {
-    				prop_dev(select, "disabled", /*disabled*/ ctx[9]);
-    			}
-
-    			if (!current || dirty[0] & /*max*/ 1048576) {
-    				attr_dev(select, "max", /*max*/ ctx[20]);
-    			}
-
-    			if (!current || dirty[0] & /*maxlength*/ 8388608) {
-    				attr_dev(select, "maxlength", /*maxlength*/ ctx[23]);
-    			}
-
-    			if (!current || dirty[0] & /*min*/ 2097152) {
-    				attr_dev(select, "min", /*min*/ ctx[21]);
-    			}
-
-    			if (!current || dirty[0] & /*minlength*/ 16777216) {
-    				attr_dev(select, "minlength", /*minlength*/ ctx[24]);
-    			}
-
-    			if (!current || dirty[0] & /*step*/ 4194304) {
-    				attr_dev(select, "step", /*step*/ ctx[22]);
-    			}
-
-    			if (!current || dirty[0] & /*multiple*/ 33554432) {
-    				prop_dev(select, "multiple", /*multiple*/ ctx[25]);
-    			}
-
-    			if (!current || dirty[0] & /*readonly*/ 128) {
-    				attr_dev(select, "readonly", /*readonly*/ ctx[7]);
-    			}
-
-    			if (!current || dirty[0] & /*required*/ 256) {
-    				prop_dev(select, "required", /*required*/ ctx[8]);
-    			}
-
-    			if (!current || dirty[0] & /*pattern*/ 134217728) {
-    				attr_dev(select, "pattern", /*pattern*/ ctx[27]);
-    			}
-
-    			if (!current || dirty[0] & /*validate*/ 268435456 && select_validate_value !== (select_validate_value = typeof /*validate*/ ctx[28] === 'string' && /*validate*/ ctx[28].length
-    			? /*validate*/ ctx[28]
-    			: undefined)) {
-    				attr_dev(select, "validate", select_validate_value);
-    			}
-
-    			if (!current || dirty[0] & /*validate, validateOnBlur*/ 805306368 && select_data_validate_value !== (select_data_validate_value = /*validate*/ ctx[28] === true || /*validate*/ ctx[28] === '' || /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(select, "data-validate", select_data_validate_value);
-    			}
-
-    			if (!current || dirty[0] & /*validateOnBlur*/ 536870912 && select_data_validate_on_blur_value !== (select_data_validate_on_blur_value = /*validateOnBlur*/ ctx[29] === true || /*validateOnBlur*/ ctx[29] === ''
-    			? true
-    			: undefined)) {
-    				attr_dev(select, "data-validate-on-blur", select_data_validate_on_blur_value);
-    			}
-
-    			if (!current || dirty[0] & /*tabindex*/ 1073741824) {
-    				attr_dev(select, "tabindex", /*tabindex*/ ctx[30]);
-    			}
-
-    			if (!current || dirty[1] & /*errorMessageForce, errorMessage*/ 12 && select_data_error_message_value !== (select_data_error_message_value = /*errorMessageForce*/ ctx[34]
-    			? undefined
-    			: /*errorMessage*/ ctx[33])) {
-    				attr_dev(select, "data-error-message", select_data_error_message_value);
-    			}
-
-    			if (!current || dirty[1] & /*inputClasses*/ 32768) {
-    				attr_dev(select, "class", /*inputClasses*/ ctx[46]);
-    			}
-
-    			if (!current || dirty[1] & /*inputValue*/ 262144) {
-    				select_option(select, /*inputValue*/ ctx[49]);
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(select);
-    			if (default_slot) default_slot.d(detaching);
-    			/*select_binding*/ ctx[78](null);
-    			mounted = false;
-    			run_all(dispose);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_6$1.name,
-    		type: "if",
-    		source: "(398:12) {#if type === 'select'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (551:10) {#if hasErrorMessage && errorMessageForce}
-    function create_if_block_4$2(ctx) {
-    	let div;
-    	let t0_value = plainText(/*errorMessage*/ ctx[33]) + "";
-    	let t0;
-    	let t1;
-    	let current;
-    	const error_message_slot_template = /*#slots*/ ctx[77]["error-message"];
-    	const error_message_slot = create_slot(error_message_slot_template, ctx, /*$$scope*/ ctx[76], get_error_message_slot_context);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			t0 = text$1(t0_value);
-    			t1 = space();
-    			if (error_message_slot) error_message_slot.c();
-    			attr_dev(div, "class", "item-input-error-message");
-    			add_location(div, file$i, 551, 12, 16416);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, t0);
-    			append_dev(div, t1);
-
-    			if (error_message_slot) {
-    				error_message_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if ((!current || dirty[1] & /*errorMessage*/ 4) && t0_value !== (t0_value = plainText(/*errorMessage*/ ctx[33]) + "")) set_data_dev(t0, t0_value);
-
-    			if (error_message_slot) {
-    				if (error_message_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						error_message_slot,
-    						error_message_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(error_message_slot_template, /*$$scope*/ ctx[76], dirty, get_error_message_slot_changes),
-    						get_error_message_slot_context
-    					);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(error_message_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(error_message_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (error_message_slot) error_message_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_4$2.name,
-    		type: "if",
-    		source: "(551:10) {#if hasErrorMessage && errorMessageForce}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (557:10) {#if clearButton}
-    function create_if_block_3$7(ctx) {
-    	let span;
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			attr_dev(span, "class", "input-clear-button");
-    			add_location(span, file$i, 556, 27, 16601);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_3$7.name,
-    		type: "if",
-    		source: "(557:10) {#if clearButton}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (558:10) {#if typeof info !== 'undefined' || hasInfoSlots}
-    function create_if_block_2$8(ctx) {
-    	let div;
-    	let t0_value = plainText(/*info*/ ctx[35]) + "";
-    	let t0;
-    	let t1;
-    	let current;
-    	const info_slot_template = /*#slots*/ ctx[77].info;
-    	const info_slot = create_slot(info_slot_template, ctx, /*$$scope*/ ctx[76], get_info_slot_context);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			t0 = text$1(t0_value);
-    			t1 = space();
-    			if (info_slot) info_slot.c();
-    			attr_dev(div, "class", "item-input-info");
-    			add_location(div, file$i, 558, 12, 16714);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, t0);
-    			append_dev(div, t1);
-
-    			if (info_slot) {
-    				info_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if ((!current || dirty[1] & /*info*/ 16) && t0_value !== (t0_value = plainText(/*info*/ ctx[35]) + "")) set_data_dev(t0, t0_value);
-
-    			if (info_slot) {
-    				if (info_slot.p && (!current || dirty[2] & /*$$scope*/ 16384)) {
-    					update_slot_base(
-    						info_slot,
-    						info_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[76],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[76])
-    						: get_slot_changes(info_slot_template, /*$$scope*/ ctx[76], dirty, get_info_slot_changes),
-    						get_info_slot_context
-    					);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(info_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(info_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (info_slot) info_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_2$8.name,
-    		type: "if",
-    		source: "(558:10) {#if typeof info !== 'undefined' || hasInfoSlots}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (571:4) {#if isSortable && !isSortableOpposite}
-    function create_if_block_1$9(ctx) {
-    	let div;
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$i, 571, 6, 17063);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_1$9.name,
-    		type: "if",
-    		source: "(571:4) {#if isSortable && !isSortableOpposite}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function create_fragment$k(ctx) {
-    	let current_block_type_index;
-    	let if_block;
-    	let if_block_anchor;
-    	let current;
-    	const if_block_creators = [create_if_block$c, create_else_block_1$3];
-    	const if_blocks = [];
-
-    	function select_block_type(ctx, dirty) {
-    		if (/*wrap*/ ctx[2]) return 0;
-    		return 1;
-    	}
-
-    	current_block_type_index = select_block_type(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-
-    	const block = {
-    		c: function create() {
-    			if_block.c();
-    			if_block_anchor = empty();
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			if_blocks[current_block_type_index].m(target, anchor);
-    			insert_dev(target, if_block_anchor, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type(ctx);
-
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
-    				group_outros();
-
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
-    				});
-
-    				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(if_block_anchor.parentNode, if_block_anchor);
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(if_block);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(if_block);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if_blocks[current_block_type_index].d(detaching);
-    			if (detaching) detach_dev(if_block_anchor);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$k.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$i($$self, $$props, $$invalidate) {
-    	let isSortable;
-    	let isSortableOpposite;
-    	let inputType;
-    	let needsValue;
-    	let inputValue;
-    	let hasInfoSlots;
-    	let hasErrorSlots;
-    	let hasMediaSlots;
-    	let hasLabelSlots;
-    	let hasErrorMessage;
-    	let inputClasses;
-    	let itemContentClasses;
-    	let labelClasses;
-    	let inputWrapClasses;
-    	let classes;
-
-    	const omit_props_names = [
-    		"class","sortable","sortableOpposite","media","dropdown","wrap","input","type","name","value","inputmode","readonly","required","disabled","placeholder","inputId","size","accept","autocomplete","autocorrect","autocapitalize","spellcheck","autofocus","autosave","max","min","step","maxlength","minlength","multiple","inputStyle","pattern","validate","validateOnBlur","onValidate","tabindex","resizable","clearButton","noFormStoreData","noStoreData","ignoreStoreData","errorMessage","errorMessageForce","info","outline","label","inlineLabel","floatingLabel","calendarParams","colorPickerParams","textEditorParams","calendarInstance","colorPickerInstance"
-    	];
-
-    	let $$restProps = compute_rest_props($$props, omit_props_names);
-    	let { $$slots: slots = {}, $$scope } = $$props;
-
-    	validate_slots('List_input', slots, [
-    		'root-start','content-start','media','inner-start','label','default','input','error-message','info','inner','inner-end','content','content-end','root','root-end'
-    	]);
-
-    	const $$slots = compute_slots(slots);
-    	const emit = createEmitter(createEventDispatcher, $$props);
-    	let { class: className = undefined } = $$props;
-    	let { sortable = undefined } = $$props;
-    	let { sortableOpposite = undefined } = $$props;
-    	let { media = undefined } = $$props;
-    	let { dropdown = 'auto' } = $$props;
-    	let { wrap = true } = $$props;
-    	let { input = true } = $$props;
-    	let { type = 'text' } = $$props;
-    	let { name = undefined } = $$props;
-    	let { value = undefined } = $$props;
-    	let { inputmode = undefined } = $$props;
-    	let { readonly = undefined } = $$props;
-    	let { required = undefined } = $$props;
-    	let { disabled = undefined } = $$props;
-    	let { placeholder = undefined } = $$props;
-    	let { inputId = undefined } = $$props;
-    	let { size = undefined } = $$props;
-    	let { accept = undefined } = $$props;
-    	let { autocomplete = undefined } = $$props;
-    	let { autocorrect = undefined } = $$props;
-    	let { autocapitalize = undefined } = $$props;
-    	let { spellcheck = undefined } = $$props;
-    	let { autofocus = undefined } = $$props;
-    	let { autosave = undefined } = $$props;
-    	let { max = undefined } = $$props;
-    	let { min = undefined } = $$props;
-    	let { step = undefined } = $$props;
-    	let { maxlength = undefined } = $$props;
-    	let { minlength = undefined } = $$props;
-    	let { multiple = undefined } = $$props;
-    	let { inputStyle = undefined } = $$props;
-    	let { pattern = undefined } = $$props;
-    	let { validate = undefined } = $$props;
-    	let { validateOnBlur = undefined } = $$props;
-    	let { onValidate = undefined } = $$props;
-    	let { tabindex = undefined } = $$props;
-    	let { resizable = undefined } = $$props;
-    	let { clearButton = undefined } = $$props;
-    	let { noFormStoreData = undefined } = $$props;
-    	let { noStoreData = undefined } = $$props;
-    	let { ignoreStoreData = undefined } = $$props;
-    	let { errorMessage = undefined } = $$props;
-    	let { errorMessageForce = undefined } = $$props;
-    	let { info = undefined } = $$props;
-    	let { outline = undefined } = $$props;
-    	let { label = undefined } = $$props;
-    	let { inlineLabel = undefined } = $$props;
-    	let { floatingLabel = undefined } = $$props;
-    	let { calendarParams = undefined } = $$props;
-    	let { colorPickerParams = undefined } = $$props;
-    	let { textEditorParams = undefined } = $$props;
-
-    	// State
-    	let inputEl;
-
-    	let inputFocused = false;
-    	let inputInvalid = false;
-    	let updateInputOnDidUpdate = false;
-    	let f7Calendar;
-    	let f7ColorPicker;
-
-    	function calendarInstance() {
-    		return f7Calendar;
-    	}
-
-    	function colorPickerInstance() {
-    		return f7ColorPicker;
-    	}
-
-    	let ListContext = getReactiveContext('ListContext', newValue => {
-    		$$invalidate(74, ListContext = newValue || {});
-    	}) || {};
-
-    	function domValue() {
-    		if (!inputEl) return undefined;
-    		return inputEl.value;
-    	}
-
-    	function inputHasValue() {
-    		if (type === 'datepicker' && Array.isArray(value) && value.length === 0) {
-    			return false;
-    		}
-
-    		const domV = domValue();
-
-    		return typeof value === 'undefined'
-    		? domV || domV === 0
-    		: value || value === 0;
-    	}
-
-    	function validateInput() {
-    		if (!app$1.f7 || !inputEl) return;
-    		const validity = inputEl.validity;
-    		if (!validity) return;
-
-    		if (!validity.valid) {
-    			if (onValidate) onValidate(false);
-
-    			if (inputInvalid !== true) {
-    				$$invalidate(73, inputInvalid = true);
-    			}
-    		} else {
-    			if (onValidate) onValidate(true);
-
-    			if (inputInvalid !== false) {
-    				$$invalidate(73, inputInvalid = false);
-    			}
-    		}
-    	}
-
-    	let initialWatched = false;
-
-    	function watchValue() {
-    		if (!initialWatched) {
-    			initialWatched = true;
-    			return;
-    		}
-
-    		if (type === 'range' || type === 'toggle') return;
-    		if (!app$1.f7) return;
-    		updateInputOnDidUpdate = true;
-
-    		if (f7Calendar) {
-    			f7Calendar.setValue(value);
-    		}
-
-    		if (f7ColorPicker) {
-    			f7ColorPicker.setValue(value);
-    		}
-    	}
-
-    	function watchColorPickerParams() {
-    		if (!app$1.f7 || !f7ColorPicker) return;
-    		extend(f7ColorPicker.params, colorPickerParams || {});
-    	}
-
-    	function watchCalendarParams() {
-    		if (!app$1.f7 || !f7Calendar) return;
-    		extend(f7Calendar.params, calendarParams || {});
-    	}
-
-    	function onTextareaResize(event) {
-    		emit('textareaResize', [event]);
-    	}
-
-    	function onInputNotEmpty(event) {
-    		emit('inputNotEmpty', [event]);
-    	}
-
-    	function onInputEmpty(event) {
-    		emit('inputEmpty', [event]);
-    	}
-
-    	function onInputClear(event) {
-    		emit('inputClear', [event]);
-    	}
-
-    	function onInput(...args) {
-    		emit('input', [...args]);
-
-    		if (!(validateOnBlur || validateOnBlur === '') && (validate || validate === '') && inputEl) {
-    			validateInput();
-    		}
-
-    		if (inputEl && type !== 'texteditor' && type !== 'colorpicker' && type !== 'datepicker') {
-    			$$invalidate(0, value = inputEl.value);
-    		}
-    	}
-
-    	function onFocus(...args) {
-    		emit('focus', [...args]);
-    		$$invalidate(72, inputFocused = true);
-    	}
-
-    	function onBlur(...args) {
-    		emit('blur', [...args]);
-
-    		if ((validate || validate === '' || validateOnBlur || validateOnBlur === '') && inputEl) {
-    			validateInput();
-    		}
-
-    		$$invalidate(72, inputFocused = false);
-    	}
-
-    	function onChange(...args) {
-    		emit('change', [...args]);
-
-    		if (type === 'texteditor') {
-    			emit('textEditorChange', [args[0]]);
-    			$$invalidate(0, value = args[1]);
-    		}
-    	}
-
-    	onMount(() => {
-    		f7ready(() => {
-    			if (type === 'range' || type === 'toggle') return;
-    			if (!inputEl) return;
-    			inputEl.addEventListener('input:notempty', onInputNotEmpty, false);
-
-    			if (type === 'textarea' && resizable) {
-    				inputEl.addEventListener('textarea:resize', onTextareaResize, false);
-    			}
-
-    			if (clearButton) {
-    				inputEl.addEventListener('input:empty', onInputEmpty, false);
-    				inputEl.addEventListener('input:clear', onInputClear, false);
-    			}
-
-    			if (type === 'datepicker') {
-    				f7Calendar = app$1.f7.calendar.create({
-    					inputEl,
-    					value,
-    					on: {
-    						change(calendar, calendarValue) {
-    							emit('calendarChange', [calendarValue]);
-    							$$invalidate(0, value = calendarValue);
-    						}
-    					},
-    					...calendarParams || {}
-    				});
-    			}
-
-    			if (type === 'colorpicker') {
-    				f7ColorPicker = app$1.f7.colorPicker.create({
-    					inputEl,
-    					value,
-    					on: {
-    						change(colorPicker, colorPickerValue) {
-    							emit('colorPickerChange', [colorPickerValue]);
-    							$$invalidate(0, value = colorPickerValue);
-    						}
-    					},
-    					...colorPickerParams || {}
-    				});
-    			}
-
-    			app$1.f7.input.checkEmptyState(inputEl);
-
-    			if (!(validateOnBlur || validateOnBlur === '') && (validate || validate === '') && typeof value !== 'undefined' && value !== null && value !== '') {
-    				setTimeout(
-    					() => {
-    						validateInput();
-    					},
-    					0
-    				);
-    			}
-
-    			if (resizable) {
-    				app$1.f7.input.resizeTextarea(inputEl);
-    			}
-    		});
-    	});
-
-    	afterUpdate(() => {
-    		if (!app$1.f7) return;
-
-    		if (updateInputOnDidUpdate) {
-    			if (!inputEl) return;
-    			updateInputOnDidUpdate = false;
-    			app$1.f7.input.checkEmptyState(inputEl);
-
-    			if (validate && !validateOnBlur) {
-    				validateInput();
-    			}
-
-    			if (resizable) {
-    				app$1.f7.input.resizeTextarea(inputEl);
-    			}
-    		}
-    	});
-
-    	onDestroy(() => {
-    		if (type === 'range' || type === 'toggle') return;
-    		if (!inputEl) return;
-    		inputEl.removeEventListener('input:notempty', onInputNotEmpty, false);
-
-    		if (type === 'textarea' && resizable) {
-    			inputEl.removeEventListener('textarea:resize', onTextareaResize, false);
-    		}
-
-    		if (clearButton) {
-    			inputEl.removeEventListener('input:empty', onInputEmpty, false);
-    			inputEl.removeEventListener('input:clear', onInputClear, false);
-    		}
-
-    		if (f7Calendar && f7Calendar.destroy) {
-    			f7Calendar.destroy();
-    		}
-
-    		if (f7ColorPicker && f7ColorPicker.destroy) {
-    			f7ColorPicker.destroy();
-    		}
-
-    		f7Calendar = null;
-    		f7ColorPicker = null;
-    	});
-
-    	function select_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			inputEl = $$value;
-    			$$invalidate(41, inputEl);
-    		});
-    	}
-
-    	function textarea_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			inputEl = $$value;
-    			$$invalidate(41, inputEl);
-    		});
-    	}
-
-    	function input_1_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			inputEl = $$value;
-    			$$invalidate(41, inputEl);
-    		});
-    	}
-
-    	function select_binding_1($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			inputEl = $$value;
-    			$$invalidate(41, inputEl);
-    		});
-    	}
-
-    	function textarea_binding_1($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			inputEl = $$value;
-    			$$invalidate(41, inputEl);
-    		});
-    	}
-
-    	function input_1_binding_1($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			inputEl = $$value;
-    			$$invalidate(41, inputEl);
-    		});
-    	}
-
-    	$$self.$$set = $$new_props => {
-    		$$invalidate(100, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
-    		$$invalidate(56, $$restProps = compute_rest_props($$props, omit_props_names));
-    		if ('class' in $$new_props) $$invalidate(57, className = $$new_props.class);
-    		if ('sortable' in $$new_props) $$invalidate(58, sortable = $$new_props.sortable);
-    		if ('sortableOpposite' in $$new_props) $$invalidate(59, sortableOpposite = $$new_props.sortableOpposite);
-    		if ('media' in $$new_props) $$invalidate(1, media = $$new_props.media);
-    		if ('dropdown' in $$new_props) $$invalidate(60, dropdown = $$new_props.dropdown);
-    		if ('wrap' in $$new_props) $$invalidate(2, wrap = $$new_props.wrap);
-    		if ('input' in $$new_props) $$invalidate(3, input = $$new_props.input);
-    		if ('type' in $$new_props) $$invalidate(4, type = $$new_props.type);
-    		if ('name' in $$new_props) $$invalidate(5, name = $$new_props.name);
-    		if ('value' in $$new_props) $$invalidate(0, value = $$new_props.value);
-    		if ('inputmode' in $$new_props) $$invalidate(6, inputmode = $$new_props.inputmode);
-    		if ('readonly' in $$new_props) $$invalidate(7, readonly = $$new_props.readonly);
-    		if ('required' in $$new_props) $$invalidate(8, required = $$new_props.required);
-    		if ('disabled' in $$new_props) $$invalidate(9, disabled = $$new_props.disabled);
-    		if ('placeholder' in $$new_props) $$invalidate(10, placeholder = $$new_props.placeholder);
-    		if ('inputId' in $$new_props) $$invalidate(11, inputId = $$new_props.inputId);
-    		if ('size' in $$new_props) $$invalidate(12, size = $$new_props.size);
-    		if ('accept' in $$new_props) $$invalidate(13, accept = $$new_props.accept);
-    		if ('autocomplete' in $$new_props) $$invalidate(14, autocomplete = $$new_props.autocomplete);
-    		if ('autocorrect' in $$new_props) $$invalidate(15, autocorrect = $$new_props.autocorrect);
-    		if ('autocapitalize' in $$new_props) $$invalidate(16, autocapitalize = $$new_props.autocapitalize);
-    		if ('spellcheck' in $$new_props) $$invalidate(17, spellcheck = $$new_props.spellcheck);
-    		if ('autofocus' in $$new_props) $$invalidate(18, autofocus = $$new_props.autofocus);
-    		if ('autosave' in $$new_props) $$invalidate(19, autosave = $$new_props.autosave);
-    		if ('max' in $$new_props) $$invalidate(20, max = $$new_props.max);
-    		if ('min' in $$new_props) $$invalidate(21, min = $$new_props.min);
-    		if ('step' in $$new_props) $$invalidate(22, step = $$new_props.step);
-    		if ('maxlength' in $$new_props) $$invalidate(23, maxlength = $$new_props.maxlength);
-    		if ('minlength' in $$new_props) $$invalidate(24, minlength = $$new_props.minlength);
-    		if ('multiple' in $$new_props) $$invalidate(25, multiple = $$new_props.multiple);
-    		if ('inputStyle' in $$new_props) $$invalidate(26, inputStyle = $$new_props.inputStyle);
-    		if ('pattern' in $$new_props) $$invalidate(27, pattern = $$new_props.pattern);
-    		if ('validate' in $$new_props) $$invalidate(28, validate = $$new_props.validate);
-    		if ('validateOnBlur' in $$new_props) $$invalidate(29, validateOnBlur = $$new_props.validateOnBlur);
-    		if ('onValidate' in $$new_props) $$invalidate(61, onValidate = $$new_props.onValidate);
-    		if ('tabindex' in $$new_props) $$invalidate(30, tabindex = $$new_props.tabindex);
-    		if ('resizable' in $$new_props) $$invalidate(31, resizable = $$new_props.resizable);
-    		if ('clearButton' in $$new_props) $$invalidate(32, clearButton = $$new_props.clearButton);
-    		if ('noFormStoreData' in $$new_props) $$invalidate(62, noFormStoreData = $$new_props.noFormStoreData);
-    		if ('noStoreData' in $$new_props) $$invalidate(63, noStoreData = $$new_props.noStoreData);
-    		if ('ignoreStoreData' in $$new_props) $$invalidate(64, ignoreStoreData = $$new_props.ignoreStoreData);
-    		if ('errorMessage' in $$new_props) $$invalidate(33, errorMessage = $$new_props.errorMessage);
-    		if ('errorMessageForce' in $$new_props) $$invalidate(34, errorMessageForce = $$new_props.errorMessageForce);
-    		if ('info' in $$new_props) $$invalidate(35, info = $$new_props.info);
-    		if ('outline' in $$new_props) $$invalidate(65, outline = $$new_props.outline);
-    		if ('label' in $$new_props) $$invalidate(36, label = $$new_props.label);
-    		if ('inlineLabel' in $$new_props) $$invalidate(66, inlineLabel = $$new_props.inlineLabel);
-    		if ('floatingLabel' in $$new_props) $$invalidate(67, floatingLabel = $$new_props.floatingLabel);
-    		if ('calendarParams' in $$new_props) $$invalidate(68, calendarParams = $$new_props.calendarParams);
-    		if ('colorPickerParams' in $$new_props) $$invalidate(69, colorPickerParams = $$new_props.colorPickerParams);
-    		if ('textEditorParams' in $$new_props) $$invalidate(37, textEditorParams = $$new_props.textEditorParams);
-    		if ('$$scope' in $$new_props) $$invalidate(76, $$scope = $$new_props.$$scope);
-    	};
-
-    	$$self.$capture_state = () => ({
-    		createEventDispatcher,
-    		onMount,
-    		afterUpdate,
-    		onDestroy,
-    		colorClasses,
-    		classNames,
-    		extend,
-    		plainText,
-    		createEmitter,
-    		restProps,
-    		app: app$1,
-    		f7ready,
-    		getReactiveContext,
-    		TextEditor: Text_editor,
-    		emit,
-    		className,
-    		sortable,
-    		sortableOpposite,
-    		media,
-    		dropdown,
-    		wrap,
-    		input,
-    		type,
-    		name,
-    		value,
-    		inputmode,
-    		readonly,
-    		required,
-    		disabled,
-    		placeholder,
-    		inputId,
-    		size,
-    		accept,
-    		autocomplete,
-    		autocorrect,
-    		autocapitalize,
-    		spellcheck,
-    		autofocus,
-    		autosave,
-    		max,
-    		min,
-    		step,
-    		maxlength,
-    		minlength,
-    		multiple,
-    		inputStyle,
-    		pattern,
-    		validate,
-    		validateOnBlur,
-    		onValidate,
-    		tabindex,
-    		resizable,
-    		clearButton,
-    		noFormStoreData,
-    		noStoreData,
-    		ignoreStoreData,
-    		errorMessage,
-    		errorMessageForce,
-    		info,
-    		outline,
-    		label,
-    		inlineLabel,
-    		floatingLabel,
-    		calendarParams,
-    		colorPickerParams,
-    		textEditorParams,
-    		inputEl,
-    		inputFocused,
-    		inputInvalid,
-    		updateInputOnDidUpdate,
-    		f7Calendar,
-    		f7ColorPicker,
-    		calendarInstance,
-    		colorPickerInstance,
-    		ListContext,
-    		domValue,
-    		inputHasValue,
-    		validateInput,
-    		initialWatched,
-    		watchValue,
-    		watchColorPickerParams,
-    		watchCalendarParams,
-    		onTextareaResize,
-    		onInputNotEmpty,
-    		onInputEmpty,
-    		onInputClear,
-    		onInput,
-    		onFocus,
-    		onBlur,
-    		onChange,
-    		classes,
-    		inputWrapClasses,
-    		labelClasses,
-    		hasErrorMessage,
-    		hasInfoSlots,
-    		itemContentClasses,
-    		inputType,
-    		inputClasses,
-    		hasErrorSlots,
-    		hasLabelSlots,
-    		hasMediaSlots,
-    		inputValue,
-    		needsValue,
-    		isSortableOpposite,
-    		isSortable
-    	});
-
-    	$$self.$inject_state = $$new_props => {
-    		$$invalidate(100, $$props = assign(assign({}, $$props), $$new_props));
-    		if ('className' in $$props) $$invalidate(57, className = $$new_props.className);
-    		if ('sortable' in $$props) $$invalidate(58, sortable = $$new_props.sortable);
-    		if ('sortableOpposite' in $$props) $$invalidate(59, sortableOpposite = $$new_props.sortableOpposite);
-    		if ('media' in $$props) $$invalidate(1, media = $$new_props.media);
-    		if ('dropdown' in $$props) $$invalidate(60, dropdown = $$new_props.dropdown);
-    		if ('wrap' in $$props) $$invalidate(2, wrap = $$new_props.wrap);
-    		if ('input' in $$props) $$invalidate(3, input = $$new_props.input);
-    		if ('type' in $$props) $$invalidate(4, type = $$new_props.type);
-    		if ('name' in $$props) $$invalidate(5, name = $$new_props.name);
-    		if ('value' in $$props) $$invalidate(0, value = $$new_props.value);
-    		if ('inputmode' in $$props) $$invalidate(6, inputmode = $$new_props.inputmode);
-    		if ('readonly' in $$props) $$invalidate(7, readonly = $$new_props.readonly);
-    		if ('required' in $$props) $$invalidate(8, required = $$new_props.required);
-    		if ('disabled' in $$props) $$invalidate(9, disabled = $$new_props.disabled);
-    		if ('placeholder' in $$props) $$invalidate(10, placeholder = $$new_props.placeholder);
-    		if ('inputId' in $$props) $$invalidate(11, inputId = $$new_props.inputId);
-    		if ('size' in $$props) $$invalidate(12, size = $$new_props.size);
-    		if ('accept' in $$props) $$invalidate(13, accept = $$new_props.accept);
-    		if ('autocomplete' in $$props) $$invalidate(14, autocomplete = $$new_props.autocomplete);
-    		if ('autocorrect' in $$props) $$invalidate(15, autocorrect = $$new_props.autocorrect);
-    		if ('autocapitalize' in $$props) $$invalidate(16, autocapitalize = $$new_props.autocapitalize);
-    		if ('spellcheck' in $$props) $$invalidate(17, spellcheck = $$new_props.spellcheck);
-    		if ('autofocus' in $$props) $$invalidate(18, autofocus = $$new_props.autofocus);
-    		if ('autosave' in $$props) $$invalidate(19, autosave = $$new_props.autosave);
-    		if ('max' in $$props) $$invalidate(20, max = $$new_props.max);
-    		if ('min' in $$props) $$invalidate(21, min = $$new_props.min);
-    		if ('step' in $$props) $$invalidate(22, step = $$new_props.step);
-    		if ('maxlength' in $$props) $$invalidate(23, maxlength = $$new_props.maxlength);
-    		if ('minlength' in $$props) $$invalidate(24, minlength = $$new_props.minlength);
-    		if ('multiple' in $$props) $$invalidate(25, multiple = $$new_props.multiple);
-    		if ('inputStyle' in $$props) $$invalidate(26, inputStyle = $$new_props.inputStyle);
-    		if ('pattern' in $$props) $$invalidate(27, pattern = $$new_props.pattern);
-    		if ('validate' in $$props) $$invalidate(28, validate = $$new_props.validate);
-    		if ('validateOnBlur' in $$props) $$invalidate(29, validateOnBlur = $$new_props.validateOnBlur);
-    		if ('onValidate' in $$props) $$invalidate(61, onValidate = $$new_props.onValidate);
-    		if ('tabindex' in $$props) $$invalidate(30, tabindex = $$new_props.tabindex);
-    		if ('resizable' in $$props) $$invalidate(31, resizable = $$new_props.resizable);
-    		if ('clearButton' in $$props) $$invalidate(32, clearButton = $$new_props.clearButton);
-    		if ('noFormStoreData' in $$props) $$invalidate(62, noFormStoreData = $$new_props.noFormStoreData);
-    		if ('noStoreData' in $$props) $$invalidate(63, noStoreData = $$new_props.noStoreData);
-    		if ('ignoreStoreData' in $$props) $$invalidate(64, ignoreStoreData = $$new_props.ignoreStoreData);
-    		if ('errorMessage' in $$props) $$invalidate(33, errorMessage = $$new_props.errorMessage);
-    		if ('errorMessageForce' in $$props) $$invalidate(34, errorMessageForce = $$new_props.errorMessageForce);
-    		if ('info' in $$props) $$invalidate(35, info = $$new_props.info);
-    		if ('outline' in $$props) $$invalidate(65, outline = $$new_props.outline);
-    		if ('label' in $$props) $$invalidate(36, label = $$new_props.label);
-    		if ('inlineLabel' in $$props) $$invalidate(66, inlineLabel = $$new_props.inlineLabel);
-    		if ('floatingLabel' in $$props) $$invalidate(67, floatingLabel = $$new_props.floatingLabel);
-    		if ('calendarParams' in $$props) $$invalidate(68, calendarParams = $$new_props.calendarParams);
-    		if ('colorPickerParams' in $$props) $$invalidate(69, colorPickerParams = $$new_props.colorPickerParams);
-    		if ('textEditorParams' in $$props) $$invalidate(37, textEditorParams = $$new_props.textEditorParams);
-    		if ('inputEl' in $$props) $$invalidate(41, inputEl = $$new_props.inputEl);
-    		if ('inputFocused' in $$props) $$invalidate(72, inputFocused = $$new_props.inputFocused);
-    		if ('inputInvalid' in $$props) $$invalidate(73, inputInvalid = $$new_props.inputInvalid);
-    		if ('updateInputOnDidUpdate' in $$props) updateInputOnDidUpdate = $$new_props.updateInputOnDidUpdate;
-    		if ('f7Calendar' in $$props) f7Calendar = $$new_props.f7Calendar;
-    		if ('f7ColorPicker' in $$props) f7ColorPicker = $$new_props.f7ColorPicker;
-    		if ('ListContext' in $$props) $$invalidate(74, ListContext = $$new_props.ListContext);
-    		if ('initialWatched' in $$props) initialWatched = $$new_props.initialWatched;
-    		if ('classes' in $$props) $$invalidate(42, classes = $$new_props.classes);
-    		if ('inputWrapClasses' in $$props) $$invalidate(43, inputWrapClasses = $$new_props.inputWrapClasses);
-    		if ('labelClasses' in $$props) $$invalidate(44, labelClasses = $$new_props.labelClasses);
-    		if ('hasErrorMessage' in $$props) $$invalidate(38, hasErrorMessage = $$new_props.hasErrorMessage);
-    		if ('hasInfoSlots' in $$props) $$invalidate(39, hasInfoSlots = $$new_props.hasInfoSlots);
-    		if ('itemContentClasses' in $$props) $$invalidate(45, itemContentClasses = $$new_props.itemContentClasses);
-    		if ('inputType' in $$props) $$invalidate(40, inputType = $$new_props.inputType);
-    		if ('inputClasses' in $$props) $$invalidate(46, inputClasses = $$new_props.inputClasses);
-    		if ('hasErrorSlots' in $$props) $$invalidate(75, hasErrorSlots = $$new_props.hasErrorSlots);
-    		if ('hasLabelSlots' in $$props) $$invalidate(47, hasLabelSlots = $$new_props.hasLabelSlots);
-    		if ('hasMediaSlots' in $$props) $$invalidate(48, hasMediaSlots = $$new_props.hasMediaSlots);
-    		if ('inputValue' in $$props) $$invalidate(49, inputValue = $$new_props.inputValue);
-    		if ('needsValue' in $$props) needsValue = $$new_props.needsValue;
-    		if ('isSortableOpposite' in $$props) $$invalidate(50, isSortableOpposite = $$new_props.isSortableOpposite);
-    		if ('isSortable' in $$props) $$invalidate(51, isSortable = $$new_props.isSortable);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	$$self.$$.update = () => {
-    		if ($$self.$$.dirty[1] & /*sortable*/ 134217728 | $$self.$$.dirty[2] & /*ListContext*/ 4096) {
-    			$$invalidate(51, isSortable = sortable === true || sortable === false
-    			? sortable
-    			: ListContext.listIsSortable);
-    		}
-
-    		if ($$self.$$.dirty[1] & /*sortableOpposite*/ 268435456 | $$self.$$.dirty[2] & /*ListContext*/ 4096) {
-    			$$invalidate(50, isSortableOpposite = sortableOpposite || ListContext.listIsSortableOpposite);
-    		}
-
-    		if ($$self.$$.dirty[0] & /*value*/ 1) {
-    			watchValue();
-    		}
-
-    		if ($$self.$$.dirty[2] & /*colorPickerParams*/ 128) {
-    			watchColorPickerParams();
-    		}
-
-    		if ($$self.$$.dirty[2] & /*calendarParams*/ 64) {
-    			watchCalendarParams();
-    		}
-
-    		if ($$self.$$.dirty[0] & /*type*/ 16) {
-    			$$invalidate(40, inputType = type === 'datepicker' || type === 'colorpicker'
-    			? 'text'
-    			: type);
-    		}
-
-    		if ($$self.$$.dirty[0] & /*type*/ 16) {
-    			needsValue = type !== 'file' && type !== 'datepicker' && type !== 'colorpicker';
-    		}
-
-    		if ($$self.$$.dirty[0] & /*value*/ 1) {
-    			$$invalidate(49, inputValue = (() => {
-    				let v;
-
-    				if (typeof value !== 'undefined') {
-    					v = value;
-    				} else {
-    					v = domValue();
-    				}
-
-    				if (typeof v === 'undefined' || v === null) return '';
-    				return v;
-    			})());
-    		}
-
-    		if ($$self.$$.dirty[1] & /*errorMessage*/ 4 | $$self.$$.dirty[2] & /*hasErrorSlots*/ 8192) {
-    			$$invalidate(38, hasErrorMessage = !!errorMessage || hasErrorSlots);
-    		}
-
-    		if ($$self.$$.dirty[1] & /*inputType, resizable, errorMessage, errorMessageForce*/ 525 | $$self.$$.dirty[2] & /*noFormStoreData, noStoreData, ignoreStoreData, inputInvalid, inputFocused*/ 3079) {
-    			$$invalidate(46, inputClasses = classNames({
-    				resizable: inputType === 'textarea' && resizable,
-    				'no-store-data': noFormStoreData || noStoreData || ignoreStoreData,
-    				'input-invalid': errorMessage && errorMessageForce || inputInvalid,
-    				'input-with-value': inputHasValue(),
-    				'input-focused': inputFocused
-    			}));
-    		}
-
-    		$$invalidate(45, itemContentClasses = classNames('item-content item-input', !wrap && className, !wrap && { disabled }, !wrap && colorClasses($$props), {
-    			'inline-label': inlineLabel,
-    			'item-input-outline': outline,
-    			'item-input-focused': inputFocused,
-    			'item-input-with-info': !!info || hasInfoSlots,
-    			'item-input-with-value': inputHasValue(),
-    			'item-input-with-error-message': hasErrorMessage && errorMessageForce || inputInvalid,
-    			'item-input-invalid': hasErrorMessage && errorMessageForce || inputInvalid
-    		}));
-
-    		if ($$self.$$.dirty[2] & /*floatingLabel*/ 32) {
-    			$$invalidate(44, labelClasses = classNames('item-title item-label', { 'item-floating-label': floatingLabel }));
-    		}
-
-    		if ($$self.$$.dirty[0] & /*type*/ 16 | $$self.$$.dirty[1] & /*dropdown*/ 536870912) {
-    			$$invalidate(43, inputWrapClasses = classNames('item-input-wrap', {
-    				'input-dropdown': dropdown === 'auto' ? type === 'select' : dropdown
-    			}));
-    		}
-
-    		$$invalidate(42, classes = classNames(className, { disabled }, colorClasses($$props)));
-    	};
-
-    	$$invalidate(39, hasInfoSlots = $$slots.info);
-    	$$invalidate(75, hasErrorSlots = $$slots['error-message']);
-    	$$invalidate(48, hasMediaSlots = $$slots.media);
-    	$$invalidate(47, hasLabelSlots = $$slots.label);
-    	$$props = exclude_internal_props($$props);
-
-    	return [
-    		value,
-    		media,
-    		wrap,
-    		input,
-    		type,
-    		name,
-    		inputmode,
-    		readonly,
-    		required,
-    		disabled,
-    		placeholder,
-    		inputId,
-    		size,
-    		accept,
-    		autocomplete,
-    		autocorrect,
-    		autocapitalize,
-    		spellcheck,
-    		autofocus,
-    		autosave,
-    		max,
-    		min,
-    		step,
-    		maxlength,
-    		minlength,
-    		multiple,
-    		inputStyle,
-    		pattern,
-    		validate,
-    		validateOnBlur,
-    		tabindex,
-    		resizable,
-    		clearButton,
-    		errorMessage,
-    		errorMessageForce,
-    		info,
-    		label,
-    		textEditorParams,
-    		hasErrorMessage,
-    		hasInfoSlots,
-    		inputType,
-    		inputEl,
-    		classes,
-    		inputWrapClasses,
-    		labelClasses,
-    		itemContentClasses,
-    		inputClasses,
-    		hasLabelSlots,
-    		hasMediaSlots,
-    		inputValue,
-    		isSortableOpposite,
-    		isSortable,
-    		onInput,
-    		onFocus,
-    		onBlur,
-    		onChange,
-    		$$restProps,
-    		className,
-    		sortable,
-    		sortableOpposite,
-    		dropdown,
-    		onValidate,
-    		noFormStoreData,
-    		noStoreData,
-    		ignoreStoreData,
-    		outline,
-    		inlineLabel,
-    		floatingLabel,
-    		calendarParams,
-    		colorPickerParams,
-    		calendarInstance,
-    		colorPickerInstance,
-    		inputFocused,
-    		inputInvalid,
-    		ListContext,
-    		hasErrorSlots,
-    		$$scope,
-    		slots,
-    		select_binding,
-    		textarea_binding,
-    		input_1_binding,
-    		select_binding_1,
-    		textarea_binding_1,
-    		input_1_binding_1
-    	];
-    }
-
-    class List_input extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-
-    		init(
-    			this,
-    			options,
-    			instance$i,
-    			create_fragment$k,
-    			safe_not_equal,
-    			{
-    				class: 57,
-    				sortable: 58,
-    				sortableOpposite: 59,
-    				media: 1,
-    				dropdown: 60,
-    				wrap: 2,
-    				input: 3,
-    				type: 4,
-    				name: 5,
-    				value: 0,
-    				inputmode: 6,
-    				readonly: 7,
-    				required: 8,
-    				disabled: 9,
-    				placeholder: 10,
-    				inputId: 11,
-    				size: 12,
-    				accept: 13,
-    				autocomplete: 14,
-    				autocorrect: 15,
-    				autocapitalize: 16,
-    				spellcheck: 17,
-    				autofocus: 18,
-    				autosave: 19,
-    				max: 20,
-    				min: 21,
-    				step: 22,
-    				maxlength: 23,
-    				minlength: 24,
-    				multiple: 25,
-    				inputStyle: 26,
-    				pattern: 27,
-    				validate: 28,
-    				validateOnBlur: 29,
-    				onValidate: 61,
-    				tabindex: 30,
-    				resizable: 31,
-    				clearButton: 32,
-    				noFormStoreData: 62,
-    				noStoreData: 63,
-    				ignoreStoreData: 64,
-    				errorMessage: 33,
-    				errorMessageForce: 34,
-    				info: 35,
-    				outline: 65,
-    				label: 36,
-    				inlineLabel: 66,
-    				floatingLabel: 67,
-    				calendarParams: 68,
-    				colorPickerParams: 69,
-    				textEditorParams: 37,
-    				calendarInstance: 70,
-    				colorPickerInstance: 71
-    			},
-    			null,
-    			[-1, -1, -1, -1]
-    		);
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "List_input",
-    			options,
-    			id: create_fragment$k.name
-    		});
-    	}
-
-    	get class() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set class(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get sortable() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set sortable(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get sortableOpposite() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set sortableOpposite(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get media() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set media(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get dropdown() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set dropdown(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get wrap() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set wrap(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get input() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set input(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get type() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set type(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get name() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set name(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get value() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set value(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get inputmode() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set inputmode(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get readonly() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set readonly(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get required() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set required(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get disabled() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set disabled(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get placeholder() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set placeholder(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get inputId() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set inputId(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get size() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set size(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get accept() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set accept(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get autocomplete() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set autocomplete(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get autocorrect() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set autocorrect(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get autocapitalize() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set autocapitalize(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get spellcheck() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set spellcheck(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get autofocus() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set autofocus(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get autosave() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set autosave(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get max() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set max(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get min() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set min(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get step() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set step(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get maxlength() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set maxlength(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get minlength() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set minlength(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get multiple() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set multiple(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get inputStyle() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set inputStyle(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get pattern() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set pattern(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get validate() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set validate(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get validateOnBlur() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set validateOnBlur(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get onValidate() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set onValidate(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get tabindex() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set tabindex(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizable() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizable(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get clearButton() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set clearButton(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get noFormStoreData() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set noFormStoreData(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get noStoreData() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set noStoreData(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get ignoreStoreData() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set ignoreStoreData(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get errorMessage() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set errorMessage(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get errorMessageForce() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set errorMessageForce(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get info() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set info(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get outline() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set outline(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get label() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set label(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get inlineLabel() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set inlineLabel(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get floatingLabel() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set floatingLabel(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get calendarParams() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set calendarParams(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get colorPickerParams() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set colorPickerParams(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get textEditorParams() {
-    		throw new Error("<List_input>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set textEditorParams(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get calendarInstance() {
-    		return this.$$.ctx[70];
-    	}
-
-    	set calendarInstance(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get colorPickerInstance() {
-    		return this.$$.ctx[71];
-    	}
-
-    	set colorPickerInstance(value) {
-    		throw new Error("<List_input>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
-
     /* node_modules\framework7-svelte\esm\svelte\list-item.svelte generated by Svelte v3.44.0 */
-    const file$h = "node_modules\\framework7-svelte\\esm\\svelte\\list-item.svelte";
+    const file$i = "node_modules\\framework7-svelte\\esm\\svelte\\list-item.svelte";
     const get_root_end_slot_changes = dirty => ({});
     const get_root_end_slot_context = ctx => ({});
     const get_root_slot_changes = dirty => ({});
@@ -56551,7 +50065,7 @@ var MultiRoomAudio = (function () {
     const get_root_start_slot_context = ctx => ({});
 
     // (341:0) {:else}
-    function create_else_block$6(ctx) {
+    function create_else_block$7(ctx) {
     	let li;
     	let t0;
     	let current_block_type_index;
@@ -56577,8 +50091,8 @@ var MultiRoomAudio = (function () {
 
     	current_block_type_index = select_block_type_1(ctx);
     	if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    	let if_block1 = /*isSortable*/ ctx[45] && /*sortable*/ ctx[15] !== false && !/*isSortableOpposite*/ ctx[44] && create_if_block_3$6(ctx);
-    	let if_block2 = (/*swipeout*/ ctx[14] || /*accordionItem*/ ctx[16]) && create_if_block_2$7(ctx);
+    	let if_block1 = /*isSortable*/ ctx[45] && /*sortable*/ ctx[15] !== false && !/*isSortableOpposite*/ ctx[44] && create_if_block_3$4(ctx);
+    	let if_block2 = (/*swipeout*/ ctx[14] || /*accordionItem*/ ctx[16]) && create_if_block_2$6(ctx);
     	const root_slot_template = /*#slots*/ ctx[69].root;
     	const root_slot = create_slot(root_slot_template, ctx, /*$$scope*/ ctx[83], get_root_slot_context);
     	const root_end_slot_template = /*#slots*/ ctx[69]["root-end"];
@@ -56613,7 +50127,7 @@ var MultiRoomAudio = (function () {
     			t4 = space();
     			if (root_end_slot) root_end_slot.c();
     			set_attributes(li, li_data);
-    			add_location(li, file$h, 341, 2, 9886);
+    			add_location(li, file$i, 341, 2, 9886);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -56696,7 +50210,7 @@ var MultiRoomAudio = (function () {
 
     			if (/*isSortable*/ ctx[45] && /*sortable*/ ctx[15] !== false && !/*isSortableOpposite*/ ctx[44]) {
     				if (if_block1) ; else {
-    					if_block1 = create_if_block_3$6(ctx);
+    					if_block1 = create_if_block_3$4(ctx);
     					if_block1.c();
     					if_block1.m(li, t2);
     				}
@@ -56713,7 +50227,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block2, 1);
     					}
     				} else {
-    					if_block2 = create_if_block_2$7(ctx);
+    					if_block2 = create_if_block_2$6(ctx);
     					if_block2.c();
     					transition_in(if_block2, 1);
     					if_block2.m(li, t3);
@@ -56804,7 +50318,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$6.name,
+    		id: create_else_block$7.name,
     		type: "else",
     		source: "(341:0) {:else}",
     		ctx
@@ -56814,7 +50328,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (329:19) 
-    function create_if_block_1$8(ctx) {
+    function create_if_block_1$7(ctx) {
     	let li;
     	let t0_value = plainText(/*title*/ ctx[1]) + "";
     	let t0;
@@ -56843,11 +50357,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			li = element("li");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (default_slot) default_slot.c();
     			set_attributes(li, li_data);
-    			add_location(li, file$h, 329, 2, 9632);
+    			add_location(li, file$i, 329, 2, 9632);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -56924,7 +50438,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$8.name,
+    		id: create_if_block_1$7.name,
     		type: "if",
     		source: "(329:19) ",
     		ctx
@@ -56964,9 +50478,9 @@ var MultiRoomAudio = (function () {
     			li = element("li");
     			span = element("span");
     			if (default_slot_or_fallback) default_slot_or_fallback.c();
-    			add_location(span, file$h, 326, 4, 9557);
+    			add_location(span, file$i, 326, 4, 9557);
     			set_attributes(li, li_data);
-    			add_location(li, file$h, 318, 2, 9353);
+    			add_location(li, file$i, 318, 2, 9353);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -57201,11 +50715,11 @@ var MultiRoomAudio = (function () {
     			t6 = space();
     			if (content_end_slot) content_end_slot.c();
     			attr_dev(div0, "class", "item-inner");
-    			add_location(div0, file$h, 737, 10, 24957);
+    			add_location(div0, file$i, 737, 10, 24957);
     			attr_dev(div1, "class", /*contentClasses*/ ctx[41]);
-    			add_location(div1, file$h, 724, 8, 24508);
+    			add_location(div1, file$i, 724, 8, 24508);
     			set_attributes(a, a_data);
-    			add_location(a, file$h, 716, 6, 24309);
+    			add_location(a, file$i, 716, 6, 24309);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
@@ -57477,7 +50991,7 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if_block.c();
     			attr_dev(div, "class", "swipeout-content");
-    			add_location(div, file$h, 350, 6, 10119);
+    			add_location(div, file$i, 350, 6, 10119);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -57596,9 +51110,9 @@ var MultiRoomAudio = (function () {
     			t6 = space();
     			if (content_end_slot) content_end_slot.c();
     			attr_dev(div0, "class", "item-inner");
-    			add_location(div0, file$h, 977, 10, 33409);
+    			add_location(div0, file$i, 977, 10, 33409);
     			attr_dev(div1, "class", /*contentClasses*/ ctx[41]);
-    			add_location(div1, file$h, 964, 8, 32941);
+    			add_location(div1, file$i, 964, 8, 32941);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -57914,13 +51428,13 @@ var MultiRoomAudio = (function () {
     			input.disabled = /*disabled*/ ctx[23];
     			input.required = /*required*/ ctx[22];
     			attr_dev(input, "type", input_type_value = /*radio*/ ctx[18] ? 'radio' : 'checkbox');
-    			add_location(input, file$h, 845, 10, 28807);
+    			add_location(input, file$i, 845, 10, 28807);
     			attr_dev(i, "class", i_class_value = `icon icon-${/*radio*/ ctx[18] ? 'radio' : 'checkbox'}`);
-    			add_location(i, file$h, 856, 10, 29122);
+    			add_location(i, file$i, 856, 10, 29122);
     			attr_dev(div, "class", "item-inner");
-    			add_location(div, file$h, 865, 10, 29428);
+    			add_location(div, file$i, 865, 10, 29428);
     			attr_dev(label, "class", /*contentClasses*/ ctx[41]);
-    			add_location(label, file$h, 840, 8, 28575);
+    			add_location(label, file$i, 840, 8, 28575);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -58208,7 +51722,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$h, 967, 12, 33112);
+    			add_location(div, file$i, 967, 12, 33112);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -58245,7 +51759,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (media_slot) media_slot.c();
     			attr_dev(div, "class", "item-media");
-    			add_location(div, file$h, 970, 12, 33198);
+    			add_location(div, file$i, 970, 12, 33198);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -58323,7 +51837,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[3])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$h, 972, 16, 33288);
+    			add_location(img, file$i, 972, 16, 33288);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -58622,7 +52136,7 @@ var MultiRoomAudio = (function () {
     			if (if_block6) if_block6.c();
     			if_block6_anchor = empty();
     			attr_dev(div, "class", "item-title-row");
-    			add_location(div, file$h, 986, 14, 33728);
+    			add_location(div, file$i, 986, 14, 33728);
     		},
     		m: function mount(target, anchor) {
     			if (if_block0) if_block0.m(target, anchor);
@@ -58946,13 +52460,13 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (if_block0) if_block0.c();
     			t0 = space();
-    			t1 = text$1(t1_value);
+    			t1 = text(t1_value);
     			t2 = space();
     			if (title_slot) title_slot.c();
     			t3 = space();
     			if (if_block1) if_block1.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 1034, 16, 35463);
+    			add_location(div, file$i, 1034, 16, 35463);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -59078,11 +52592,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 1036, 20, 35542);
+    			add_location(div, file$i, 1036, 20, 35542);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -59152,11 +52666,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 1044, 20, 35837);
+    			add_location(div, file$i, 1044, 20, 35837);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -59243,7 +52757,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 1053, 16, 36131);
+    			add_location(div, file$i, 1053, 16, 36131);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -59397,8 +52911,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 1056, 20, 36275);
+    			t = text(t_value);
+    			add_location(span, file$i, 1056, 20, 36275);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -59487,7 +53001,7 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -59582,11 +53096,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 981, 16, 33566);
+    			add_location(div, file$i, 981, 16, 33566);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -59656,11 +53170,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (title_slot) title_slot.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 989, 18, 33851);
+    			add_location(div, file$i, 989, 18, 33851);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -59747,7 +53261,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 996, 18, 34097);
+    			add_location(div, file$i, 996, 18, 34097);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -59901,8 +53415,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 999, 22, 34247);
+    			t = text(t_value);
+    			add_location(span, file$i, 999, 22, 34247);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -59935,7 +53449,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_10$1] },
+    				$$slots: { default: [create_default_slot_10] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -59985,13 +53499,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (1003:22) <Badge color={badgeColor}>
-    function create_default_slot_10$1(ctx) {
+    function create_default_slot_10(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -60006,7 +53520,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_10$1.name,
+    		id: create_default_slot_10.name,
     		type: "slot",
     		source: "(1003:22) <Badge color={badgeColor}>",
     		ctx
@@ -60028,11 +53542,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (subtitle_slot) subtitle_slot.c();
     			attr_dev(div, "class", "item-subtitle");
-    			add_location(div, file$h, 1010, 16, 34665);
+    			add_location(div, file$i, 1010, 16, 34665);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -60102,11 +53616,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			attr_dev(div, "class", "item-text");
-    			add_location(div, file$h, 1016, 16, 34863);
+    			add_location(div, file$i, 1016, 16, 34863);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -60234,11 +53748,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 1026, 16, 35181);
+    			add_location(div, file$i, 1026, 16, 35181);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -60303,7 +53817,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$h, 843, 12, 28748);
+    			add_location(div, file$i, 843, 12, 28748);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -60340,7 +53854,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (media_slot) media_slot.c();
     			attr_dev(div, "class", "item-media");
-    			add_location(div, file$h, 858, 12, 29217);
+    			add_location(div, file$i, 858, 12, 29217);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -60418,7 +53932,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[3])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$h, 860, 16, 29307);
+    			add_location(img, file$i, 860, 16, 29307);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -60717,7 +54231,7 @@ var MultiRoomAudio = (function () {
     			if (if_block6) if_block6.c();
     			if_block6_anchor = empty();
     			attr_dev(div, "class", "item-title-row");
-    			add_location(div, file$h, 874, 14, 29747);
+    			add_location(div, file$i, 874, 14, 29747);
     		},
     		m: function mount(target, anchor) {
     			if (if_block0) if_block0.m(target, anchor);
@@ -61041,13 +54555,13 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (if_block0) if_block0.c();
     			t0 = space();
-    			t1 = text$1(t1_value);
+    			t1 = text(t1_value);
     			t2 = space();
     			if (title_slot) title_slot.c();
     			t3 = space();
     			if (if_block1) if_block1.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 922, 16, 31482);
+    			add_location(div, file$i, 922, 16, 31482);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -61173,11 +54687,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 924, 20, 31561);
+    			add_location(div, file$i, 924, 20, 31561);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -61247,11 +54761,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 932, 20, 31856);
+    			add_location(div, file$i, 932, 20, 31856);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -61338,7 +54852,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 941, 16, 32150);
+    			add_location(div, file$i, 941, 16, 32150);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -61492,8 +55006,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 944, 20, 32294);
+    			t = text(t_value);
+    			add_location(span, file$i, 944, 20, 32294);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -61526,7 +55040,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_9$1] },
+    				$$slots: { default: [create_default_slot_9] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -61576,13 +55090,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (948:20) <Badge color={badgeColor}>
-    function create_default_slot_9$1(ctx) {
+    function create_default_slot_9(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -61597,7 +55111,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_9$1.name,
+    		id: create_default_slot_9.name,
     		type: "slot",
     		source: "(948:20) <Badge color={badgeColor}>",
     		ctx
@@ -61677,11 +55191,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 869, 16, 29585);
+    			add_location(div, file$i, 869, 16, 29585);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -61751,11 +55265,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (title_slot) title_slot.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 877, 18, 29870);
+    			add_location(div, file$i, 877, 18, 29870);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -61842,7 +55356,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 884, 18, 30116);
+    			add_location(div, file$i, 884, 18, 30116);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -61996,8 +55510,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 887, 22, 30266);
+    			t = text(t_value);
+    			add_location(span, file$i, 887, 22, 30266);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -62030,7 +55544,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_8$1] },
+    				$$slots: { default: [create_default_slot_8] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -62080,13 +55594,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (891:22) <Badge color={badgeColor}>
-    function create_default_slot_8$1(ctx) {
+    function create_default_slot_8(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -62101,7 +55615,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_8$1.name,
+    		id: create_default_slot_8.name,
     		type: "slot",
     		source: "(891:22) <Badge color={badgeColor}>",
     		ctx
@@ -62123,11 +55637,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (subtitle_slot) subtitle_slot.c();
     			attr_dev(div, "class", "item-subtitle");
-    			add_location(div, file$h, 898, 16, 30684);
+    			add_location(div, file$i, 898, 16, 30684);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -62197,11 +55711,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			attr_dev(div, "class", "item-text");
-    			add_location(div, file$h, 904, 16, 30882);
+    			add_location(div, file$i, 904, 16, 30882);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -62329,11 +55843,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 914, 16, 31200);
+    			add_location(div, file$i, 914, 16, 31200);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -62398,7 +55912,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$h, 727, 12, 24660);
+    			add_location(div, file$i, 727, 12, 24660);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -62435,7 +55949,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (media_slot) media_slot.c();
     			attr_dev(div, "class", "item-media");
-    			add_location(div, file$h, 730, 12, 24746);
+    			add_location(div, file$i, 730, 12, 24746);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -62513,7 +56027,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[3])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$h, 732, 16, 24836);
+    			add_location(img, file$i, 732, 16, 24836);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -62812,7 +56326,7 @@ var MultiRoomAudio = (function () {
     			if (if_block6) if_block6.c();
     			if_block6_anchor = empty();
     			attr_dev(div, "class", "item-title-row");
-    			add_location(div, file$h, 746, 14, 25276);
+    			add_location(div, file$i, 746, 14, 25276);
     		},
     		m: function mount(target, anchor) {
     			if (if_block0) if_block0.m(target, anchor);
@@ -63136,13 +56650,13 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (if_block0) if_block0.c();
     			t0 = space();
-    			t1 = text$1(t1_value);
+    			t1 = text(t1_value);
     			t2 = space();
     			if (title_slot) title_slot.c();
     			t3 = space();
     			if (if_block1) if_block1.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 794, 16, 27011);
+    			add_location(div, file$i, 794, 16, 27011);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -63268,11 +56782,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 796, 20, 27090);
+    			add_location(div, file$i, 796, 20, 27090);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -63342,11 +56856,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 804, 20, 27385);
+    			add_location(div, file$i, 804, 20, 27385);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -63433,7 +56947,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 813, 16, 27679);
+    			add_location(div, file$i, 813, 16, 27679);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -63587,8 +57101,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 816, 20, 27823);
+    			t = text(t_value);
+    			add_location(span, file$i, 816, 20, 27823);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -63621,7 +57135,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_7$1] },
+    				$$slots: { default: [create_default_slot_7] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -63671,13 +57185,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (820:20) <Badge color={badgeColor}>
-    function create_default_slot_7$1(ctx) {
+    function create_default_slot_7(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -63692,7 +57206,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_7$1.name,
+    		id: create_default_slot_7.name,
     		type: "slot",
     		source: "(820:20) <Badge color={badgeColor}>",
     		ctx
@@ -63772,11 +57286,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 741, 16, 25114);
+    			add_location(div, file$i, 741, 16, 25114);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -63846,11 +57360,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (title_slot) title_slot.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 749, 18, 25399);
+    			add_location(div, file$i, 749, 18, 25399);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -63937,7 +57451,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 756, 18, 25645);
+    			add_location(div, file$i, 756, 18, 25645);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -64091,8 +57605,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 759, 22, 25795);
+    			t = text(t_value);
+    			add_location(span, file$i, 759, 22, 25795);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -64125,7 +57639,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_6$2] },
+    				$$slots: { default: [create_default_slot_6$1] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -64175,13 +57689,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (763:22) <Badge color={badgeColor}>
-    function create_default_slot_6$2(ctx) {
+    function create_default_slot_6$1(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -64196,7 +57710,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_6$2.name,
+    		id: create_default_slot_6$1.name,
     		type: "slot",
     		source: "(763:22) <Badge color={badgeColor}>",
     		ctx
@@ -64218,11 +57732,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (subtitle_slot) subtitle_slot.c();
     			attr_dev(div, "class", "item-subtitle");
-    			add_location(div, file$h, 770, 16, 26213);
+    			add_location(div, file$i, 770, 16, 26213);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -64292,11 +57806,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			attr_dev(div, "class", "item-text");
-    			add_location(div, file$h, 776, 16, 26411);
+    			add_location(div, file$i, 776, 16, 26411);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -64424,11 +57938,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 786, 16, 26729);
+    			add_location(div, file$i, 786, 16, 26729);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -64633,11 +58147,11 @@ var MultiRoomAudio = (function () {
     			t6 = space();
     			if (content_end_slot) content_end_slot.c();
     			attr_dev(div0, "class", "item-inner");
-    			add_location(div0, file$h, 373, 14, 10913);
+    			add_location(div0, file$i, 373, 14, 10913);
     			attr_dev(div1, "class", /*contentClasses*/ ctx[41]);
-    			add_location(div1, file$h, 360, 12, 10412);
+    			add_location(div1, file$i, 360, 12, 10412);
     			set_attributes(a, a_data);
-    			add_location(a, file$h, 352, 10, 10181);
+    			add_location(a, file$i, 352, 10, 10181);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
@@ -64946,9 +58460,9 @@ var MultiRoomAudio = (function () {
     			t6 = space();
     			if (content_end_slot) content_end_slot.c();
     			attr_dev(div0, "class", "item-inner");
-    			add_location(div0, file$h, 613, 14, 20325);
+    			add_location(div0, file$i, 613, 14, 20325);
     			attr_dev(div1, "class", /*contentClasses*/ ctx[41]);
-    			add_location(div1, file$h, 600, 12, 19805);
+    			add_location(div1, file$i, 600, 12, 19805);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -65264,13 +58778,13 @@ var MultiRoomAudio = (function () {
     			input.disabled = /*disabled*/ ctx[23];
     			input.required = /*required*/ ctx[22];
     			attr_dev(input, "type", input_type_value = /*radio*/ ctx[18] ? 'radio' : 'checkbox');
-    			add_location(input, file$h, 481, 14, 15195);
+    			add_location(input, file$i, 481, 14, 15195);
     			attr_dev(i, "class", i_class_value = `icon icon-${/*radio*/ ctx[18] ? 'radio' : 'checkbox'}`);
-    			add_location(i, file$h, 492, 14, 15554);
+    			add_location(i, file$i, 492, 14, 15554);
     			attr_dev(div, "class", "item-inner");
-    			add_location(div, file$h, 501, 14, 15896);
+    			add_location(div, file$i, 501, 14, 15896);
     			attr_dev(label, "class", /*contentClasses*/ ctx[41]);
-    			add_location(label, file$h, 476, 12, 14943);
+    			add_location(label, file$i, 476, 12, 14943);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -65558,7 +59072,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$h, 603, 16, 19988);
+    			add_location(div, file$i, 603, 16, 19988);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -65595,7 +59109,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (media_slot) media_slot.c();
     			attr_dev(div, "class", "item-media");
-    			add_location(div, file$h, 606, 16, 20086);
+    			add_location(div, file$i, 606, 16, 20086);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -65673,7 +59187,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[3])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$h, 608, 20, 20184);
+    			add_location(img, file$i, 608, 20, 20184);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -65972,7 +59486,7 @@ var MultiRoomAudio = (function () {
     			if (if_block6) if_block6.c();
     			if_block6_anchor = empty();
     			attr_dev(div, "class", "item-title-row");
-    			add_location(div, file$h, 622, 18, 20680);
+    			add_location(div, file$i, 622, 18, 20680);
     		},
     		m: function mount(target, anchor) {
     			if (if_block0) if_block0.m(target, anchor);
@@ -66296,13 +59810,13 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (if_block0) if_block0.c();
     			t0 = space();
-    			t1 = text$1(t1_value);
+    			t1 = text(t1_value);
     			t2 = space();
     			if (title_slot) title_slot.c();
     			t3 = space();
     			if (if_block1) if_block1.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 670, 20, 22607);
+    			add_location(div, file$i, 670, 20, 22607);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -66428,11 +59942,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 672, 24, 22694);
+    			add_location(div, file$i, 672, 24, 22694);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -66502,11 +60016,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 680, 24, 23021);
+    			add_location(div, file$i, 680, 24, 23021);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -66593,7 +60107,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 689, 20, 23351);
+    			add_location(div, file$i, 689, 20, 23351);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -66747,8 +60261,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 692, 24, 23507);
+    			t = text(t_value);
+    			add_location(span, file$i, 692, 24, 23507);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -66837,7 +60351,7 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -66932,11 +60446,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 617, 20, 20498);
+    			add_location(div, file$i, 617, 20, 20498);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67006,11 +60520,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (title_slot) title_slot.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 625, 22, 20815);
+    			add_location(div, file$i, 625, 22, 20815);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67097,7 +60611,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 632, 22, 21089);
+    			add_location(div, file$i, 632, 22, 21089);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67251,8 +60765,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 635, 26, 21251);
+    			t = text(t_value);
+    			add_location(span, file$i, 635, 26, 21251);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -67341,7 +60855,7 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -67378,11 +60892,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (subtitle_slot) subtitle_slot.c();
     			attr_dev(div, "class", "item-subtitle");
-    			add_location(div, file$h, 646, 20, 21713);
+    			add_location(div, file$i, 646, 20, 21713);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67452,11 +60966,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			attr_dev(div, "class", "item-text");
-    			add_location(div, file$h, 652, 20, 21935);
+    			add_location(div, file$i, 652, 20, 21935);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67584,11 +61098,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 662, 20, 22293);
+    			add_location(div, file$i, 662, 20, 22293);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67653,7 +61167,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$h, 479, 16, 15128);
+    			add_location(div, file$i, 479, 16, 15128);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67690,7 +61204,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (media_slot) media_slot.c();
     			attr_dev(div, "class", "item-media");
-    			add_location(div, file$h, 494, 16, 15657);
+    			add_location(div, file$i, 494, 16, 15657);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -67768,7 +61282,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[3])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$h, 496, 20, 15755);
+    			add_location(img, file$i, 496, 20, 15755);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -68067,7 +61581,7 @@ var MultiRoomAudio = (function () {
     			if (if_block6) if_block6.c();
     			if_block6_anchor = empty();
     			attr_dev(div, "class", "item-title-row");
-    			add_location(div, file$h, 510, 18, 16251);
+    			add_location(div, file$i, 510, 18, 16251);
     		},
     		m: function mount(target, anchor) {
     			if (if_block0) if_block0.m(target, anchor);
@@ -68391,13 +61905,13 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (if_block0) if_block0.c();
     			t0 = space();
-    			t1 = text$1(t1_value);
+    			t1 = text(t1_value);
     			t2 = space();
     			if (title_slot) title_slot.c();
     			t3 = space();
     			if (if_block1) if_block1.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 558, 20, 18178);
+    			add_location(div, file$i, 558, 20, 18178);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -68523,11 +62037,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 560, 24, 18265);
+    			add_location(div, file$i, 560, 24, 18265);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -68597,11 +62111,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 568, 24, 18592);
+    			add_location(div, file$i, 568, 24, 18592);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -68688,7 +62202,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 577, 20, 18922);
+    			add_location(div, file$i, 577, 20, 18922);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -68842,8 +62356,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 580, 24, 19078);
+    			t = text(t_value);
+    			add_location(span, file$i, 580, 24, 19078);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -68932,7 +62446,7 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -69027,11 +62541,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 505, 20, 16069);
+    			add_location(div, file$i, 505, 20, 16069);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69101,11 +62615,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (title_slot) title_slot.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 513, 22, 16386);
+    			add_location(div, file$i, 513, 22, 16386);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69192,7 +62706,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 520, 22, 16660);
+    			add_location(div, file$i, 520, 22, 16660);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69346,8 +62860,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 523, 26, 16822);
+    			t = text(t_value);
+    			add_location(span, file$i, 523, 26, 16822);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -69380,7 +62894,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_2$4] },
+    				$$slots: { default: [create_default_slot_2$3] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -69430,13 +62944,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (527:26) <Badge color={badgeColor}>
-    function create_default_slot_2$4(ctx) {
+    function create_default_slot_2$3(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -69451,7 +62965,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_2$4.name,
+    		id: create_default_slot_2$3.name,
     		type: "slot",
     		source: "(527:26) <Badge color={badgeColor}>",
     		ctx
@@ -69473,11 +62987,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (subtitle_slot) subtitle_slot.c();
     			attr_dev(div, "class", "item-subtitle");
-    			add_location(div, file$h, 534, 20, 17284);
+    			add_location(div, file$i, 534, 20, 17284);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69547,11 +63061,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			attr_dev(div, "class", "item-text");
-    			add_location(div, file$h, 540, 20, 17506);
+    			add_location(div, file$i, 540, 20, 17506);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69679,11 +63193,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 550, 20, 17864);
+    			add_location(div, file$i, 550, 20, 17864);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69748,7 +63262,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$h, 363, 16, 10576);
+    			add_location(div, file$i, 363, 16, 10576);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69785,7 +63299,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (media_slot) media_slot.c();
     			attr_dev(div, "class", "item-media");
-    			add_location(div, file$h, 366, 16, 10674);
+    			add_location(div, file$i, 366, 16, 10674);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -69863,7 +63377,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			if (!src_url_equal(img.src, img_src_value = /*media*/ ctx[3])) attr_dev(img, "src", img_src_value);
-    			add_location(img, file$h, 368, 20, 10772);
+    			add_location(img, file$i, 368, 20, 10772);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -70162,7 +63676,7 @@ var MultiRoomAudio = (function () {
     			if (if_block6) if_block6.c();
     			if_block6_anchor = empty();
     			attr_dev(div, "class", "item-title-row");
-    			add_location(div, file$h, 382, 18, 11268);
+    			add_location(div, file$i, 382, 18, 11268);
     		},
     		m: function mount(target, anchor) {
     			if (if_block0) if_block0.m(target, anchor);
@@ -70486,13 +64000,13 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (if_block0) if_block0.c();
     			t0 = space();
-    			t1 = text$1(t1_value);
+    			t1 = text(t1_value);
     			t2 = space();
     			if (title_slot) title_slot.c();
     			t3 = space();
     			if (if_block1) if_block1.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 430, 20, 13195);
+    			add_location(div, file$i, 430, 20, 13195);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -70618,11 +64132,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 432, 24, 13282);
+    			add_location(div, file$i, 432, 24, 13282);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -70692,11 +64206,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 440, 24, 13609);
+    			add_location(div, file$i, 440, 24, 13609);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -70783,7 +64297,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 449, 20, 13939);
+    			add_location(div, file$i, 449, 20, 13939);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -70937,8 +64451,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 452, 24, 14095);
+    			t = text(t_value);
+    			add_location(span, file$i, 452, 24, 14095);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -70971,7 +64485,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_1$5] },
+    				$$slots: { default: [create_default_slot_1$4] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -71021,13 +64535,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (456:24) <Badge color={badgeColor}>
-    function create_default_slot_1$5(ctx) {
+    function create_default_slot_1$4(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -71042,7 +64556,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_1$5.name,
+    		id: create_default_slot_1$4.name,
     		type: "slot",
     		source: "(456:24) <Badge color={badgeColor}>",
     		ctx
@@ -71122,11 +64636,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (header_slot) header_slot.c();
     			attr_dev(div, "class", "item-header");
-    			add_location(div, file$h, 377, 20, 11086);
+    			add_location(div, file$i, 377, 20, 11086);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -71196,11 +64710,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (title_slot) title_slot.c();
     			attr_dev(div, "class", "item-title");
-    			add_location(div, file$h, 385, 22, 11403);
+    			add_location(div, file$i, 385, 22, 11403);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -71287,7 +64801,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (after_end_slot) after_end_slot.c();
     			attr_dev(div, "class", "item-after");
-    			add_location(div, file$h, 392, 22, 11677);
+    			add_location(div, file$i, 392, 22, 11677);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -71441,8 +64955,8 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
-    			add_location(span, file$h, 395, 26, 11839);
+    			t = text(t_value);
+    			add_location(span, file$i, 395, 26, 11839);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -71475,7 +64989,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot$a] },
+    				$$slots: { default: [create_default_slot$9] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -71525,13 +65039,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (399:26) <Badge color={badgeColor}>
-    function create_default_slot$a(ctx) {
+    function create_default_slot$9(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -71546,7 +65060,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$a.name,
+    		id: create_default_slot$9.name,
     		type: "slot",
     		source: "(399:26) <Badge color={badgeColor}>",
     		ctx
@@ -71568,11 +65082,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (subtitle_slot) subtitle_slot.c();
     			attr_dev(div, "class", "item-subtitle");
-    			add_location(div, file$h, 406, 20, 12301);
+    			add_location(div, file$i, 406, 20, 12301);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -71642,11 +65156,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (text_slot) text_slot.c();
     			attr_dev(div, "class", "item-text");
-    			add_location(div, file$h, 412, 20, 12523);
+    			add_location(div, file$i, 412, 20, 12523);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -71774,11 +65288,11 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			div = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (footer_slot) footer_slot.c();
     			attr_dev(div, "class", "item-footer");
-    			add_location(div, file$h, 422, 20, 12881);
+    			add_location(div, file$i, 422, 20, 12881);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -71836,14 +65350,14 @@ var MultiRoomAudio = (function () {
     }
 
     // (1079:4) {#if isSortable && sortable !== false && !isSortableOpposite}
-    function create_if_block_3$6(ctx) {
+    function create_if_block_3$4(ctx) {
     	let div;
 
     	const block = {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "sortable-handler");
-    			add_location(div, file$h, 1079, 6, 37024);
+    			add_location(div, file$i, 1079, 6, 37024);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -71855,7 +65369,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3$6.name,
+    		id: create_if_block_3$4.name,
     		type: "if",
     		source: "(1079:4) {#if isSortable && sortable !== false && !isSortableOpposite}",
     		ctx
@@ -71865,7 +65379,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (1082:4) {#if swipeout || accordionItem}
-    function create_if_block_2$7(ctx) {
+    function create_if_block_2$6(ctx) {
     	let current;
     	const default_slot_template = /*#slots*/ ctx[69].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[83], null);
@@ -71913,7 +65427,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$7.name,
+    		id: create_if_block_2$6.name,
     		type: "if",
     		source: "(1082:4) {#if swipeout || accordionItem}",
     		ctx
@@ -71929,7 +65443,7 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -71958,7 +65472,7 @@ var MultiRoomAudio = (function () {
     	let if_block;
     	let if_block_anchor;
     	let current;
-    	const if_block_creators = [create_if_block$b, create_if_block_1$8, create_else_block$6];
+    	const if_block_creators = [create_if_block$b, create_if_block_1$7, create_else_block$7];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -73255,7 +66769,7 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\list.svelte generated by Svelte v3.44.0 */
-    const file$g = "node_modules\\framework7-svelte\\esm\\svelte\\list.svelte";
+    const file$h = "node_modules\\framework7-svelte\\esm\\svelte\\list.svelte";
     const get_after_list_slot_changes_1 = dirty => ({});
     const get_after_list_slot_context_1 = ctx => ({});
     const get_list_slot_changes_1 = dirty => ({});
@@ -73280,7 +66794,7 @@ var MultiRoomAudio = (function () {
     	let current;
     	const before_list_slot_template = /*#slots*/ ctx[44]["before-list"];
     	const before_list_slot = create_slot(before_list_slot_template, ctx, /*$$scope*/ ctx[43], get_before_list_slot_context_1);
-    	const if_block_creators = [create_if_block_2$6, create_else_block_2$1];
+    	const if_block_creators = [create_if_block_2$5, create_else_block_2$1];
     	const if_blocks = [];
 
     	function select_block_type_2(ctx, dirty) {
@@ -73318,7 +66832,7 @@ var MultiRoomAudio = (function () {
     			t1 = space();
     			if (after_list_slot) after_list_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$g, 211, 2, 6024);
+    			add_location(div, file$h, 211, 2, 6024);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -73451,7 +66965,7 @@ var MultiRoomAudio = (function () {
     	let dispose;
     	const before_list_slot_template = /*#slots*/ ctx[44]["before-list"];
     	const before_list_slot = create_slot(before_list_slot_template, ctx, /*$$scope*/ ctx[43], get_before_list_slot_context);
-    	const if_block_creators = [create_if_block_1$7, create_else_block$5];
+    	const if_block_creators = [create_if_block_1$6, create_else_block$6];
     	const if_blocks = [];
 
     	function select_block_type_1(ctx, dirty) {
@@ -73489,7 +67003,7 @@ var MultiRoomAudio = (function () {
     			t1 = space();
     			if (after_list_slot) after_list_slot.c();
     			set_attributes(form_1, form_1_data);
-    			add_location(form_1, file$g, 190, 2, 5566);
+    			add_location(form_1, file$h, 190, 2, 5566);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, form_1, anchor);
@@ -73675,7 +67189,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (221:4) {#if hasUlSlots && ul}
-    function create_if_block_2$6(ctx) {
+    function create_if_block_2$5(ctx) {
     	let ul_1;
     	let t;
     	let current;
@@ -73690,7 +67204,7 @@ var MultiRoomAudio = (function () {
     			if (list_slot) list_slot.c();
     			t = space();
     			if (default_slot) default_slot.c();
-    			add_location(ul_1, file$g, 221, 6, 6305);
+    			add_location(ul_1, file$h, 221, 6, 6305);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, ul_1, anchor);
@@ -73758,7 +67272,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$6.name,
+    		id: create_if_block_2$5.name,
     		type: "if",
     		source: "(221:4) {#if hasUlSlots && ul}",
     		ctx
@@ -73768,7 +67282,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (206:4) {:else}
-    function create_else_block$5(ctx) {
+    function create_else_block$6(ctx) {
     	let current;
     	const default_slot_template = /*#slots*/ ctx[44].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[43], null);
@@ -73816,7 +67330,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$5.name,
+    		id: create_else_block$6.name,
     		type: "else",
     		source: "(206:4) {:else}",
     		ctx
@@ -73826,7 +67340,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (201:4) {#if hasUlSlots && ul}
-    function create_if_block_1$7(ctx) {
+    function create_if_block_1$6(ctx) {
     	let ul_1;
     	let t;
     	let current;
@@ -73841,7 +67355,7 @@ var MultiRoomAudio = (function () {
     			if (list_slot) list_slot.c();
     			t = space();
     			if (default_slot) default_slot.c();
-    			add_location(ul_1, file$g, 201, 6, 5873);
+    			add_location(ul_1, file$h, 201, 6, 5873);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, ul_1, anchor);
@@ -73909,7 +67423,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$7.name,
+    		id: create_if_block_1$6.name,
     		type: "if",
     		source: "(201:4) {#if hasUlSlots && ul}",
     		ctx
@@ -74765,7 +68279,7 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\nav-left.svelte generated by Svelte v3.44.0 */
-    const file$f = "node_modules\\framework7-svelte\\esm\\svelte\\nav-left.svelte";
+    const file$g = "node_modules\\framework7-svelte\\esm\\svelte\\nav-left.svelte";
 
     // (46:2) {#if backLink}
     function create_if_block$9(ctx) {
@@ -74847,7 +68361,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if (default_slot) default_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$f, 44, 0, 1102);
+    			add_location(div, file$g, 44, 0, 1102);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -75122,7 +68636,7 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\nav-right.svelte generated by Svelte v3.44.0 */
-    const file$e = "node_modules\\framework7-svelte\\esm\\svelte\\nav-right.svelte";
+    const file$f = "node_modules\\framework7-svelte\\esm\\svelte\\nav-right.svelte";
 
     function create_fragment$g(ctx) {
     	let div;
@@ -75141,7 +68655,7 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (default_slot) default_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$e, 20, 0, 385);
+    			add_location(div, file$f, 20, 0, 385);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -75278,16 +68792,16 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\nav-title.svelte generated by Svelte v3.44.0 */
-    const file$d = "node_modules\\framework7-svelte\\esm\\svelte\\nav-title.svelte";
+    const file$e = "node_modules\\framework7-svelte\\esm\\svelte\\nav-title.svelte";
 
     // (24:2) {#if typeof title !== 'undefined'}
-    function create_if_block_1$6(ctx) {
+    function create_if_block_1$5(ctx) {
     	let t_value = plainText(/*title*/ ctx[0]) + "";
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1(t_value);
+    			t = text(t_value);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -75302,7 +68816,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$6.name,
+    		id: create_if_block_1$5.name,
     		type: "if",
     		source: "(24:2) {#if typeof title !== 'undefined'}",
     		ctx
@@ -75320,9 +68834,9 @@ var MultiRoomAudio = (function () {
     	const block = {
     		c: function create() {
     			span = element("span");
-    			t = text$1(t_value);
+    			t = text(t_value);
     			attr_dev(span, "class", "subtitle");
-    			add_location(span, file$d, 24, 39, 612);
+    			add_location(span, file$e, 24, 39, 612);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -75352,7 +68866,7 @@ var MultiRoomAudio = (function () {
     	let t0;
     	let t1;
     	let current;
-    	let if_block0 = typeof /*title*/ ctx[0] !== 'undefined' && create_if_block_1$6(ctx);
+    	let if_block0 = typeof /*title*/ ctx[0] !== 'undefined' && create_if_block_1$5(ctx);
     	let if_block1 = typeof /*subtitle*/ ctx[1] !== 'undefined' && create_if_block$8(ctx);
     	const default_slot_template = /*#slots*/ ctx[7].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[6], null);
@@ -75372,7 +68886,7 @@ var MultiRoomAudio = (function () {
     			t1 = space();
     			if (default_slot) default_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$d, 22, 0, 463);
+    			add_location(div, file$e, 22, 0, 463);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -75395,7 +68909,7 @@ var MultiRoomAudio = (function () {
     				if (if_block0) {
     					if_block0.p(ctx, dirty);
     				} else {
-    					if_block0 = create_if_block_1$6(ctx);
+    					if_block0 = create_if_block_1$5(ctx);
     					if_block0.c();
     					if_block0.m(div, t0);
     				}
@@ -75572,7 +69086,7 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\navbar.svelte generated by Svelte v3.44.0 */
-    const file$c = "node_modules\\framework7-svelte\\esm\\svelte\\navbar.svelte";
+    const file$d = "node_modules\\framework7-svelte\\esm\\svelte\\navbar.svelte";
     const get_after_inner_slot_changes$1 = dirty => ({});
     const get_after_inner_slot_context$1 = ctx => ({});
     const get_title_large_slot_changes = dirty => ({});
@@ -75591,7 +69105,7 @@ var MultiRoomAudio = (function () {
     const get_before_inner_slot_context$1 = ctx => ({});
 
     // (197:4) {#if backLink || hasLeftSlots}
-    function create_if_block_3$5(ctx) {
+    function create_if_block_3$3(ctx) {
     	let navleft;
     	let current;
 
@@ -75602,7 +69116,7 @@ var MultiRoomAudio = (function () {
     				backLinkForce: /*backLinkForce*/ ctx[2],
     				backLinkShowText: /*backLinkShowText*/ ctx[3],
     				onBackClick: /*onBackClick*/ ctx[15],
-    				$$slots: { default: [create_default_slot_2$3] },
+    				$$slots: { default: [create_default_slot_2$2] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -75645,7 +69159,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3$5.name,
+    		id: create_if_block_3$3.name,
     		type: "if",
     		source: "(197:4) {#if backLink || hasLeftSlots}",
     		ctx
@@ -75655,7 +69169,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (198:6) <NavLeft {backLink} {backLinkUrl} {backLinkForce} {backLinkShowText} {onBackClick}>
-    function create_default_slot_2$3(ctx) {
+    function create_default_slot_2$2(ctx) {
     	let t;
     	let current;
     	const nav_left_slot_template = /*#slots*/ ctx[43]["nav-left"];
@@ -75733,7 +69247,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_2$3.name,
+    		id: create_default_slot_2$2.name,
     		type: "slot",
     		source: "(198:6) <NavLeft {backLink} {backLinkUrl} {backLinkForce} {backLinkShowText} {onBackClick}>",
     		ctx
@@ -75743,7 +69257,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (203:4) {#if title || subtitle || hasTitleSlots}
-    function create_if_block_2$5(ctx) {
+    function create_if_block_2$4(ctx) {
     	let navtitle;
     	let current;
 
@@ -75751,7 +69265,7 @@ var MultiRoomAudio = (function () {
     			props: {
     				title: /*title*/ ctx[4],
     				subtitle: /*subtitle*/ ctx[5],
-    				$$slots: { default: [create_default_slot_1$4] },
+    				$$slots: { default: [create_default_slot_1$3] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -75792,7 +69306,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$5.name,
+    		id: create_if_block_2$4.name,
     		type: "if",
     		source: "(203:4) {#if title || subtitle || hasTitleSlots}",
     		ctx
@@ -75802,7 +69316,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (204:6) <NavTitle {title} {subtitle}>
-    function create_default_slot_1$4(ctx) {
+    function create_default_slot_1$3(ctx) {
     	let current;
     	const title_slot_template = /*#slots*/ ctx[43].title;
     	const title_slot = create_slot(title_slot_template, ctx, /*$$scope*/ ctx[45], get_title_slot_context);
@@ -75850,7 +69364,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_1$4.name,
+    		id: create_default_slot_1$3.name,
     		type: "slot",
     		source: "(204:6) <NavTitle {title} {subtitle}>",
     		ctx
@@ -75860,13 +69374,13 @@ var MultiRoomAudio = (function () {
     }
 
     // (208:4) {#if hasRightSlots}
-    function create_if_block_1$5(ctx) {
+    function create_if_block_1$4(ctx) {
     	let navright;
     	let current;
 
     	navright = new Nav_right({
     			props: {
-    				$$slots: { default: [create_default_slot$9] },
+    				$$slots: { default: [create_default_slot$8] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -75905,7 +69419,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$5.name,
+    		id: create_if_block_1$4.name,
     		type: "if",
     		source: "(208:4) {#if hasRightSlots}",
     		ctx
@@ -75915,7 +69429,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (209:6) <NavRight>
-    function create_default_slot$9(ctx) {
+    function create_default_slot$8(ctx) {
     	let t;
     	let current;
     	const nav_right_slot_template = /*#slots*/ ctx[43]["nav-right"];
@@ -75993,7 +69507,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$9.name,
+    		id: create_default_slot$8.name,
     		type: "slot",
     		source: "(209:6) <NavRight>",
     		ctx
@@ -76017,13 +69531,13 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div1 = element("div");
     			div0 = element("div");
-    			t0 = text$1(t0_value);
+    			t0 = text(t0_value);
     			t1 = space();
     			if (title_large_slot) title_large_slot.c();
     			attr_dev(div0, "class", "title-large-text");
-    			add_location(div0, file$c, 215, 8, 6820);
+    			add_location(div0, file$d, 215, 8, 6820);
     			attr_dev(div1, "class", "title-large");
-    			add_location(div1, file$c, 214, 6, 6786);
+    			add_location(div1, file$d, 214, 6, 6786);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -76095,9 +69609,9 @@ var MultiRoomAudio = (function () {
     	let current;
     	const before_inner_slot_template = /*#slots*/ ctx[43]["before-inner"];
     	const before_inner_slot = create_slot(before_inner_slot_template, ctx, /*$$scope*/ ctx[45], get_before_inner_slot_context$1);
-    	let if_block0 = (/*backLink*/ ctx[0] || /*hasLeftSlots*/ ctx[14]) && create_if_block_3$5(ctx);
-    	let if_block1 = (/*title*/ ctx[4] || /*subtitle*/ ctx[5] || /*hasTitleSlots*/ ctx[12]) && create_if_block_2$5(ctx);
-    	let if_block2 = /*hasRightSlots*/ ctx[13] && create_if_block_1$5(ctx);
+    	let if_block0 = (/*backLink*/ ctx[0] || /*hasLeftSlots*/ ctx[14]) && create_if_block_3$3(ctx);
+    	let if_block1 = (/*title*/ ctx[4] || /*subtitle*/ ctx[5] || /*hasTitleSlots*/ ctx[12]) && create_if_block_2$4(ctx);
+    	let if_block2 = /*hasRightSlots*/ ctx[13] && create_if_block_1$4(ctx);
     	let if_block3 = (/*largeTitle*/ ctx[11] || /*hasTitleLargeSlots*/ ctx[10]) && create_if_block$7(ctx);
     	const default_slot_template = /*#slots*/ ctx[43].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[45], null);
@@ -76136,11 +69650,11 @@ var MultiRoomAudio = (function () {
     			t6 = space();
     			if (after_inner_slot) after_inner_slot.c();
     			attr_dev(div0, "class", "navbar-bg");
-    			add_location(div0, file$c, 193, 2, 6165);
+    			add_location(div0, file$d, 193, 2, 6165);
     			attr_dev(div1, "class", /*innerClasses*/ ctx[8]);
-    			add_location(div1, file$c, 195, 2, 6224);
+    			add_location(div1, file$d, 195, 2, 6224);
     			set_attributes(div2, div2_data);
-    			add_location(div2, file$c, 192, 0, 6076);
+    			add_location(div2, file$d, 192, 0, 6076);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -76202,7 +69716,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_3$5(ctx);
+    					if_block0 = create_if_block_3$3(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(div1, t2);
@@ -76225,7 +69739,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block1, 1);
     					}
     				} else {
-    					if_block1 = create_if_block_2$5(ctx);
+    					if_block1 = create_if_block_2$4(ctx);
     					if_block1.c();
     					transition_in(if_block1, 1);
     					if_block1.m(div1, t3);
@@ -76248,7 +69762,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block2, 1);
     					}
     				} else {
-    					if_block2 = create_if_block_1$5(ctx);
+    					if_block2 = create_if_block_1$4(ctx);
     					if_block2.c();
     					transition_in(if_block2, 1);
     					if_block2.m(div1, t4);
@@ -77024,10 +70538,10 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\page-content.svelte generated by Svelte v3.44.0 */
-    const file$b = "node_modules\\framework7-svelte\\esm\\svelte\\page-content.svelte";
+    const file$c = "node_modules\\framework7-svelte\\esm\\svelte\\page-content.svelte";
 
     // (125:2) {#if ptr && ptrPreloader && !ptrBottom}
-    function create_if_block_3$4(ctx) {
+    function create_if_block_3$2(ctx) {
     	let div1;
     	let preloader;
     	let t;
@@ -77042,9 +70556,9 @@ var MultiRoomAudio = (function () {
     			t = space();
     			div0 = element("div");
     			attr_dev(div0, "class", "ptr-arrow");
-    			add_location(div0, file$b, 127, 6, 3529);
+    			add_location(div0, file$c, 127, 6, 3529);
     			attr_dev(div1, "class", "ptr-preloader");
-    			add_location(div1, file$b, 125, 4, 3475);
+    			add_location(div1, file$c, 125, 4, 3475);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -77070,7 +70584,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3$4.name,
+    		id: create_if_block_3$2.name,
     		type: "if",
     		source: "(125:2) {#if ptr && ptrPreloader && !ptrBottom}",
     		ctx
@@ -77080,7 +70594,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (131:2) {#if infinite && infiniteTop && infinitePreloader}
-    function create_if_block_2$4(ctx) {
+    function create_if_block_2$3(ctx) {
     	let preloader;
     	let current;
 
@@ -77113,7 +70627,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2$4.name,
+    		id: create_if_block_2$3.name,
     		type: "if",
     		source: "(131:2) {#if infinite && infiniteTop && infinitePreloader}",
     		ctx
@@ -77123,7 +70637,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (135:2) {#if infinite && !infiniteTop && infinitePreloader}
-    function create_if_block_1$4(ctx) {
+    function create_if_block_1$3(ctx) {
     	let preloader;
     	let current;
 
@@ -77156,7 +70670,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$4.name,
+    		id: create_if_block_1$3.name,
     		type: "if",
     		source: "(135:2) {#if infinite && !infiniteTop && infinitePreloader}",
     		ctx
@@ -77181,9 +70695,9 @@ var MultiRoomAudio = (function () {
     			t = space();
     			div0 = element("div");
     			attr_dev(div0, "class", "ptr-arrow");
-    			add_location(div0, file$b, 140, 6, 3911);
+    			add_location(div0, file$c, 140, 6, 3911);
     			attr_dev(div1, "class", "ptr-preloader");
-    			add_location(div1, file$b, 138, 4, 3857);
+    			add_location(div1, file$c, 138, 4, 3857);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -77227,11 +70741,11 @@ var MultiRoomAudio = (function () {
     	let div_data_ptr_mousewheel_value;
     	let div_data_infinite_distance_value;
     	let current;
-    	let if_block0 = /*ptr*/ ctx[0] && /*ptrPreloader*/ ctx[2] && !/*ptrBottom*/ ctx[3] && create_if_block_3$4(ctx);
-    	let if_block1 = /*infinite*/ ctx[5] && /*infiniteTop*/ ctx[6] && /*infinitePreloader*/ ctx[8] && create_if_block_2$4(ctx);
+    	let if_block0 = /*ptr*/ ctx[0] && /*ptrPreloader*/ ctx[2] && !/*ptrBottom*/ ctx[3] && create_if_block_3$2(ctx);
+    	let if_block1 = /*infinite*/ ctx[5] && /*infiniteTop*/ ctx[6] && /*infinitePreloader*/ ctx[8] && create_if_block_2$3(ctx);
     	const default_slot_template = /*#slots*/ ctx[21].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[20], null);
-    	let if_block2 = /*infinite*/ ctx[5] && !/*infiniteTop*/ ctx[6] && /*infinitePreloader*/ ctx[8] && create_if_block_1$4(ctx);
+    	let if_block2 = /*infinite*/ ctx[5] && !/*infiniteTop*/ ctx[6] && /*infinitePreloader*/ ctx[8] && create_if_block_1$3(ctx);
     	let if_block3 = /*ptr*/ ctx[0] && /*ptrPreloader*/ ctx[2] && /*ptrBottom*/ ctx[3] && create_if_block$6(ctx);
 
     	let div_levels = [
@@ -77267,7 +70781,7 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (if_block3) if_block3.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$b, 116, 0, 3193);
+    			add_location(div, file$c, 116, 0, 3193);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -77297,7 +70811,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block0, 1);
     					}
     				} else {
-    					if_block0 = create_if_block_3$4(ctx);
+    					if_block0 = create_if_block_3$2(ctx);
     					if_block0.c();
     					transition_in(if_block0, 1);
     					if_block0.m(div, t0);
@@ -77318,7 +70832,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block1, 1);
     					}
     				} else {
-    					if_block1 = create_if_block_2$4(ctx);
+    					if_block1 = create_if_block_2$3(ctx);
     					if_block1.c();
     					transition_in(if_block1, 1);
     					if_block1.m(div, t1);
@@ -77354,7 +70868,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block2, 1);
     					}
     				} else {
-    					if_block2 = create_if_block_1$4(ctx);
+    					if_block2 = create_if_block_1$3(ctx);
     					if_block2.c();
     					transition_in(if_block2, 1);
     					if_block2.m(div, t3);
@@ -77873,7 +71387,7 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\page.svelte generated by Svelte v3.44.0 */
-    const file$a = "node_modules\\framework7-svelte\\esm\\svelte\\page.svelte";
+    const file$b = "node_modules\\framework7-svelte\\esm\\svelte\\page.svelte";
     const get_static_slot_changes_1 = dirty => ({});
     const get_static_slot_context_1 = ctx => ({});
     const get_static_slot_changes = dirty => ({});
@@ -77882,7 +71396,7 @@ var MultiRoomAudio = (function () {
     const get_fixed_slot_context = ctx => ({});
 
     // (342:2) {:else}
-    function create_else_block$4(ctx) {
+    function create_else_block$5(ctx) {
     	let t;
     	let current;
     	const static_slot_template = /*#slots*/ ctx[46].static;
@@ -77960,7 +71474,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$4.name,
+    		id: create_else_block$5.name,
     		type: "else",
     		source: "(342:2) {:else}",
     		ctx
@@ -77996,7 +71510,7 @@ var MultiRoomAudio = (function () {
     				onPtrRefresh: /*onPtrRefresh*/ ctx[21],
     				onPtrDone: /*onPtrDone*/ ctx[22],
     				onInfinite: /*onInfinite*/ ctx[23],
-    				$$slots: { default: [create_default_slot$8] },
+    				$$slots: { default: [create_default_slot$7] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -78059,7 +71573,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (317:4) <PageContent       {ptr}       {ptrDistance}       {ptrPreloader}       {ptrBottom}       {ptrMousewheel}       {infinite}       {infiniteTop}       {infiniteDistance}       {infinitePreloader}       {hideBarsOnScroll}       {hideNavbarOnScroll}       {hideToolbarOnScroll}       {messagesContent}       {loginScreen}       {onPtrPullStart}       {onPtrPullMove}       {onPtrPullEnd}       {onPtrRefresh}       {onPtrDone}       {onInfinite}     >
-    function create_default_slot$8(ctx) {
+    function create_default_slot$7(ctx) {
     	let t;
     	let current;
     	const static_slot_template = /*#slots*/ ctx[46].static;
@@ -78137,7 +71651,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$8.name,
+    		id: create_default_slot$7.name,
     		type: "slot",
     		source: "(317:4) <PageContent       {ptr}       {ptrDistance}       {ptrPreloader}       {ptrBottom}       {ptrMousewheel}       {infinite}       {infiniteTop}       {infiniteDistance}       {infinitePreloader}       {hideBarsOnScroll}       {hideNavbarOnScroll}       {hideToolbarOnScroll}       {messagesContent}       {loginScreen}       {onPtrPullStart}       {onPtrPullMove}       {onPtrPullEnd}       {onPtrRefresh}       {onPtrDone}       {onInfinite}     >",
     		ctx
@@ -78154,7 +71668,7 @@ var MultiRoomAudio = (function () {
     	let current;
     	const fixed_slot_template = /*#slots*/ ctx[46].fixed;
     	const fixed_slot = create_slot(fixed_slot_template, ctx, /*$$scope*/ ctx[48], get_fixed_slot_context);
-    	const if_block_creators = [create_if_block$5, create_else_block$4];
+    	const if_block_creators = [create_if_block$5, create_else_block$5];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -78184,7 +71698,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			if_block.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$a, 313, 0, 9751);
+    			add_location(div, file$b, 313, 0, 9751);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -79109,7 +72623,7 @@ var MultiRoomAudio = (function () {
     }
 
     /* node_modules\framework7-svelte\esm\svelte\popup.svelte generated by Svelte v3.44.0 */
-    const file$9 = "node_modules\\framework7-svelte\\esm\\svelte\\popup.svelte";
+    const file$a = "node_modules\\framework7-svelte\\esm\\svelte\\popup.svelte";
     const get_default_slot_changes$1 = dirty => ({ popup: dirty[0] & /*f7Popup*/ 2 });
     const get_default_slot_context$1 = ctx => ({ popup: /*f7Popup*/ ctx[1] });
 
@@ -79130,7 +72644,7 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (default_slot) default_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$9, 137, 0, 3622);
+    			add_location(div, file$a, 137, 0, 3622);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -79586,9 +73100,213 @@ var MultiRoomAudio = (function () {
     	}
     }
 
-    /* node_modules\framework7-svelte\esm\svelte\router-context-provider.svelte generated by Svelte v3.44.0 */
+    /* node_modules\framework7-svelte\esm\svelte\progressbar.svelte generated by Svelte v3.44.0 */
+    const file$9 = "node_modules\\framework7-svelte\\esm\\svelte\\progressbar.svelte";
 
     function create_fragment$a(ctx) {
+    	let span1;
+    	let span0;
+
+    	let span1_levels = [
+    		{ class: /*classes*/ ctx[3] },
+    		{ "data-progress": /*progress*/ ctx[0] },
+    		restProps(/*$$restProps*/ ctx[4])
+    	];
+
+    	let span1_data = {};
+
+    	for (let i = 0; i < span1_levels.length; i += 1) {
+    		span1_data = assign(span1_data, span1_levels[i]);
+    	}
+
+    	const block = {
+    		c: function create() {
+    			span1 = element("span");
+    			span0 = element("span");
+    			attr_dev(span0, "style", /*transformStyle*/ ctx[2]);
+    			add_location(span0, file$9, 35, 2, 884);
+    			set_attributes(span1, span1_data);
+    			add_location(span1, file$9, 34, 0, 791);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, span1, anchor);
+    			append_dev(span1, span0);
+    			/*span1_binding*/ ctx[8](span1);
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*transformStyle*/ 4) {
+    				attr_dev(span0, "style", /*transformStyle*/ ctx[2]);
+    			}
+
+    			set_attributes(span1, span1_data = get_spread_update(span1_levels, [
+    				dirty & /*classes*/ 8 && { class: /*classes*/ ctx[3] },
+    				dirty & /*progress*/ 1 && { "data-progress": /*progress*/ ctx[0] },
+    				dirty & /*$$restProps*/ 16 && restProps(/*$$restProps*/ ctx[4])
+    			]));
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(span1);
+    			/*span1_binding*/ ctx[8](null);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$a.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$9($$self, $$props, $$invalidate) {
+    	let classes;
+    	let transformStyle;
+    	const omit_props_names = ["class","progress","infinite","set"];
+    	let $$restProps = compute_rest_props($$props, omit_props_names);
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('Progressbar', slots, []);
+    	let { class: className = undefined } = $$props;
+    	let { progress = 0 } = $$props;
+    	let { infinite = false } = $$props;
+    	let el;
+
+    	function set(progress, speed) {
+    		if (!app$1.f7) return;
+    		app$1.f7.progressbar.set(el, progress, speed);
+    	}
+
+    	function span1_binding($$value) {
+    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+    			el = $$value;
+    			$$invalidate(1, el);
+    		});
+    	}
+
+    	$$self.$$set = $$new_props => {
+    		$$invalidate(9, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
+    		$$invalidate(4, $$restProps = compute_rest_props($$props, omit_props_names));
+    		if ('class' in $$new_props) $$invalidate(5, className = $$new_props.class);
+    		if ('progress' in $$new_props) $$invalidate(0, progress = $$new_props.progress);
+    		if ('infinite' in $$new_props) $$invalidate(6, infinite = $$new_props.infinite);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		colorClasses,
+    		classNames,
+    		restProps,
+    		app: app$1,
+    		className,
+    		progress,
+    		infinite,
+    		el,
+    		set,
+    		transformStyle,
+    		classes
+    	});
+
+    	$$self.$inject_state = $$new_props => {
+    		$$invalidate(9, $$props = assign(assign({}, $$props), $$new_props));
+    		if ('className' in $$props) $$invalidate(5, className = $$new_props.className);
+    		if ('progress' in $$props) $$invalidate(0, progress = $$new_props.progress);
+    		if ('infinite' in $$props) $$invalidate(6, infinite = $$new_props.infinite);
+    		if ('el' in $$props) $$invalidate(1, el = $$new_props.el);
+    		if ('transformStyle' in $$props) $$invalidate(2, transformStyle = $$new_props.transformStyle);
+    		if ('classes' in $$props) $$invalidate(3, classes = $$new_props.classes);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		$$invalidate(3, classes = classNames(className, 'progressbar', { 'progressbar-infinite': infinite }, colorClasses($$props)));
+
+    		if ($$self.$$.dirty & /*progress*/ 1) {
+    			$$invalidate(2, transformStyle = {
+    				transform: progress ? `translate3d(${-100 + progress}%, 0, 0)` : '',
+    				WebkitTransform: progress ? `translate3d(${-100 + progress}%, 0, 0)` : ''
+    			});
+    		}
+    	};
+
+    	$$props = exclude_internal_props($$props);
+
+    	return [
+    		progress,
+    		el,
+    		transformStyle,
+    		classes,
+    		$$restProps,
+    		className,
+    		infinite,
+    		set,
+    		span1_binding
+    	];
+    }
+
+    class Progressbar extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(this, options, instance$9, create_fragment$a, safe_not_equal, {
+    			class: 5,
+    			progress: 0,
+    			infinite: 6,
+    			set: 7
+    		});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Progressbar",
+    			options,
+    			id: create_fragment$a.name
+    		});
+    	}
+
+    	get class() {
+    		throw new Error("<Progressbar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set class(value) {
+    		throw new Error("<Progressbar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get progress() {
+    		throw new Error("<Progressbar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set progress(value) {
+    		throw new Error("<Progressbar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get infinite() {
+    		throw new Error("<Progressbar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set infinite(value) {
+    		throw new Error("<Progressbar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get set() {
+    		return this.$$.ctx[7];
+    	}
+
+    	set set(value) {
+    		throw new Error("<Progressbar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* node_modules\framework7-svelte\esm\svelte\router-context-provider.svelte generated by Svelte v3.44.0 */
+
+    function create_fragment$9(ctx) {
     	let current;
     	const default_slot_template = /*#slots*/ ctx[3].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[2], null);
@@ -79639,7 +73357,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$a.name,
+    		id: create_fragment$9.name,
     		type: "component",
     		source: "",
     		ctx
@@ -79648,7 +73366,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$9($$self, $$props, $$invalidate) {
+    function instance$8($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Router_context_provider', slots, ['default']);
     	let { route = undefined } = $$props;
@@ -79683,13 +73401,13 @@ var MultiRoomAudio = (function () {
     class Router_context_provider extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$9, create_fragment$a, safe_not_equal, { route: 0, router: 1 });
+    		init(this, options, instance$8, create_fragment$9, safe_not_equal, { route: 0, router: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Router_context_provider",
     			options,
-    			id: create_fragment$a.name
+    			id: create_fragment$9.name
     		});
     	}
 
@@ -79710,607 +73428,15 @@ var MultiRoomAudio = (function () {
     	}
     }
 
-    /* node_modules\framework7-svelte\esm\svelte\row.svelte generated by Svelte v3.44.0 */
-    const file$8 = "node_modules\\framework7-svelte\\esm\\svelte\\row.svelte";
-
-    // (58:22) 
-    function create_if_block_2$3(ctx) {
-    	let p;
-    	let t;
-    	let current;
-    	let mounted;
-    	let dispose;
-    	const default_slot_template = /*#slots*/ ctx[12].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[11], null);
-    	let if_block = /*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2] && create_if_block_3$3(ctx);
-    	let p_levels = [{ class: /*classes*/ ctx[4] }, restProps(/*$$restProps*/ ctx[6])];
-    	let p_data = {};
-
-    	for (let i = 0; i < p_levels.length; i += 1) {
-    		p_data = assign(p_data, p_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			p = element("p");
-    			if (default_slot) default_slot.c();
-    			t = space();
-    			if (if_block) if_block.c();
-    			set_attributes(p, p_data);
-    			add_location(p, file$8, 58, 2, 1423);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, p, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(p, null);
-    			}
-
-    			append_dev(p, t);
-    			if (if_block) if_block.m(p, null);
-    			/*p_binding*/ ctx[14](p);
-    			current = true;
-
-    			if (!mounted) {
-    				dispose = listen_dev(p, "click", /*onClick*/ ctx[5], false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 2048)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[11],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[11])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[11], dirty, null),
-    						null
-    					);
-    				}
-    			}
-
-    			if (/*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2]) {
-    				if (if_block) ; else {
-    					if_block = create_if_block_3$3(ctx);
-    					if_block.c();
-    					if_block.m(p, null);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
-
-    			set_attributes(p, p_data = get_spread_update(p_levels, [
-    				(!current || dirty & /*classes*/ 16) && { class: /*classes*/ ctx[4] },
-    				dirty & /*$$restProps*/ 64 && restProps(/*$$restProps*/ ctx[6])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(p);
-    			if (default_slot) default_slot.d(detaching);
-    			if (if_block) if_block.d();
-    			/*p_binding*/ ctx[14](null);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_2$3.name,
-    		type: "if",
-    		source: "(58:22) ",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (53:0) {#if tag === 'div'}
-    function create_if_block$4(ctx) {
-    	let div;
-    	let t;
-    	let current;
-    	let mounted;
-    	let dispose;
-    	const default_slot_template = /*#slots*/ ctx[12].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[11], null);
-    	let if_block = /*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2] && create_if_block_1$3(ctx);
-    	let div_levels = [{ class: /*classes*/ ctx[4] }, restProps(/*$$restProps*/ ctx[6])];
-    	let div_data = {};
-
-    	for (let i = 0; i < div_levels.length; i += 1) {
-    		div_data = assign(div_data, div_levels[i]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (default_slot) default_slot.c();
-    			t = space();
-    			if (if_block) if_block.c();
-    			set_attributes(div, div_data);
-    			add_location(div, file$8, 53, 2, 1216);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(div, null);
-    			}
-
-    			append_dev(div, t);
-    			if (if_block) if_block.m(div, null);
-    			/*div_binding*/ ctx[13](div);
-    			current = true;
-
-    			if (!mounted) {
-    				dispose = listen_dev(div, "click", /*onClick*/ ctx[5], false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 2048)) {
-    					update_slot_base(
-    						default_slot,
-    						default_slot_template,
-    						ctx,
-    						/*$$scope*/ ctx[11],
-    						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[11])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[11], dirty, null),
-    						null
-    					);
-    				}
-    			}
-
-    			if (/*resizable*/ ctx[1] && /*resizableHandler*/ ctx[2]) {
-    				if (if_block) ; else {
-    					if_block = create_if_block_1$3(ctx);
-    					if_block.c();
-    					if_block.m(div, null);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
-
-    			set_attributes(div, div_data = get_spread_update(div_levels, [
-    				(!current || dirty & /*classes*/ 16) && { class: /*classes*/ ctx[4] },
-    				dirty & /*$$restProps*/ 64 && restProps(/*$$restProps*/ ctx[6])
-    			]));
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (default_slot) default_slot.d(detaching);
-    			if (if_block) if_block.d();
-    			/*div_binding*/ ctx[13](null);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block$4.name,
-    		type: "if",
-    		source: "(53:0) {#if tag === 'div'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (61:4) {#if resizable && resizableHandler}
-    function create_if_block_3$3(ctx) {
-    	let span;
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			attr_dev(span, "class", "resize-handler");
-    			add_location(span, file$8, 60, 39, 1557);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_3$3.name,
-    		type: "if",
-    		source: "(61:4) {#if resizable && resizableHandler}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (56:4) {#if resizable && resizableHandler}
-    function create_if_block_1$3(ctx) {
-    	let span;
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			attr_dev(span, "class", "resize-handler");
-    			add_location(span, file$8, 55, 39, 1352);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_1$3.name,
-    		type: "if",
-    		source: "(56:4) {#if resizable && resizableHandler}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function create_fragment$9(ctx) {
-    	let current_block_type_index;
-    	let if_block;
-    	let if_block_anchor;
-    	let current;
-    	const if_block_creators = [create_if_block$4, create_if_block_2$3];
-    	const if_blocks = [];
-
-    	function select_block_type(ctx, dirty) {
-    		if (/*tag*/ ctx[0] === 'div') return 0;
-    		if (/*tag*/ ctx[0] === 'p') return 1;
-    		return -1;
-    	}
-
-    	if (~(current_block_type_index = select_block_type(ctx))) {
-    		if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			if (if_block) if_block.c();
-    			if_block_anchor = empty();
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			if (~current_block_type_index) {
-    				if_blocks[current_block_type_index].m(target, anchor);
-    			}
-
-    			insert_dev(target, if_block_anchor, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, [dirty]) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type(ctx);
-
-    			if (current_block_type_index === previous_block_index) {
-    				if (~current_block_type_index) {
-    					if_blocks[current_block_type_index].p(ctx, dirty);
-    				}
-    			} else {
-    				if (if_block) {
-    					group_outros();
-
-    					transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    						if_blocks[previous_block_index] = null;
-    					});
-
-    					check_outros();
-    				}
-
-    				if (~current_block_type_index) {
-    					if_block = if_blocks[current_block_type_index];
-
-    					if (!if_block) {
-    						if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    						if_block.c();
-    					} else {
-    						if_block.p(ctx, dirty);
-    					}
-
-    					transition_in(if_block, 1);
-    					if_block.m(if_block_anchor.parentNode, if_block_anchor);
-    				} else {
-    					if_block = null;
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(if_block);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(if_block);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (~current_block_type_index) {
-    				if_blocks[current_block_type_index].d(detaching);
-    			}
-
-    			if (detaching) detach_dev(if_block_anchor);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$9.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$8($$self, $$props, $$invalidate) {
-    	let classes;
-
-    	const omit_props_names = [
-    		"class","noGap","tag","resizable","resizableFixed","resizableAbsolute","resizableHandler"
-    	];
-
-    	let $$restProps = compute_rest_props($$props, omit_props_names);
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('Row', slots, ['default']);
-    	const emit = createEmitter(createEventDispatcher, $$props);
-    	let { class: className = undefined } = $$props;
-    	let { noGap = false } = $$props;
-    	let { tag = 'div' } = $$props;
-    	let { resizable = false } = $$props;
-    	let { resizableFixed = false } = $$props;
-    	let { resizableAbsolute = false } = $$props;
-    	let { resizableHandler = true } = $$props;
-    	let el;
-
-    	function onClick() {
-    		emit('click');
-    	}
-
-    	function onResize(targetEl) {
-    		if (el !== targetEl) return;
-    		emit('gridResize');
-    	}
-
-    	onMount(() => {
-    		f7ready(() => {
-    			app$1.f7.on('gridResize', onResize);
-    		});
-    	});
-
-    	onDestroy(() => {
-    		if (!app$1.f7) return;
-    		app$1.f7.off('gridResize', onResize);
-    	});
-
-    	function div_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			el = $$value;
-    			$$invalidate(3, el);
-    		});
-    	}
-
-    	function p_binding($$value) {
-    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-    			el = $$value;
-    			$$invalidate(3, el);
-    		});
-    	}
-
-    	$$self.$$set = $$new_props => {
-    		$$invalidate(17, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
-    		$$invalidate(6, $$restProps = compute_rest_props($$props, omit_props_names));
-    		if ('class' in $$new_props) $$invalidate(7, className = $$new_props.class);
-    		if ('noGap' in $$new_props) $$invalidate(8, noGap = $$new_props.noGap);
-    		if ('tag' in $$new_props) $$invalidate(0, tag = $$new_props.tag);
-    		if ('resizable' in $$new_props) $$invalidate(1, resizable = $$new_props.resizable);
-    		if ('resizableFixed' in $$new_props) $$invalidate(9, resizableFixed = $$new_props.resizableFixed);
-    		if ('resizableAbsolute' in $$new_props) $$invalidate(10, resizableAbsolute = $$new_props.resizableAbsolute);
-    		if ('resizableHandler' in $$new_props) $$invalidate(2, resizableHandler = $$new_props.resizableHandler);
-    		if ('$$scope' in $$new_props) $$invalidate(11, $$scope = $$new_props.$$scope);
-    	};
-
-    	$$self.$capture_state = () => ({
-    		createEventDispatcher,
-    		onMount,
-    		onDestroy,
-    		colorClasses,
-    		classNames,
-    		createEmitter,
-    		restProps,
-    		app: app$1,
-    		f7ready,
-    		emit,
-    		className,
-    		noGap,
-    		tag,
-    		resizable,
-    		resizableFixed,
-    		resizableAbsolute,
-    		resizableHandler,
-    		el,
-    		onClick,
-    		onResize,
-    		classes
-    	});
-
-    	$$self.$inject_state = $$new_props => {
-    		$$invalidate(17, $$props = assign(assign({}, $$props), $$new_props));
-    		if ('className' in $$props) $$invalidate(7, className = $$new_props.className);
-    		if ('noGap' in $$props) $$invalidate(8, noGap = $$new_props.noGap);
-    		if ('tag' in $$props) $$invalidate(0, tag = $$new_props.tag);
-    		if ('resizable' in $$props) $$invalidate(1, resizable = $$new_props.resizable);
-    		if ('resizableFixed' in $$props) $$invalidate(9, resizableFixed = $$new_props.resizableFixed);
-    		if ('resizableAbsolute' in $$props) $$invalidate(10, resizableAbsolute = $$new_props.resizableAbsolute);
-    		if ('resizableHandler' in $$props) $$invalidate(2, resizableHandler = $$new_props.resizableHandler);
-    		if ('el' in $$props) $$invalidate(3, el = $$new_props.el);
-    		if ('classes' in $$props) $$invalidate(4, classes = $$new_props.classes);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	$$self.$$.update = () => {
-    		$$invalidate(4, classes = classNames(
-    			className,
-    			'row',
-    			{
-    				'no-gap': noGap,
-    				resizable,
-    				'resizable-fixed': resizableFixed,
-    				'resizable-absolute': resizableAbsolute
-    			},
-    			colorClasses($$props)
-    		));
-    	};
-
-    	$$props = exclude_internal_props($$props);
-
-    	return [
-    		tag,
-    		resizable,
-    		resizableHandler,
-    		el,
-    		classes,
-    		onClick,
-    		$$restProps,
-    		className,
-    		noGap,
-    		resizableFixed,
-    		resizableAbsolute,
-    		$$scope,
-    		slots,
-    		div_binding,
-    		p_binding
-    	];
-    }
-
-    class Row extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-
-    		init(this, options, instance$8, create_fragment$9, safe_not_equal, {
-    			class: 7,
-    			noGap: 8,
-    			tag: 0,
-    			resizable: 1,
-    			resizableFixed: 9,
-    			resizableAbsolute: 10,
-    			resizableHandler: 2
-    		});
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "Row",
-    			options,
-    			id: create_fragment$9.name
-    		});
-    	}
-
-    	get class() {
-    		throw new Error("<Row>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set class(value) {
-    		throw new Error("<Row>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get noGap() {
-    		throw new Error("<Row>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set noGap(value) {
-    		throw new Error("<Row>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get tag() {
-    		throw new Error("<Row>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set tag(value) {
-    		throw new Error("<Row>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizable() {
-    		throw new Error("<Row>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizable(value) {
-    		throw new Error("<Row>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizableFixed() {
-    		throw new Error("<Row>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizableFixed(value) {
-    		throw new Error("<Row>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizableAbsolute() {
-    		throw new Error("<Row>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizableAbsolute(value) {
-    		throw new Error("<Row>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get resizableHandler() {
-    		throw new Error("<Row>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set resizableHandler(value) {
-    		throw new Error("<Row>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
-
     /* node_modules\framework7-svelte\esm\svelte\toolbar.svelte generated by Svelte v3.44.0 */
-    const file$7 = "node_modules\\framework7-svelte\\esm\\svelte\\toolbar.svelte";
+    const file$8 = "node_modules\\framework7-svelte\\esm\\svelte\\toolbar.svelte";
     const get_after_inner_slot_changes = dirty => ({});
     const get_after_inner_slot_context = ctx => ({});
     const get_before_inner_slot_changes = dirty => ({});
     const get_before_inner_slot_context = ctx => ({});
 
     // (106:2) {:else}
-    function create_else_block$3(ctx) {
+    function create_else_block$4(ctx) {
     	let current;
     	const default_slot_template = /*#slots*/ ctx[24].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[23], null);
@@ -80358,7 +73484,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$3.name,
+    		id: create_else_block$4.name,
     		type: "else",
     		source: "(106:2) {:else}",
     		ctx
@@ -80368,7 +73494,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (102:2) {#if inner}
-    function create_if_block$3(ctx) {
+    function create_if_block$4(ctx) {
     	let div;
     	let current;
     	const default_slot_template = /*#slots*/ ctx[24].default;
@@ -80379,7 +73505,7 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if (default_slot) default_slot.c();
     			attr_dev(div, "class", "toolbar-inner");
-    			add_location(div, file$7, 102, 4, 2741);
+    			add_location(div, file$8, 102, 4, 2741);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -80423,7 +73549,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$3.name,
+    		id: create_if_block$4.name,
     		type: "if",
     		source: "(102:2) {#if inner}",
     		ctx
@@ -80441,7 +73567,7 @@ var MultiRoomAudio = (function () {
     	let current;
     	const before_inner_slot_template = /*#slots*/ ctx[24]["before-inner"];
     	const before_inner_slot = create_slot(before_inner_slot_template, ctx, /*$$scope*/ ctx[23], get_before_inner_slot_context);
-    	const if_block_creators = [create_if_block$3, create_else_block$3];
+    	const if_block_creators = [create_if_block$4, create_else_block$4];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -80475,7 +73601,7 @@ var MultiRoomAudio = (function () {
     			t1 = space();
     			if (after_inner_slot) after_inner_slot.c();
     			set_attributes(div, div_data);
-    			add_location(div, file$7, 99, 0, 2605);
+    			add_location(div, file$8, 99, 0, 2605);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -81041,9 +74167,9 @@ var MultiRoomAudio = (function () {
     };
 
     /* node_modules\framework7-svelte\esm\svelte\view.svelte generated by Svelte v3.44.0 */
-    const file$6 = "node_modules\\framework7-svelte\\esm\\svelte\\view.svelte";
+    const file$7 = "node_modules\\framework7-svelte\\esm\\svelte\\view.svelte";
 
-    function get_each_context$1(ctx, list, i) {
+    function get_each_context$2(ctx, list, i) {
     	const child_ctx = ctx.slice();
     	child_ctx[29] = list[i];
     	return child_ctx;
@@ -81053,7 +74179,7 @@ var MultiRoomAudio = (function () {
     const get_default_slot_context = ctx => ({ view: /*f7View*/ ctx[3] });
 
     // (194:4) <RouterContextProvider route={page.props.f7route} router={page.props.f7router}>
-    function create_default_slot$7(ctx) {
+    function create_default_slot$6(ctx) {
     	let switch_instance;
     	let t;
     	let current;
@@ -81136,7 +74262,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$7.name,
+    		id: create_default_slot$6.name,
     		type: "slot",
     		source: "(194:4) <RouterContextProvider route={page.props.f7route} router={page.props.f7router}>",
     		ctx
@@ -81146,7 +74272,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (193:2) {#each pages as page (page.id)}
-    function create_each_block$1(key_1, ctx) {
+    function create_each_block$2(key_1, ctx) {
     	let first;
     	let routercontextprovider;
     	let current;
@@ -81155,7 +74281,7 @@ var MultiRoomAudio = (function () {
     			props: {
     				route: /*page*/ ctx[29].props.f7route,
     				router: /*page*/ ctx[29].props.f7router,
-    				$$slots: { default: [create_default_slot$7] },
+    				$$slots: { default: [create_default_slot$6] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -81203,7 +74329,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_each_block$1.name,
+    		id: create_each_block$2.name,
     		type: "each",
     		source: "(193:2) {#each pages as page (page.id)}",
     		ctx
@@ -81223,12 +74349,12 @@ var MultiRoomAudio = (function () {
     	let each_value = /*pages*/ ctx[4];
     	validate_each_argument(each_value);
     	const get_key = ctx => /*page*/ ctx[29].id;
-    	validate_each_keys(ctx, each_value, get_each_context$1, get_key);
+    	validate_each_keys(ctx, each_value, get_each_context$2, get_key);
 
     	for (let i = 0; i < each_value.length; i += 1) {
-    		let child_ctx = get_each_context$1(ctx, each_value, i);
+    		let child_ctx = get_each_context$2(ctx, each_value, i);
     		let key = get_key(child_ctx);
-    		each_1_lookup.set(key, each_blocks[i] = create_each_block$1(key, child_ctx));
+    		each_1_lookup.set(key, each_blocks[i] = create_each_block$2(key, child_ctx));
     	}
 
     	const block = {
@@ -81244,7 +74370,7 @@ var MultiRoomAudio = (function () {
     			attr_dev(div, "class", /*classes*/ ctx[5]);
     			attr_dev(div, "style", /*style*/ ctx[1]);
     			attr_dev(div, "id", /*id*/ ctx[0]);
-    			add_location(div, file$6, 190, 0, 5403);
+    			add_location(div, file$7, 190, 0, 5403);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -81285,8 +74411,8 @@ var MultiRoomAudio = (function () {
     				each_value = /*pages*/ ctx[4];
     				validate_each_argument(each_value);
     				group_outros();
-    				validate_each_keys(ctx, each_value, get_each_context$1, get_key);
-    				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div, outro_and_destroy_block, create_each_block$1, null, get_each_context$1);
+    				validate_each_keys(ctx, each_value, get_each_context$2, get_key);
+    				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div, outro_and_destroy_block, create_each_block$2, null, get_each_context$2);
     				check_outros();
     			}
 
@@ -81765,17 +74891,14 @@ var MultiRoomAudio = (function () {
         return { set, update, subscribe };
     }
 
-    const text = writable('Testo prova');
-
-    window.setText = (t) => {
-        text.set(t);
-    };
+    const deviceId = writable('');
+    const webSocket = writable(null);
 
     /* src\pages\NowPlaying.svelte generated by Svelte v3.44.0 */
-    const file$5 = "src\\pages\\NowPlaying.svelte";
+    const file$6 = "src\\pages\\NowPlaying.svelte";
 
-    // (57:12) {#if !isSpeaker}
-    function create_if_block_3$2(ctx) {
+    // (58:12) {#if !isSpeaker}
+    function create_if_block_3$1(ctx) {
     	let div;
     	let a;
     	let i;
@@ -81785,16 +74908,17 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			a = element("a");
     			i = element("i");
-    			i.textContent = "expand_more";
+    			i.textContent = "close";
     			attr_dev(i, "class", "icon material-icons");
     			attr_dev(i, "style", "");
-    			add_location(i, file$5, 63, 25, 2154);
+    			add_location(i, file$6, 64, 25, 2208);
     			attr_dev(a, "class", "link icon-only popup-close");
     			attr_dev(a, "href", "#");
-    			attr_dev(a, "iconmd", "material:expand_more");
-    			add_location(a, file$5, 59, 20, 1976);
-    			attr_dev(div, "class", "left");
-    			add_location(div, file$5, 57, 16, 1869);
+    			attr_dev(a, "iconmd", "material:close");
+    			add_location(a, file$6, 60, 20, 2036);
+    			attr_dev(div, "class", "right");
+    			set_style(div, "margin-right", "14px");
+    			add_location(div, file$6, 58, 16, 1900);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -81808,16 +74932,16 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3$2.name,
+    		id: create_if_block_3$1.name,
     		type: "if",
-    		source: "(57:12) {#if !isSpeaker}",
+    		source: "(58:12) {#if !isSpeaker}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (71:8) {#if isSpeaker}
+    // (72:8) {#if isSpeaker}
     function create_if_block_2$2(ctx) {
     	let div;
 
@@ -81825,7 +74949,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			div = element("div");
     			set_style(div, "flex", "4");
-    			add_location(div, file$5, 71, 12, 2372);
+    			add_location(div, file$6, 72, 12, 2419);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -81839,15 +74963,15 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_2$2.name,
     		type: "if",
-    		source: "(71:8) {#if isSpeaker}",
+    		source: "(72:8) {#if isSpeaker}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (102:20) {#if !isSpeaker}
-    function create_if_block$2(ctx) {
+    // (104:20) {#if !isSpeaker}
+    function create_if_block$3(ctx) {
     	let div0;
     	let a0;
     	let i0;
@@ -81863,7 +74987,7 @@ var MultiRoomAudio = (function () {
 
     	function select_block_type(ctx, dirty) {
     		if (/*playing*/ ctx[5]) return create_if_block_1$2;
-    		return create_else_block$2;
+    		return create_else_block$3;
     	}
 
     	let current_block_type = select_block_type(ctx);
@@ -81885,21 +75009,21 @@ var MultiRoomAudio = (function () {
     			i1 = element("i");
     			i1.textContent = "skip_next";
     			attr_dev(i0, "class", "icon material-icons svelte-1fulacq");
-    			add_location(i0, file$5, 108, 32, 3968);
+    			add_location(i0, file$6, 110, 32, 4068);
     			attr_dev(a0, "class", "svelte-1fulacq");
-    			add_location(a0, file$5, 107, 28, 3931);
+    			add_location(a0, file$6, 109, 28, 4031);
     			attr_dev(div0, "class", "fab color-white tansparent svelte-1fulacq");
-    			add_location(div0, file$5, 102, 24, 3643);
+    			add_location(div0, file$6, 104, 24, 3743);
     			attr_dev(a1, "class", "fab-play svelte-1fulacq");
-    			add_location(a1, file$5, 118, 28, 4450);
+    			add_location(a1, file$6, 120, 28, 4550);
     			attr_dev(div1, "class", "fab svelte-1fulacq");
-    			add_location(div1, file$5, 113, 24, 4180);
+    			add_location(div1, file$6, 115, 24, 4280);
     			attr_dev(i1, "class", "icon material-icons  svelte-1fulacq");
-    			add_location(i1, file$5, 136, 32, 5335);
+    			add_location(i1, file$6, 138, 32, 5435);
     			attr_dev(a2, "class", "svelte-1fulacq");
-    			add_location(a2, file$5, 135, 28, 5298);
+    			add_location(a2, file$6, 137, 28, 5398);
     			attr_dev(div2, "class", "fab color-white tansparent svelte-1fulacq");
-    			add_location(div2, file$5, 130, 24, 5010);
+    			add_location(div2, file$6, 132, 24, 5110);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div0, anchor);
@@ -81949,17 +75073,17 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$2.name,
+    		id: create_if_block$3.name,
     		type: "if",
-    		source: "(102:20) {#if !isSpeaker}",
+    		source: "(104:20) {#if !isSpeaker}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (124:32) {:else}
-    function create_else_block$2(ctx) {
+    // (126:32) {:else}
+    function create_else_block$3(ctx) {
     	let i;
 
     	const block = {
@@ -81967,7 +75091,7 @@ var MultiRoomAudio = (function () {
     			i = element("i");
     			i.textContent = "play_arrow";
     			attr_dev(i, "class", "icon material-icons svelte-1fulacq");
-    			add_location(i, file$5, 124, 36, 4754);
+    			add_location(i, file$6, 126, 36, 4854);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, i, anchor);
@@ -81979,16 +75103,16 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$2.name,
+    		id: create_else_block$3.name,
     		type: "else",
-    		source: "(124:32) {:else}",
+    		source: "(126:32) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (120:32) {#if playing}
+    // (122:32) {#if playing}
     function create_if_block_1$2(ctx) {
     	let i;
 
@@ -81997,7 +75121,7 @@ var MultiRoomAudio = (function () {
     			i = element("i");
     			i.textContent = "pause";
     			attr_dev(i, "class", "icon material-icons svelte-1fulacq");
-    			add_location(i, file$5, 120, 36, 4555);
+    			add_location(i, file$6, 122, 36, 4655);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, i, anchor);
@@ -82011,15 +75135,15 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_1$2.name,
     		type: "if",
-    		source: "(120:32) {#if playing}",
+    		source: "(122:32) {#if playing}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (53:0) <Page>
-    function create_default_slot$6(ctx) {
+    // (54:0) <Page>
+    function create_default_slot$5(ctx) {
     	let div2;
     	let div0;
     	let t0;
@@ -82057,7 +75181,7 @@ var MultiRoomAudio = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	let if_block0 = !/*isSpeaker*/ ctx[3] && create_if_block_3$2(ctx);
+    	let if_block0 = !/*isSpeaker*/ ctx[3] && create_if_block_3$1(ctx);
     	let if_block1 = /*isSpeaker*/ ctx[3] && create_if_block_2$2(ctx);
 
     	range = new Range({
@@ -82072,7 +75196,7 @@ var MultiRoomAudio = (function () {
     			$$inline: true
     		});
 
-    	let if_block2 = !/*isSpeaker*/ ctx[3] && create_if_block$2(ctx);
+    	let if_block2 = !/*isSpeaker*/ ctx[3] && create_if_block$3(ctx);
 
     	const block = {
     		c: function create() {
@@ -82092,65 +75216,65 @@ var MultiRoomAudio = (function () {
     			div13 = element("div");
     			div5 = element("div");
     			div4 = element("div");
-    			t4 = text$1(/*title*/ ctx[1]);
+    			t4 = text(/*title*/ ctx[1]);
     			t5 = space();
     			div7 = element("div");
     			div6 = element("div");
-    			t6 = text$1(/*artist*/ ctx[2]);
+    			t6 = text(/*artist*/ ctx[2]);
     			t7 = space();
     			div8 = element("div");
     			create_component(range.$$.fragment);
     			t8 = space();
     			div11 = element("div");
     			div9 = element("div");
-    			t9 = text$1(/*leftTime*/ ctx[11]);
+    			t9 = text(/*leftTime*/ ctx[11]);
     			t10 = space();
     			div10 = element("div");
-    			t11 = text$1(/*rightTime*/ ctx[12]);
+    			t11 = text(/*rightTime*/ ctx[12]);
     			t12 = space();
     			div12 = element("div");
     			if (if_block2) if_block2.c();
     			t13 = space();
     			div15 = element("div");
     			attr_dev(div0, "class", "navbar-bg svelte-1fulacq");
-    			add_location(div0, file$5, 54, 8, 1752);
+    			add_location(div0, file$6, 55, 8, 1783);
     			attr_dev(div1, "class", "navbar-inner sliding");
-    			add_location(div1, file$5, 55, 8, 1787);
+    			add_location(div1, file$6, 56, 8, 1818);
     			attr_dev(div2, "class", "navbar");
     			attr_dev(div2, "data-f7-slot", "fixed");
-    			add_location(div2, file$5, 53, 4, 1701);
+    			add_location(div2, file$6, 54, 4, 1732);
     			attr_dev(img, "alt", "Album");
     			if (!src_url_equal(img.src, img_src_value = /*imageUrl*/ ctx[0])) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "class", "svelte-1fulacq");
-    			add_location(img, file$5, 74, 12, 2462);
+    			add_location(img, file$6, 75, 12, 2509);
     			attr_dev(div3, "class", "player-img svelte-1fulacq");
-    			add_location(div3, file$5, 73, 8, 2424);
+    			add_location(div3, file$6, 74, 8, 2471);
     			attr_dev(div4, "class", "song-title svelte-1fulacq");
-    			add_location(div4, file$5, 82, 20, 2698);
+    			add_location(div4, file$6, 83, 20, 2745);
     			attr_dev(div5, "class", "row-flex svelte-1fulacq");
-    			add_location(div5, file$5, 81, 16, 2654);
+    			add_location(div5, file$6, 82, 16, 2701);
     			attr_dev(div6, "class", "song-subtitle svelte-1fulacq");
-    			add_location(div6, file$5, 85, 20, 2821);
+    			add_location(div6, file$6, 86, 20, 2868);
     			attr_dev(div7, "class", "row-flex svelte-1fulacq");
-    			add_location(div7, file$5, 84, 16, 2777);
+    			add_location(div7, file$6, 85, 16, 2824);
     			attr_dev(div8, "class", "row-flex music-slider svelte-1fulacq");
-    			add_location(div8, file$5, 87, 16, 2904);
+    			add_location(div8, file$6, 88, 16, 2951);
     			set_style(div9, "margin-left", "17%");
-    			add_location(div9, file$5, 97, 20, 3397);
+    			add_location(div9, file$6, 99, 20, 3497);
     			set_style(div10, "margin-right", "17%");
-    			add_location(div10, file$5, 98, 20, 3466);
+    			add_location(div10, file$6, 100, 20, 3566);
     			attr_dev(div11, "class", "row-flex row-time svelte-1fulacq");
-    			add_location(div11, file$5, 96, 16, 3344);
+    			add_location(div11, file$6, 98, 16, 3444);
     			attr_dev(div12, "class", "row-flex svelte-1fulacq");
-    			add_location(div12, file$5, 100, 16, 3557);
+    			add_location(div12, file$6, 102, 16, 3657);
     			attr_dev(div13, "class", "column-flex svelte-1fulacq");
-    			add_location(div13, file$5, 80, 12, 2611);
+    			add_location(div13, file$6, 81, 12, 2658);
     			attr_dev(div14, "class", "player-buttons svelte-1fulacq");
-    			add_location(div14, file$5, 79, 8, 2569);
+    			add_location(div14, file$6, 80, 8, 2616);
     			attr_dev(div15, "class", "player-bottom svelte-1fulacq");
-    			add_location(div15, file$5, 145, 8, 5615);
+    			add_location(div15, file$6, 147, 8, 5715);
     			attr_dev(div16, "class", "player svelte-1fulacq");
-    			add_location(div16, file$5, 69, 4, 2313);
+    			add_location(div16, file$6, 70, 4, 2360);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div2, anchor);
@@ -82194,7 +75318,8 @@ var MultiRoomAudio = (function () {
     			if (!mounted) {
     				dispose = [
     					listen_dev(div8, "pointerdown", /*pointerdown_handler*/ ctx[20], false, false, false),
-    					listen_dev(div8, "pointerup", /*onPointerUp*/ ctx[14], false, false, false)
+    					listen_dev(div8, "pointerup", /*onPointerUp*/ ctx[14], false, false, false),
+    					listen_dev(div8, "mouseleave", /*onPointerUp*/ ctx[14], false, false, false)
     				];
 
     				mounted = true;
@@ -82203,7 +75328,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			if (!/*isSpeaker*/ ctx[3]) {
     				if (if_block0) ; else {
-    					if_block0 = create_if_block_3$2(ctx);
+    					if_block0 = create_if_block_3$1(ctx);
     					if_block0.c();
     					if_block0.m(div1, null);
     				}
@@ -82241,7 +75366,7 @@ var MultiRoomAudio = (function () {
     				if (if_block2) {
     					if_block2.p(ctx, dirty);
     				} else {
-    					if_block2 = create_if_block$2(ctx);
+    					if_block2 = create_if_block$3(ctx);
     					if_block2.c();
     					if_block2.m(div12, null);
     				}
@@ -82274,9 +75399,9 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$6.name,
+    		id: create_default_slot$5.name,
     		type: "slot",
-    		source: "(53:0) <Page>",
+    		source: "(54:0) <Page>",
     		ctx
     	});
 
@@ -82289,7 +75414,7 @@ var MultiRoomAudio = (function () {
 
     	page = new Page({
     			props: {
-    				$$slots: { default: [create_default_slot$6] },
+    				$$slots: { default: [create_default_slot$5] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -82392,6 +75517,8 @@ var MultiRoomAudio = (function () {
     	let rangeValuePressed = 0;
 
     	function onPointerUp() {
+    		if (!sliderDragged) return;
+
     		// Fix glitch before receiving new command by server
     		setTimeout(() => $$invalidate(9, sliderDragged = false), 1000);
 
@@ -82697,25 +75824,25 @@ var MultiRoomAudio = (function () {
     	}
     }
 
-    /* src\pages\MusicListPage.svelte generated by Svelte v3.44.0 */
+    /* src\pages\ClientPage.svelte generated by Svelte v3.44.0 */
 
-    const { console: console_1$1 } = globals;
-    const file$4 = "src\\pages\\MusicListPage.svelte";
+    const { console: console_1$2 } = globals;
+    const file$5 = "src\\pages\\ClientPage.svelte";
 
-    function get_each_context(ctx, list, i) {
+    function get_each_context$1(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[31] = list[i];
+    	child_ctx[33] = list[i];
     	return child_ctx;
     }
 
     function get_each_context_1(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[34] = list[i];
+    	child_ctx[36] = list[i];
     	return child_ctx;
     }
 
-    // (188:4) <NavRight>
-    function create_default_slot_6$1(ctx) {
+    // (210:8) <NavRight>
+    function create_default_slot_6(ctx) {
     	let link0;
     	let t;
     	let link1;
@@ -82723,7 +75850,7 @@ var MultiRoomAudio = (function () {
 
     	link0 = new Link({
     			props: {
-    				iconMd: "material:leak_add",
+    				iconMd: "material:other_houses",
     				iconOnly: true,
     				href: "/rooms/"
     			},
@@ -82771,23 +75898,23 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_6$1.name,
+    		id: create_default_slot_6.name,
     		type: "slot",
-    		source: "(188:4) <NavRight>",
+    		source: "(210:8) <NavRight>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (187:2) <Navbar title="Multiroom Audio">
+    // (209:4) <Navbar title="Multiroom Audio">
     function create_default_slot_5$1(ctx) {
     	let navright;
     	let current;
 
     	navright = new Nav_right({
     			props: {
-    				$$slots: { default: [create_default_slot_6$1] },
+    				$$slots: { default: [create_default_slot_6] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -82804,7 +75931,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const navright_changes = {};
 
-    			if (dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[1] & /*$$scope*/ 256) {
     				navright_changes.$$scope = { dirty, ctx };
     			}
 
@@ -82828,21 +75955,21 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_5$1.name,
     		type: "slot",
-    		source: "(187:2) <Navbar title=\\\"Multiroom Audio\\\">",
+    		source: "(209:4) <Navbar title=\\\"Multiroom Audio\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (199:10) {:else}
+    // (224:20) {:else}
     function create_else_block_3(ctx) {
     	let chip;
     	let current;
 
     	chip = new Chip({
     			props: {
-    				text: /*speaker*/ ctx[34].name,
+    				text: /*speaker*/ ctx[36].name,
     				color: "#6200ee",
     				iconMd: "material:volume_up"
     			},
@@ -82859,7 +75986,7 @@ var MultiRoomAudio = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const chip_changes = {};
-    			if (dirty[0] & /*speakerList*/ 2) chip_changes.text = /*speaker*/ ctx[34].name;
+    			if (dirty[0] & /*speakerList*/ 2) chip_changes.text = /*speaker*/ ctx[36].name;
     			chip.$set(chip_changes);
     		},
     		i: function intro(local) {
@@ -82880,21 +76007,21 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_else_block_3.name,
     		type: "else",
-    		source: "(199:10) {:else}",
+    		source: "(224:20) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (197:10) {#if speaker.isMuted}
+    // (219:20) {#if speaker.isMuted}
     function create_if_block_5(ctx) {
     	let chip;
     	let current;
 
     	chip = new Chip({
     			props: {
-    				text: /*speaker*/ ctx[34].name,
+    				text: /*speaker*/ ctx[36].name,
     				iconMd: "material:volume_mute"
     			},
     			$$inline: true
@@ -82910,7 +76037,7 @@ var MultiRoomAudio = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const chip_changes = {};
-    			if (dirty[0] & /*speakerList*/ 2) chip_changes.text = /*speaker*/ ctx[34].name;
+    			if (dirty[0] & /*speakerList*/ 2) chip_changes.text = /*speaker*/ ctx[36].name;
     			chip.$set(chip_changes);
     		},
     		i: function intro(local) {
@@ -82931,14 +76058,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_5.name,
     		type: "if",
-    		source: "(197:10) {#if speaker.isMuted}",
+    		source: "(219:20) {#if speaker.isMuted}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (195:6) {#each speakerList as speaker}
+    // (217:12) {#each speakerList as speaker}
     function create_each_block_1(ctx) {
     	let div;
     	let current_block_type_index;
@@ -82949,7 +76076,7 @@ var MultiRoomAudio = (function () {
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
-    		if (/*speaker*/ ctx[34].isMuted) return 0;
+    		if (/*speaker*/ ctx[36].isMuted) return 0;
     		return 1;
     	}
 
@@ -82961,8 +76088,8 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			if_block.c();
     			t = space();
-    			attr_dev(div, "class", "speaker-chip svelte-5jskny");
-    			add_location(div, file$4, 195, 8, 4670);
+    			attr_dev(div, "class", "speaker-chip svelte-ai9wpq");
+    			add_location(div, file$5, 217, 16, 6107);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -83016,14 +76143,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_each_block_1.name,
     		type: "each",
-    		source: "(195:6) {#each speakerList as speaker}",
+    		source: "(217:12) {#each speakerList as speaker}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (193:2) <Toolbar top>
+    // (215:4) <Toolbar top>
     function create_default_slot_4$1(ctx) {
     	let div;
     	let current;
@@ -83047,8 +76174,8 @@ var MultiRoomAudio = (function () {
     				each_blocks[i].c();
     			}
 
-    			attr_dev(div, "class", "list-speakers svelte-5jskny");
-    			add_location(div, file$4, 193, 4, 4595);
+    			attr_dev(div, "class", "list-speakers svelte-ai9wpq");
+    			add_location(div, file$5, 215, 8, 6018);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -83116,15 +76243,15 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_4$1.name,
     		type: "slot",
-    		source: "(193:2) <Toolbar top>",
+    		source: "(215:4) <Toolbar top>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (207:2) {#if playingSong != null}
-    function create_if_block_3$1(ctx) {
+    // (236:4) {#if playingSong != null}
+    function create_if_block_3(ctx) {
     	let div8;
     	let span1;
     	let span0;
@@ -83177,45 +76304,45 @@ var MultiRoomAudio = (function () {
     			div3 = element("div");
     			div1 = element("div");
     			div0 = element("div");
-    			t2 = text$1(t2_value);
+    			t2 = text(t2_value);
     			t3 = space();
     			div2 = element("div");
-    			t4 = text$1(t4_value);
+    			t4 = text(t4_value);
     			t5 = space();
     			div5 = element("div");
     			t6 = space();
     			div6 = element("div");
     			if_block.c();
     			set_style(span0, "transform", "translate3d(" + (/*progress*/ ctx[5] - 100) + "%, 0px, 0px)");
-    			add_location(span0, file$4, 209, 10, 5142);
-    			attr_dev(span1, "class", "progressbar svelte-5jskny");
-    			add_location(span1, file$4, 208, 8, 5104);
+    			add_location(span0, file$5, 238, 16, 6864);
+    			attr_dev(span1, "class", "progressbar svelte-ai9wpq");
+    			add_location(span1, file$5, 237, 12, 6820);
     			attr_dev(img, "id", "album");
     			attr_dev(img, "alt", img_alt_value = /*playingSong*/ ctx[4].song.title);
     			if (!src_url_equal(img.src, img_src_value = /*playingSong*/ ctx[4].song.albumImageUrl)) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "class", "svelte-5jskny");
-    			add_location(img, file$4, 213, 12, 5356);
-    			attr_dev(div0, "class", "item-title svelte-5jskny");
-    			add_location(div0, file$4, 220, 16, 5620);
+    			attr_dev(img, "class", "svelte-ai9wpq");
+    			add_location(img, file$5, 244, 20, 7135);
+    			attr_dev(div0, "class", "item-title svelte-ai9wpq");
+    			add_location(div0, file$5, 251, 28, 7468);
     			attr_dev(div1, "class", "item-title-row");
     			set_style(div1, "display", "flex");
-    			add_location(div1, file$4, 219, 14, 5552);
-    			attr_dev(div2, "class", "item-subtitle svelte-5jskny");
-    			add_location(div2, file$4, 222, 14, 5712);
+    			add_location(div1, file$5, 250, 24, 7387);
+    			attr_dev(div2, "class", "item-subtitle svelte-ai9wpq");
+    			add_location(div2, file$5, 255, 24, 7644);
     			attr_dev(div3, "class", "item-inner");
-    			add_location(div3, file$4, 218, 12, 5512);
-    			attr_dev(div4, "class", "toolbarBox svelte-5jskny");
-    			add_location(div4, file$4, 212, 10, 5280);
-    			set_style(div5, "height", "70px");
-    			set_style(div5, "flex", "1");
-    			add_location(div5, file$4, 225, 10, 5820);
+    			add_location(div3, file$5, 249, 20, 7337);
+    			attr_dev(div4, "class", "toolbarBox svelte-ai9wpq");
+    			add_location(div4, file$5, 243, 16, 7051);
+    			set_style(div5, "width", "100%");
+    			set_style(div5, "height", "100%");
+    			add_location(div5, file$5, 260, 16, 7828);
     			set_style(div6, "margin-right", "14px");
-    			add_location(div6, file$4, 226, 10, 5911);
+    			add_location(div6, file$5, 264, 16, 7984);
     			attr_dev(div7, "class", "toolbar-inner");
-    			add_location(div7, file$4, 211, 8, 5241);
+    			add_location(div7, file$5, 242, 12, 7006);
     			attr_dev(div8, "class", "toolbar toolbar-bottom");
     			attr_dev(div8, "data-f7-slot", "fixed");
-    			add_location(div8, file$4, 207, 6, 5036);
+    			add_location(div8, file$5, 236, 8, 6749);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div8, anchor);
@@ -83309,16 +76436,16 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3$1.name,
+    		id: create_if_block_3.name,
     		type: "if",
-    		source: "(207:2) {#if playingSong != null}",
+    		source: "(236:4) {#if playingSong != null}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (237:12) {:else}
+    // (275:20) {:else}
     function create_else_block_2(ctx) {
     	let link;
     	let current;
@@ -83357,14 +76484,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_else_block_2.name,
     		type: "else",
-    		source: "(237:12) {:else}",
+    		source: "(275:20) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (228:12) {#if state != 1}
+    // (266:20) {#if state != 1}
     function create_if_block_4(ctx) {
     	let link;
     	let current;
@@ -83406,20 +76533,20 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_4.name,
     		type: "if",
-    		source: "(228:12) {#if state != 1}",
+    		source: "(266:20) {#if state != 1}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (252:2) <Block>
+    // (290:4) <Block>
     function create_default_slot_3$1(ctx) {
     	let t;
 
     	const block = {
     		c: function create() {
-    			t = text$1("Bella zio se ti piace il nostro lavoro mettici un bel 30 😆");
+    			t = text("Bella zio se ti piace il nostro lavoro mettici un bel 30 😆");
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t, anchor);
@@ -83433,29 +76560,29 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_3$1.name,
     		type: "slot",
-    		source: "(252:2) <Block>",
+    		source: "(290:4) <Block>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (255:6) {#if setLastTitleBlock(song.dirPath)}
+    // (293:12) {#if setLastTitleBlock(song.dirPath)}
     function create_if_block_2$1(ctx) {
     	let li;
     	let div;
-    	let t_value = /*song*/ ctx[31].dirPath + "";
+    	let t_value = /*song*/ ctx[33].dirPath + "";
     	let t;
 
     	const block = {
     		c: function create() {
     			li = element("li");
     			div = element("div");
-    			t = text$1(t_value);
-    			attr_dev(div, "class", "block-path svelte-5jskny");
-    			add_location(div, file$4, 256, 10, 6789);
+    			t = text(t_value);
+    			attr_dev(div, "class", "block-path svelte-ai9wpq");
+    			add_location(div, file$5, 294, 20, 9121);
     			attr_dev(li, "class", "list-group-title");
-    			add_location(li, file$4, 255, 8, 6748);
+    			add_location(li, file$5, 293, 16, 9070);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -83463,7 +76590,7 @@ var MultiRoomAudio = (function () {
     			append_dev(div, t);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*songs*/ 1 && t_value !== (t_value = /*song*/ ctx[31].dirPath + "")) set_data_dev(t, t_value);
+    			if (dirty[0] & /*songs*/ 1 && t_value !== (t_value = /*song*/ ctx[33].dirPath + "")) set_data_dev(t, t_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(li);
@@ -83474,29 +76601,29 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_2$1.name,
     		type: "if",
-    		source: "(255:6) {#if setLastTitleBlock(song.dirPath)}",
+    		source: "(293:12) {#if setLastTitleBlock(song.dirPath)}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (281:6) {:else}
+    // (319:12) {:else}
     function create_else_block_1(ctx) {
     	let listitem;
     	let current;
 
     	function click_handler_5(...args) {
-    		return /*click_handler_5*/ ctx[18](/*song*/ ctx[31], ...args);
+    		return /*click_handler_5*/ ctx[18](/*song*/ ctx[33], ...args);
     	}
 
     	listitem = new List_item({
     			props: {
-    				title: /*song*/ ctx[31].title,
-    				subtitle: /*song*/ ctx[31].artist,
+    				title: /*song*/ ctx[33].title,
+    				subtitle: /*song*/ ctx[33].artist,
     				link: true,
     				$$slots: {
-    					after: [create_after_slot_1$1],
+    					after: [create_after_slot_1],
     					media: [create_media_slot_1]
     				},
     				$$scope: { ctx }
@@ -83517,10 +76644,10 @@ var MultiRoomAudio = (function () {
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
     			const listitem_changes = {};
-    			if (dirty[0] & /*songs*/ 1) listitem_changes.title = /*song*/ ctx[31].title;
-    			if (dirty[0] & /*songs*/ 1) listitem_changes.subtitle = /*song*/ ctx[31].artist;
+    			if (dirty[0] & /*songs*/ 1) listitem_changes.title = /*song*/ ctx[33].title;
+    			if (dirty[0] & /*songs*/ 1) listitem_changes.subtitle = /*song*/ ctx[33].artist;
 
-    			if (dirty[0] & /*songs*/ 1 | dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[0] & /*songs*/ 1 | dirty[1] & /*$$scope*/ 256) {
     				listitem_changes.$$scope = { dirty, ctx };
     			}
 
@@ -83544,14 +76671,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_else_block_1.name,
     		type: "else",
-    		source: "(281:6) {:else}",
+    		source: "(319:12) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (260:6) {#if playingSong != null && song.id == playingSong.songId && state == 1}
+    // (298:12) {#if playingSong != null && song.id == playingSong.songId && state == 1}
     function create_if_block_1$1(ctx) {
     	let div;
     	let listitem;
@@ -83560,8 +76687,8 @@ var MultiRoomAudio = (function () {
 
     	listitem = new List_item({
     			props: {
-    				title: /*song*/ ctx[31].title,
-    				subtitle: /*song*/ ctx[31].artist,
+    				title: /*song*/ ctx[33].title,
+    				subtitle: /*song*/ ctx[33].artist,
     				$$slots: {
     					after: [create_after_slot$1],
     					media: [create_media_slot]
@@ -83577,7 +76704,7 @@ var MultiRoomAudio = (function () {
     			create_component(listitem.$$.fragment);
     			t = space();
     			set_style(div, "background-color", "#5521f314");
-    			add_location(div, file$4, 260, 8, 6951);
+    			add_location(div, file$5, 298, 16, 9311);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -83587,10 +76714,10 @@ var MultiRoomAudio = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const listitem_changes = {};
-    			if (dirty[0] & /*songs*/ 1) listitem_changes.title = /*song*/ ctx[31].title;
-    			if (dirty[0] & /*songs*/ 1) listitem_changes.subtitle = /*song*/ ctx[31].artist;
+    			if (dirty[0] & /*songs*/ 1) listitem_changes.title = /*song*/ ctx[33].title;
+    			if (dirty[0] & /*songs*/ 1) listitem_changes.subtitle = /*song*/ ctx[33].artist;
 
-    			if (dirty[0] & /*songs*/ 1 | dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[0] & /*songs*/ 1 | dirty[1] & /*$$scope*/ 256) {
     				listitem_changes.$$scope = { dirty, ctx };
     			}
 
@@ -83615,14 +76742,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_1$1.name,
     		type: "if",
-    		source: "(260:6) {#if playingSong != null && song.id == playingSong.songId && state == 1}",
+    		source: "(298:12) {#if playingSong != null && song.id == playingSong.songId && state == 1}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (288:10) 
+    // (329:20) 
     function create_media_slot_1(ctx) {
     	let img;
     	let img_alt_value;
@@ -83632,21 +76759,21 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			attr_dev(img, "slot", "media");
-    			attr_dev(img, "alt", img_alt_value = /*song*/ ctx[31].title);
-    			if (!src_url_equal(img.src, img_src_value = /*song*/ ctx[31].albumImageUrl)) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", img_alt_value = /*song*/ ctx[33].title);
+    			if (!src_url_equal(img.src, img_src_value = /*song*/ ctx[33].albumImageUrl)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "width", "44");
-    			attr_dev(img, "class", "svelte-5jskny");
-    			add_location(img, file$4, 287, 10, 7844);
+    			attr_dev(img, "class", "svelte-ai9wpq");
+    			add_location(img, file$5, 328, 20, 10553);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*songs*/ 1 && img_alt_value !== (img_alt_value = /*song*/ ctx[31].title)) {
+    			if (dirty[0] & /*songs*/ 1 && img_alt_value !== (img_alt_value = /*song*/ ctx[33].title)) {
     				attr_dev(img, "alt", img_alt_value);
     			}
 
-    			if (dirty[0] & /*songs*/ 1 && !src_url_equal(img.src, img_src_value = /*song*/ ctx[31].albumImageUrl)) {
+    			if (dirty[0] & /*songs*/ 1 && !src_url_equal(img.src, img_src_value = /*song*/ ctx[33].albumImageUrl)) {
     				attr_dev(img, "src", img_src_value);
     			}
     		},
@@ -83659,15 +76786,15 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_media_slot_1.name,
     		type: "slot",
-    		source: "(288:10) ",
+    		source: "(329:20) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (294:10) 
-    function create_after_slot_1$1(ctx) {
+    // (335:20) 
+    function create_after_slot_1(ctx) {
     	let span;
     	let link;
     	let t;
@@ -83688,7 +76815,7 @@ var MultiRoomAudio = (function () {
     			t = space();
     			attr_dev(span, "slot", "after");
     			set_style(span, "margin-right", "10px");
-    			add_location(span, file$4, 293, 10, 7992);
+    			add_location(span, file$5, 334, 20, 10769);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -83714,16 +76841,16 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_after_slot_1$1.name,
+    		id: create_after_slot_1.name,
     		type: "slot",
-    		source: "(294:10) ",
+    		source: "(335:20) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (263:12) 
+    // (301:24) 
     function create_media_slot(ctx) {
     	let img;
     	let img_alt_value;
@@ -83733,21 +76860,21 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			img = element("img");
     			attr_dev(img, "slot", "media");
-    			attr_dev(img, "alt", img_alt_value = /*song*/ ctx[31].title);
-    			if (!src_url_equal(img.src, img_src_value = /*song*/ ctx[31].albumImageUrl)) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", img_alt_value = /*song*/ ctx[33].title);
+    			if (!src_url_equal(img.src, img_src_value = /*song*/ ctx[33].albumImageUrl)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "width", "44");
-    			attr_dev(img, "class", "svelte-5jskny");
-    			add_location(img, file$4, 262, 12, 7070);
+    			attr_dev(img, "class", "svelte-ai9wpq");
+    			add_location(img, file$5, 300, 24, 9452);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*songs*/ 1 && img_alt_value !== (img_alt_value = /*song*/ ctx[31].title)) {
+    			if (dirty[0] & /*songs*/ 1 && img_alt_value !== (img_alt_value = /*song*/ ctx[33].title)) {
     				attr_dev(img, "alt", img_alt_value);
     			}
 
-    			if (dirty[0] & /*songs*/ 1 && !src_url_equal(img.src, img_src_value = /*song*/ ctx[31].albumImageUrl)) {
+    			if (dirty[0] & /*songs*/ 1 && !src_url_equal(img.src, img_src_value = /*song*/ ctx[33].albumImageUrl)) {
     				attr_dev(img, "src", img_src_value);
     			}
     		},
@@ -83760,14 +76887,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_media_slot.name,
     		type: "slot",
-    		source: "(263:12) ",
+    		source: "(301:24) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (269:12) 
+    // (307:24) 
     function create_after_slot$1(ctx) {
     	let span;
     	let link;
@@ -83786,7 +76913,7 @@ var MultiRoomAudio = (function () {
     			create_component(link.$$.fragment);
     			attr_dev(span, "slot", "after");
     			set_style(span, "margin-right", "10px");
-    			add_location(span, file$4, 268, 12, 7230);
+    			add_location(span, file$5, 306, 24, 9692);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -83813,16 +76940,16 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_after_slot$1.name,
     		type: "slot",
-    		source: "(269:12) ",
+    		source: "(307:24) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (254:4) {#each songs as song}
-    function create_each_block(ctx) {
-    	let show_if = /*setLastTitleBlock*/ ctx[12](/*song*/ ctx[31].dirPath);
+    // (292:8) {#each songs as song}
+    function create_each_block$1(ctx) {
+    	let show_if = /*setLastTitleBlock*/ ctx[12](/*song*/ ctx[33].dirPath);
     	let t;
     	let current_block_type_index;
     	let if_block1;
@@ -83833,7 +76960,7 @@ var MultiRoomAudio = (function () {
     	const if_blocks = [];
 
     	function select_block_type_2(ctx, dirty) {
-    		if (/*playingSong*/ ctx[4] != null && /*song*/ ctx[31].id == /*playingSong*/ ctx[4].songId && /*state*/ ctx[3] == 1) return 0;
+    		if (/*playingSong*/ ctx[4] != null && /*song*/ ctx[33].id == /*playingSong*/ ctx[4].songId && /*state*/ ctx[3] == 1) return 0;
     		return 1;
     	}
 
@@ -83855,7 +76982,7 @@ var MultiRoomAudio = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty[0] & /*songs*/ 1) show_if = /*setLastTitleBlock*/ ctx[12](/*song*/ ctx[31].dirPath);
+    			if (dirty[0] & /*songs*/ 1) show_if = /*setLastTitleBlock*/ ctx[12](/*song*/ ctx[33].dirPath);
 
     			if (show_if) {
     				if (if_block0) {
@@ -83915,17 +77042,17 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_each_block.name,
+    		id: create_each_block$1.name,
     		type: "each",
-    		source: "(254:4) {#each songs as song}",
+    		source: "(292:8) {#each songs as song}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (253:2) <List mediaList>
-    function create_default_slot_2$2(ctx) {
+    // (291:4) <List mediaList>
+    function create_default_slot_2$1(ctx) {
     	let each_1_anchor;
     	let current;
     	let each_value = /*songs*/ ctx[0];
@@ -83933,7 +77060,7 @@ var MultiRoomAudio = (function () {
     	let each_blocks = [];
 
     	for (let i = 0; i < each_value.length; i += 1) {
-    		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+    		each_blocks[i] = create_each_block$1(get_each_context$1(ctx, each_value, i));
     	}
 
     	const out = i => transition_out(each_blocks[i], 1, 1, () => {
@@ -83963,13 +77090,13 @@ var MultiRoomAudio = (function () {
     				let i;
 
     				for (i = 0; i < each_value.length; i += 1) {
-    					const child_ctx = get_each_context(ctx, each_value, i);
+    					const child_ctx = get_each_context$1(ctx, each_value, i);
 
     					if (each_blocks[i]) {
     						each_blocks[i].p(child_ctx, dirty);
     						transition_in(each_blocks[i], 1);
     					} else {
-    						each_blocks[i] = create_each_block(child_ctx);
+    						each_blocks[i] = create_each_block$1(child_ctx);
     						each_blocks[i].c();
     						transition_in(each_blocks[i], 1);
     						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
@@ -84011,17 +77138,17 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_2$2.name,
+    		id: create_default_slot_2$1.name,
     		type: "slot",
-    		source: "(253:2) <List mediaList>",
+    		source: "(291:4) <List mediaList>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (185:0) <Page>
-    function create_default_slot_1$3(ctx) {
+    // (207:0) <Page>
+    function create_default_slot_1$2(ctx) {
     	let navbar;
     	let t0;
     	let toolbar;
@@ -84050,7 +77177,7 @@ var MultiRoomAudio = (function () {
     			$$inline: true
     		});
 
-    	let if_block = /*playingSong*/ ctx[4] != null && create_if_block_3$1(ctx);
+    	let if_block = /*playingSong*/ ctx[4] != null && create_if_block_3(ctx);
 
     	block = new Block({
     			props: {
@@ -84063,7 +77190,7 @@ var MultiRoomAudio = (function () {
     	list = new List({
     			props: {
     				mediaList: true,
-    				$$slots: { default: [create_default_slot_2$2] },
+    				$$slots: { default: [create_default_slot_2$1] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -84096,14 +77223,14 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const navbar_changes = {};
 
-    			if (dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[1] & /*$$scope*/ 256) {
     				navbar_changes.$$scope = { dirty, ctx };
     			}
 
     			navbar.$set(navbar_changes);
     			const toolbar_changes = {};
 
-    			if (dirty[0] & /*speakerList*/ 2 | dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[0] & /*speakerList*/ 2 | dirty[1] & /*$$scope*/ 256) {
     				toolbar_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84117,7 +77244,7 @@ var MultiRoomAudio = (function () {
     						transition_in(if_block, 1);
     					}
     				} else {
-    					if_block = create_if_block_3$1(ctx);
+    					if_block = create_if_block_3(ctx);
     					if_block.c();
     					transition_in(if_block, 1);
     					if_block.m(t2.parentNode, t2);
@@ -84134,14 +77261,14 @@ var MultiRoomAudio = (function () {
 
     			const block_changes = {};
 
-    			if (dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[1] & /*$$scope*/ 256) {
     				block_changes.$$scope = { dirty, ctx };
     			}
 
     			block.$set(block_changes);
     			const list_changes = {};
 
-    			if (dirty[0] & /*songs, playingSong, state*/ 25 | dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[0] & /*songs, playingSong, state*/ 25 | dirty[1] & /*$$scope*/ 256) {
     				list_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84179,17 +77306,17 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block: block_1,
-    		id: create_default_slot_1$3.name,
+    		id: create_default_slot_1$2.name,
     		type: "slot",
-    		source: "(185:0) <Page>",
+    		source: "(207:0) <Page>",
     		ctx
     	});
 
     	return block_1;
     }
 
-    // (324:2) {:else}
-    function create_else_block$1(ctx) {
+    // (362:4) {:else}
+    function create_else_block$2(ctx) {
     	let nowplaying;
     	let current;
 
@@ -84229,17 +77356,17 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$1.name,
+    		id: create_else_block$2.name,
     		type: "else",
-    		source: "(324:2) {:else}",
+    		source: "(362:4) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (311:2) {#if playingSong != null}
-    function create_if_block$1(ctx) {
+    // (349:4) {#if playingSong != null}
+    function create_if_block$2(ctx) {
     	let nowplaying;
     	let current;
 
@@ -84294,22 +77421,22 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$1.name,
+    		id: create_if_block$2.name,
     		type: "if",
-    		source: "(311:2) {#if playingSong != null}",
+    		source: "(349:4) {#if playingSong != null}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (306:0) <Popup    opened={popupOpened}    onPopupClosed={() => (popupOpened = false)}    swipeToClose  >
-    function create_default_slot$5(ctx) {
+    // (344:0) <Popup      opened={popupOpened}      onPopupClosed={() => (popupOpened = false)}      swipeToClose  >
+    function create_default_slot$4(ctx) {
     	let current_block_type_index;
     	let if_block;
     	let if_block_anchor;
     	let current;
-    	const if_block_creators = [create_if_block$1, create_else_block$1];
+    	const if_block_creators = [create_if_block$2, create_else_block$2];
     	const if_blocks = [];
 
     	function select_block_type_3(ctx, dirty) {
@@ -84374,9 +77501,9 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$5.name,
+    		id: create_default_slot$4.name,
     		type: "slot",
-    		source: "(306:0) <Popup    opened={popupOpened}    onPopupClosed={() => (popupOpened = false)}    swipeToClose  >",
+    		source: "(344:0) <Popup      opened={popupOpened}      onPopupClosed={() => (popupOpened = false)}      swipeToClose  >",
     		ctx
     	});
 
@@ -84391,7 +77518,7 @@ var MultiRoomAudio = (function () {
 
     	page = new Page({
     			props: {
-    				$$slots: { default: [create_default_slot_1$3] },
+    				$$slots: { default: [create_default_slot_1$2] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -84402,7 +77529,7 @@ var MultiRoomAudio = (function () {
     				opened: /*popupOpened*/ ctx[2],
     				onPopupClosed: /*func_1*/ ctx[20],
     				swipeToClose: true,
-    				$$slots: { default: [create_default_slot$5] },
+    				$$slots: { default: [create_default_slot$4] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -84426,7 +77553,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const page_changes = {};
 
-    			if (dirty[0] & /*songs, playingSong, state, popupOpened, progress, speakerList*/ 63 | dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[0] & /*songs, playingSong, state, popupOpened, progress, speakerList*/ 63 | dirty[1] & /*$$scope*/ 256) {
     				page_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84435,7 +77562,7 @@ var MultiRoomAudio = (function () {
     			if (dirty[0] & /*popupOpened*/ 4) popup_changes.opened = /*popupOpened*/ ctx[2];
     			if (dirty[0] & /*popupOpened*/ 4) popup_changes.onPopupClosed = /*func_1*/ ctx[20];
 
-    			if (dirty[0] & /*playingSong, state*/ 24 | dirty[1] & /*$$scope*/ 64) {
+    			if (dirty[0] & /*playingSong, state*/ 24 | dirty[1] & /*$$scope*/ 256) {
     				popup_changes.$$scope = { dirty, ctx };
     			}
 
@@ -84470,12 +77597,18 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
+    function onSocketClose(event) {
+    	// TODO print connection lost
+    	console.log(event);
+    }
+
     function instance$5($$self, $$props, $$invalidate) {
+    	let $deviceId;
+    	validate_store(deviceId, 'deviceId');
+    	component_subscribe($$self, deviceId, $$value => $$invalidate(23, $deviceId = $$value));
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('MusicListPage', slots, []);
+    	validate_slots('ClientPage', slots, []);
     	let socket;
-    	const urlParams = new URLSearchParams(window.location.search);
-    	const clientId = urlParams.get("clientId");
     	const blankSong = "http://" + location.hostname + ":80/imgs/blank_album.png";
 
     	onMount(() => {
@@ -84483,29 +77616,41 @@ var MultiRoomAudio = (function () {
     		socketSetup();
     	});
 
+    	onDestroy(() => {
+    		socketDestroy();
+    	});
+
     	function socketSetup() {
     		socket = new WebSocket("ws://" + location.hostname + "/websocket");
+    		socket.addEventListener("open", onSocketOpen);
+    		socket.addEventListener("message", onSocketMessage);
+    		socket.addEventListener("close", onSocketClose);
+    		webSocket.set(socket);
+    	}
 
-    		socket.onopen = () => {
-    			sendInitMessage();
-    		};
+    	// Socket functions
+    	function onSocketOpen() {
+    		sendInitMessage();
+    	}
 
-    		socket.onmessage = event => {
-    			processMessage(JSON.parse(event.data));
-    		};
+    	function onSocketMessage(event) {
+    		processMessage(JSON.parse(event.data));
+    	}
 
-    		socket.onclose = event => {
-    			console.log(event);
-    		};
+    	function socketDestroy() {
+    		socket.removeEventListener("open", onSocketOpen);
+    		socket.removeEventListener("message", onSocketMessage);
+    		socket.removeEventListener("close", onSocketClose);
+    		webSocket.set(null);
     	}
 
     	function sendInitMessage() {
-    		console.log(clientId);
+    		console.log($deviceId);
 
     		socket.send(JSON.stringify({
     			type: "HELLO",
     			deviceType: 0, // client type
-    			id: clientId,
+    			id: $deviceId,
     			name: "vallascClient", // TODO change name
     			
     		}));
@@ -84524,8 +77669,7 @@ var MultiRoomAudio = (function () {
     	let progress = 0;
 
     	function processMessage(message) {
-    		console.log(message);
-
+    		//console.log(message)
     		switch (message.type) {
     			case "PLAY":
     				$$invalidate(3, state = 1);
@@ -84615,7 +77759,7 @@ var MultiRoomAudio = (function () {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<MusicListPage> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$2.warn(`<ClientPage> was created with unknown prop '${key}'`);
     	});
 
     	const click_handler = () => $$invalidate(2, popupOpened = true);
@@ -84646,6 +77790,7 @@ var MultiRoomAudio = (function () {
 
     	$$self.$capture_state = () => ({
     		onMount,
+    		onDestroy,
     		Page,
     		Navbar,
     		Toolbar,
@@ -84656,13 +77801,16 @@ var MultiRoomAudio = (function () {
     		Popup,
     		Block,
     		Chip,
-    		text,
+    		deviceId,
+    		webSocket,
     		NowPlaying,
     		socket,
-    		urlParams,
-    		clientId,
     		blankSong,
     		socketSetup,
+    		onSocketOpen,
+    		onSocketMessage,
+    		onSocketClose,
+    		socketDestroy,
     		sendInitMessage,
     		makeImageurl,
     		songs,
@@ -84680,7 +77828,8 @@ var MultiRoomAudio = (function () {
     		next,
     		prev,
     		lastTitleBlock,
-    		setLastTitleBlock
+    		setLastTitleBlock,
+    		$deviceId
     	});
 
     	$$self.$inject_state = $$props => {
@@ -84723,25 +77872,215 @@ var MultiRoomAudio = (function () {
     	];
     }
 
-    class MusicListPage extends SvelteComponentDev {
+    class ClientPage extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
     		init(this, options, instance$5, create_fragment$5, safe_not_equal, {}, null, [-1, -1]);
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "MusicListPage",
+    			tagName: "ClientPage",
     			options,
     			id: create_fragment$5.name
     		});
     	}
     }
 
+    /* src\pages\WalkRoomAnimation.svelte generated by Svelte v3.44.0 */
+
+    const file$4 = "src\\pages\\WalkRoomAnimation.svelte";
+
+    function create_fragment$4(ctx) {
+    	let svg;
+    	let g0;
+    	let path0;
+    	let g1;
+    	let path1;
+    	let g2;
+    	let text_1;
+    	let tspan;
+    	let t;
+
+    	const block = {
+    		c: function create() {
+    			svg = svg_element("svg");
+    			g0 = svg_element("g");
+    			path0 = svg_element("path");
+    			g1 = svg_element("g");
+    			path1 = svg_element("path");
+    			g2 = svg_element("g");
+    			text_1 = svg_element("text");
+    			tspan = svg_element("tspan");
+    			t = text(/*roomName*/ ctx[0]);
+    			set_style(path0, "stroke", "rgb(0,0,0)");
+    			set_style(path0, "stroke-width", "6");
+    			set_style(path0, "stroke-dasharray", "none");
+    			set_style(path0, "stroke-linecap", "butt");
+    			set_style(path0, "stroke-dashoffset", "0");
+    			set_style(path0, "stroke-linejoin", "miter");
+    			set_style(path0, "stroke-miterlimit", "4");
+    			set_style(path0, "fill", "none");
+    			set_style(path0, "fill-rule", "nonzero");
+    			set_style(path0, "opacity", "1");
+    			attr_dev(path0, "vector-effect", "non-scaling-stroke");
+    			attr_dev(path0, "transform", " translate(-154.5, -148)");
+    			attr_dev(path0, "d", "M 0 0 L 219 0 L 219 84 L 309 84 L 309 296 L 97 296 L 97 219 L 0 219 z");
+    			attr_dev(path0, "stroke-linecap", "round");
+    			add_location(path0, file$4, 13, 8, 311);
+    			attr_dev(g0, "transform", "matrix(1.02 0 0 1 200 231)");
+    			add_location(g0, file$4, 12, 4, 259);
+    			attr_dev(path1, "class", "path svelte-eamy0n");
+    			attr_dev(path1, "xmlns", "http://www.w3.org/2000/svg");
+    			set_style(path1, "stroke", "rgb(98,0,238)");
+    			set_style(path1, "stroke-width", "24");
+    			set_style(path1, "stroke-dasharray", "none");
+    			set_style(path1, "stroke-linecap", "butt");
+    			set_style(path1, "stroke-dashoffset", "0");
+    			set_style(path1, "stroke-linejoin", "miter");
+    			set_style(path1, "stroke-miterlimit", "4");
+    			set_style(path1, "fill", "none");
+    			set_style(path1, "fill-rule", "nonzero");
+    			set_style(path1, "opacity", "1");
+    			attr_dev(path1, "vector-effect", "non-scaling-stroke");
+    			attr_dev(path1, "transform", " translate(-132, -124)");
+    			attr_dev(path1, "d", "M 0 0 L 171 0 L 171 82 L 264 82 L 264 248 L 93 248 L 93 171 L 0 171 z");
+    			attr_dev(path1, "stroke-linecap", "round");
+    			add_location(path1, file$4, 25, 8, 892);
+    			attr_dev(g1, "xmlns", "http://www.w3.org/2000/svg");
+    			attr_dev(g1, "transform", "matrix(1 0 0 0.97 200 230)");
+    			add_location(g1, file$4, 21, 4, 781);
+    			attr_dev(tspan, "x", "-119.12");
+    			attr_dev(tspan, "y", "13.51");
+    			add_location(tspan, file$4, 48, 13, 2015);
+    			attr_dev(text_1, "xml:space", "preserve");
+    			attr_dev(text_1, "font-family", "Roboto");
+    			attr_dev(text_1, "font-size", "40");
+    			attr_dev(text_1, "font-style", "normal");
+    			attr_dev(text_1, "font-weight", "700");
+    			attr_dev(text_1, "line-height", "1.16");
+    			set_style(text_1, "stroke", "none");
+    			set_style(text_1, "stroke-width", "1");
+    			set_style(text_1, "stroke-dasharray", "none");
+    			set_style(text_1, "stroke-linecap", "butt");
+    			set_style(text_1, "stroke-dashoffset", "0");
+    			set_style(text_1, "stroke-linejoin", "miter");
+    			set_style(text_1, "stroke-miterlimit", "4");
+    			set_style(text_1, "fill", "rgb(0,0,0)");
+    			set_style(text_1, "fill-rule", "nonzero");
+    			set_style(text_1, "opacity", "1");
+    			set_style(text_1, "white-space", "pre");
+    			add_location(text_1, file$4, 40, 8, 1569);
+    			attr_dev(g2, "xmlns", "http://www.w3.org/2000/svg");
+    			attr_dev(g2, "transform", "matrix(1 0 0 0.99 212.5 230)");
+    			attr_dev(g2, "style", "");
+    			add_location(g2, file$4, 35, 4, 1438);
+    			attr_dev(svg, "xmlns", "http://www.w3.org/2000/svg");
+    			attr_dev(svg, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+    			attr_dev(svg, "version", "1.1");
+    			attr_dev(svg, "width", "500");
+    			attr_dev(svg, "height", "500");
+    			attr_dev(svg, "viewBox", "0 0 400 500");
+    			attr_dev(svg, "xml:space", "preserve");
+    			attr_dev(svg, "class", "svelte-eamy0n");
+    			add_location(svg, file$4, 3, 0, 51);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, svg, anchor);
+    			append_dev(svg, g0);
+    			append_dev(g0, path0);
+    			append_dev(svg, g1);
+    			append_dev(g1, path1);
+    			append_dev(svg, g2);
+    			append_dev(g2, text_1);
+    			append_dev(text_1, tspan);
+    			append_dev(tspan, t);
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*roomName*/ 1) set_data_dev(t, /*roomName*/ ctx[0]);
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(svg);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$4.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$4($$self, $$props, $$invalidate) {
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('WalkRoomAnimation', slots, []);
+    	let { roomName = "" } = $$props;
+    	const writable_props = ['roomName'];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<WalkRoomAnimation> was created with unknown prop '${key}'`);
+    	});
+
+    	$$self.$$set = $$props => {
+    		if ('roomName' in $$props) $$invalidate(0, roomName = $$props.roomName);
+    	};
+
+    	$$self.$capture_state = () => ({ roomName });
+
+    	$$self.$inject_state = $$props => {
+    		if ('roomName' in $$props) $$invalidate(0, roomName = $$props.roomName);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [roomName];
+    }
+
+    class WalkRoomAnimation extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$4, create_fragment$4, safe_not_equal, { roomName: 0 });
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "WalkRoomAnimation",
+    			options,
+    			id: create_fragment$4.name
+    		});
+    	}
+
+    	get roomName() {
+    		throw new Error("<WalkRoomAnimation>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set roomName(value) {
+    		throw new Error("<WalkRoomAnimation>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
     /* src\pages\RoomsPage.svelte generated by Svelte v3.44.0 */
+
+    const { console: console_1$1 } = globals;
     const file$3 = "src\\pages\\RoomsPage.svelte";
 
-    // (8:4) <Fab position="right-bottom" href="/calibration/">
-    function create_default_slot_2$1(ctx) {
+    function get_each_context(ctx, list, i) {
+    	const child_ctx = ctx.slice();
+    	child_ctx[18] = list[i];
+    	return child_ctx;
+    }
+
+    // (135:4) <Fab position="right-bottom" onClick={dialogInsertRoomName} text="New">
+    function create_default_slot_5(ctx) {
     	let icon;
     	let current;
 
@@ -84775,151 +78114,212 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_2$1.name,
+    		id: create_default_slot_5.name,
     		type: "slot",
-    		source: "(8:4) <Fab position=\\\"right-bottom\\\" href=\\\"/calibration/\\\">",
+    		source: "(135:4) <Fab position=\\\"right-bottom\\\" onClick={dialogInsertRoomName} text=\\\"New\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (14:12) 
-    function create_after_slot_2(ctx) {
-    	let span;
-    	let link;
-    	let current;
-
-    	link = new Link({
-    			props: { iconMd: "material:delete", color: "red" },
-    			$$inline: true
-    		});
+    // (160:4) {:else}
+    function create_else_block$1(ctx) {
+    	let div3;
+    	let div0;
+    	let t0;
+    	let div1;
+    	let t2;
+    	let div2;
 
     	const block = {
     		c: function create() {
-    			span = element("span");
-    			create_component(link.$$.fragment);
-    			attr_dev(span, "slot", "after");
-    			add_location(span, file$3, 13, 12, 366);
+    			div3 = element("div");
+    			div0 = element("div");
+    			t0 = space();
+    			div1 = element("div");
+    			div1.textContent = "Add a new room ↘️";
+    			t2 = space();
+    			div2 = element("div");
+    			add_location(div0, file$3, 161, 12, 4496);
+    			attr_dev(div1, "class", "no-rooms svelte-jwdyjs");
+    			add_location(div1, file$3, 162, 12, 4516);
+    			add_location(div2, file$3, 165, 12, 4607);
+    			attr_dev(div3, "class", "center svelte-jwdyjs");
+    			add_location(div3, file$3, 160, 8, 4462);
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    			mount_component(link, span, null);
-    			current = true;
+    			insert_dev(target, div3, anchor);
+    			append_dev(div3, div0);
+    			append_dev(div3, t0);
+    			append_dev(div3, div1);
+    			append_dev(div3, t2);
+    			append_dev(div3, div2);
     		},
     		p: noop,
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(link.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(link.$$.fragment, local);
-    			current = false;
-    		},
+    		i: noop,
+    		o: noop,
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    			destroy_component(link);
+    			if (detaching) detach_dev(div3);
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_after_slot_2.name,
-    		type: "slot",
-    		source: "(14:12) ",
+    		id: create_else_block$1.name,
+    		type: "else",
+    		source: "(160:4) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (19:12) 
-    function create_after_slot_1(ctx) {
-    	let span;
-    	let link;
+    // (139:4) {#if roomsLenght > 0}
+    function create_if_block$1(ctx) {
+    	let list;
     	let current;
 
-    	link = new Link({
-    			props: { iconMd: "material:delete", color: "red" },
+    	list = new List({
+    			props: {
+    				mediaList: true,
+    				$$slots: { default: [create_default_slot_4] },
+    				$$scope: { ctx }
+    			},
     			$$inline: true
     		});
 
     	const block = {
     		c: function create() {
-    			span = element("span");
-    			create_component(link.$$.fragment);
-    			attr_dev(span, "slot", "after");
-    			add_location(span, file$3, 18, 12, 550);
+    			create_component(list.$$.fragment);
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    			mount_component(link, span, null);
+    			mount_component(list, target, anchor);
     			current = true;
     		},
-    		p: noop,
+    		p: function update(ctx, dirty) {
+    			const list_changes = {};
+
+    			if (dirty & /*$$scope, rooms*/ 2097154) {
+    				list_changes.$$scope = { dirty, ctx };
+    			}
+
+    			list.$set(list_changes);
+    		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(link.$$.fragment, local);
+    			transition_in(list.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(link.$$.fragment, local);
+    			transition_out(list.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    			destroy_component(link);
+    			destroy_component(list, detaching);
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_after_slot_1.name,
-    		type: "slot",
-    		source: "(19:12) ",
+    		id: create_if_block$1.name,
+    		type: "if",
+    		source: "(139:4) {#if roomsLenght > 0}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (24:12) 
+    // (143:20) 
     function create_after_slot(ctx) {
     	let span;
-    	let link;
+    	let link0;
+    	let t0;
+    	let a0;
+    	let t1;
+    	let link1;
+    	let t2;
+    	let a1;
+    	let t3;
     	let current;
 
-    	link = new Link({
-    			props: { iconMd: "material:delete", color: "red" },
+    	function func() {
+    		return /*func*/ ctx[8](/*room*/ ctx[18]);
+    	}
+
+    	link0 = new Link({
+    			props: { iconMd: "material:radar", onClick: func },
+    			$$inline: true
+    		});
+
+    	function func_1() {
+    		return /*func_1*/ ctx[9](/*room*/ ctx[18]);
+    	}
+
+    	link1 = new Link({
+    			props: {
+    				iconMd: "material:delete",
+    				color: "red",
+    				onClick: func_1
+    			},
     			$$inline: true
     		});
 
     	const block = {
     		c: function create() {
     			span = element("span");
-    			create_component(link.$$.fragment);
+    			create_component(link0.$$.fragment);
+    			t0 = space();
+    			a0 = element("a");
+    			t1 = space();
+    			create_component(link1.$$.fragment);
+    			t2 = space();
+    			a1 = element("a");
+    			t3 = space();
+    			set_style(a0, "margin-left", "16px");
+    			add_location(a0, file$3, 146, 24, 3891);
+    			set_style(a1, "margin-left", "8px");
+    			add_location(a1, file$3, 154, 24, 4312);
     			attr_dev(span, "slot", "after");
-    			add_location(span, file$3, 23, 12, 745);
+    			add_location(span, file$3, 142, 20, 3603);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
-    			mount_component(link, span, null);
+    			mount_component(link0, span, null);
+    			append_dev(span, t0);
+    			append_dev(span, a0);
+    			append_dev(span, t1);
+    			mount_component(link1, span, null);
+    			append_dev(span, t2);
+    			append_dev(span, a1);
+    			append_dev(span, t3);
     			current = true;
     		},
-    		p: noop,
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+    			const link0_changes = {};
+    			if (dirty & /*rooms*/ 2) link0_changes.onClick = func;
+    			link0.$set(link0_changes);
+    			const link1_changes = {};
+    			if (dirty & /*rooms*/ 2) link1_changes.onClick = func_1;
+    			link1.$set(link1_changes);
+    		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(link.$$.fragment, local);
+    			transition_in(link0.$$.fragment, local);
+    			transition_in(link1.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(link.$$.fragment, local);
+    			transition_out(link0.$$.fragment, local);
+    			transition_out(link1.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(span);
-    			destroy_component(link);
+    			destroy_component(link0);
+    			destroy_component(link1);
     		}
     	};
 
@@ -84927,43 +78327,22 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_after_slot.name,
     		type: "slot",
-    		source: "(24:12) ",
+    		source: "(143:20) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (12:4) <List>
-    function create_default_slot_1$2(ctx) {
-    	let listitem0;
-    	let t0;
-    	let listitem1;
-    	let t1;
-    	let listitem2;
+    // (141:12) {#each rooms as room}
+    function create_each_block(ctx) {
+    	let listitem;
     	let current;
 
-    	listitem0 = new List_item({
+    	listitem = new List_item({
     			props: {
-    				title: "Cucina",
-    				$$slots: { after: [create_after_slot_2] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	listitem1 = new List_item({
-    			props: {
-    				title: "Camera Luca",
-    				$$slots: { after: [create_after_slot_1] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	listitem2 = new List_item({
-    			props: {
-    				title: "Cammera Andrea",
+    				title: /*room*/ ctx[18].roomId,
+    				subtitle: "" + (/*room*/ ctx[18].samples + " fingerpint" + (/*room*/ ctx[18].samples == 1 ? "" : "s")),
     				$$slots: { after: [create_after_slot] },
     				$$scope: { ctx }
     			},
@@ -84972,103 +78351,205 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
-    			create_component(listitem0.$$.fragment);
-    			t0 = space();
-    			create_component(listitem1.$$.fragment);
-    			t1 = space();
-    			create_component(listitem2.$$.fragment);
+    			create_component(listitem.$$.fragment);
     		},
     		m: function mount(target, anchor) {
-    			mount_component(listitem0, target, anchor);
-    			insert_dev(target, t0, anchor);
-    			mount_component(listitem1, target, anchor);
-    			insert_dev(target, t1, anchor);
-    			mount_component(listitem2, target, anchor);
+    			mount_component(listitem, target, anchor);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			const listitem0_changes = {};
+    			const listitem_changes = {};
+    			if (dirty & /*rooms*/ 2) listitem_changes.title = /*room*/ ctx[18].roomId;
+    			if (dirty & /*rooms*/ 2) listitem_changes.subtitle = "" + (/*room*/ ctx[18].samples + " fingerpint" + (/*room*/ ctx[18].samples == 1 ? "" : "s"));
 
-    			if (dirty & /*$$scope*/ 1) {
-    				listitem0_changes.$$scope = { dirty, ctx };
+    			if (dirty & /*$$scope, rooms*/ 2097154) {
+    				listitem_changes.$$scope = { dirty, ctx };
     			}
 
-    			listitem0.$set(listitem0_changes);
-    			const listitem1_changes = {};
-
-    			if (dirty & /*$$scope*/ 1) {
-    				listitem1_changes.$$scope = { dirty, ctx };
-    			}
-
-    			listitem1.$set(listitem1_changes);
-    			const listitem2_changes = {};
-
-    			if (dirty & /*$$scope*/ 1) {
-    				listitem2_changes.$$scope = { dirty, ctx };
-    			}
-
-    			listitem2.$set(listitem2_changes);
+    			listitem.$set(listitem_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(listitem0.$$.fragment, local);
-    			transition_in(listitem1.$$.fragment, local);
-    			transition_in(listitem2.$$.fragment, local);
+    			transition_in(listitem.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(listitem0.$$.fragment, local);
-    			transition_out(listitem1.$$.fragment, local);
-    			transition_out(listitem2.$$.fragment, local);
+    			transition_out(listitem.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			destroy_component(listitem0, detaching);
-    			if (detaching) detach_dev(t0);
-    			destroy_component(listitem1, detaching);
-    			if (detaching) detach_dev(t1);
-    			destroy_component(listitem2, detaching);
+    			destroy_component(listitem, detaching);
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_1$2.name,
-    		type: "slot",
-    		source: "(12:4) <List>",
+    		id: create_each_block.name,
+    		type: "each",
+    		source: "(141:12) {#each rooms as room}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (5:0) <Page>
-    function create_default_slot$4(ctx) {
-    	let navbar;
+    // (140:8) <List mediaList>
+    function create_default_slot_4(ctx) {
+    	let each_1_anchor;
+    	let current;
+    	let each_value = /*rooms*/ ctx[1];
+    	validate_each_argument(each_value);
+    	let each_blocks = [];
+
+    	for (let i = 0; i < each_value.length; i += 1) {
+    		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+    	}
+
+    	const out = i => transition_out(each_blocks[i], 1, 1, () => {
+    		each_blocks[i] = null;
+    	});
+
+    	const block = {
+    		c: function create() {
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].c();
+    			}
+
+    			each_1_anchor = empty();
+    		},
+    		m: function mount(target, anchor) {
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].m(target, anchor);
+    			}
+
+    			insert_dev(target, each_1_anchor, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*rooms, deleteRoom, startMisuration*/ 82) {
+    				each_value = /*rooms*/ ctx[1];
+    				validate_each_argument(each_value);
+    				let i;
+
+    				for (i = 0; i < each_value.length; i += 1) {
+    					const child_ctx = get_each_context(ctx, each_value, i);
+
+    					if (each_blocks[i]) {
+    						each_blocks[i].p(child_ctx, dirty);
+    						transition_in(each_blocks[i], 1);
+    					} else {
+    						each_blocks[i] = create_each_block(child_ctx);
+    						each_blocks[i].c();
+    						transition_in(each_blocks[i], 1);
+    						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
+    					}
+    				}
+
+    				group_outros();
+
+    				for (i = each_value.length; i < each_blocks.length; i += 1) {
+    					out(i);
+    				}
+
+    				check_outros();
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+
+    			for (let i = 0; i < each_value.length; i += 1) {
+    				transition_in(each_blocks[i]);
+    			}
+
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			each_blocks = each_blocks.filter(Boolean);
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				transition_out(each_blocks[i]);
+    			}
+
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_each(each_blocks, detaching);
+    			if (detaching) detach_dev(each_1_anchor);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot_4.name,
+    		type: "slot",
+    		source: "(140:8) <List mediaList>",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (177:20) <Button icon="material:stop"                           large fill color="red"                           popupClose                           onClick={stopScan}>
+    function create_default_slot_3(ctx) {
+    	let t;
+
+    	const block = {
+    		c: function create() {
+    			t = text("STOP");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, t, anchor);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(t);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot_3.name,
+    		type: "slot",
+    		source: "(177:20) <Button icon=\\\"material:stop\\\"                           large fill color=\\\"red\\\"                           popupClose                           onClick={stopScan}>",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (171:8) <Page>
+    function create_default_slot_2(ctx) {
+    	let div2;
+    	let progressbar;
     	let t0;
-    	let fab;
-    	let t1;
-    	let list;
+    	let div0;
+    	let t2;
+    	let walkroomanimation;
+    	let t3;
+    	let div1;
+    	let button;
     	let current;
 
-    	navbar = new Navbar({
-    			props: { title: "House rooms", backLink: true },
+    	progressbar = new Progressbar({
+    			props: { infinite: true },
     			$$inline: true
     		});
 
-    	fab = new Fab({
+    	walkroomanimation = new WalkRoomAnimation({
     			props: {
-    				position: "right-bottom",
-    				href: "/calibration/",
-    				$$slots: { default: [create_default_slot_2$1] },
-    				$$scope: { ctx }
+    				roomName: /*currentRoomId*/ ctx[3].substring(0, 9)
     			},
     			$$inline: true
     		});
 
-    	list = new List({
+    	button = new Button({
     			props: {
-    				$$slots: { default: [create_default_slot_1$2] },
+    				icon: "material:stop",
+    				large: true,
+    				fill: true,
+    				color: "red",
+    				popupClose: true,
+    				onClick: /*stopScan*/ ctx[7],
+    				$$slots: { default: [create_default_slot_3] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -85076,76 +78557,87 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
-    			create_component(navbar.$$.fragment);
+    			div2 = element("div");
+    			create_component(progressbar.$$.fragment);
     			t0 = space();
-    			create_component(fab.$$.fragment);
-    			t1 = space();
-    			create_component(list.$$.fragment);
+    			div0 = element("div");
+    			div0.textContent = "Walk around the perimeter of the room slowly";
+    			t2 = space();
+    			create_component(walkroomanimation.$$.fragment);
+    			t3 = space();
+    			div1 = element("div");
+    			create_component(button.$$.fragment);
+    			attr_dev(div0, "class", "block text-title svelte-jwdyjs");
+    			add_location(div0, file$3, 173, 16, 4882);
+    			attr_dev(div1, "class", "button-stop svelte-jwdyjs");
+    			add_location(div1, file$3, 175, 16, 5060);
+    			attr_dev(div2, "class", "center svelte-jwdyjs");
+    			add_location(div2, file$3, 171, 12, 4790);
     		},
     		m: function mount(target, anchor) {
-    			mount_component(navbar, target, anchor);
-    			insert_dev(target, t0, anchor);
-    			mount_component(fab, target, anchor);
-    			insert_dev(target, t1, anchor);
-    			mount_component(list, target, anchor);
+    			insert_dev(target, div2, anchor);
+    			mount_component(progressbar, div2, null);
+    			append_dev(div2, t0);
+    			append_dev(div2, div0);
+    			append_dev(div2, t2);
+    			mount_component(walkroomanimation, div2, null);
+    			append_dev(div2, t3);
+    			append_dev(div2, div1);
+    			mount_component(button, div1, null);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			const fab_changes = {};
+    			const walkroomanimation_changes = {};
+    			if (dirty & /*currentRoomId*/ 8) walkroomanimation_changes.roomName = /*currentRoomId*/ ctx[3].substring(0, 9);
+    			walkroomanimation.$set(walkroomanimation_changes);
+    			const button_changes = {};
 
-    			if (dirty & /*$$scope*/ 1) {
-    				fab_changes.$$scope = { dirty, ctx };
+    			if (dirty & /*$$scope*/ 2097152) {
+    				button_changes.$$scope = { dirty, ctx };
     			}
 
-    			fab.$set(fab_changes);
-    			const list_changes = {};
-
-    			if (dirty & /*$$scope*/ 1) {
-    				list_changes.$$scope = { dirty, ctx };
-    			}
-
-    			list.$set(list_changes);
+    			button.$set(button_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(navbar.$$.fragment, local);
-    			transition_in(fab.$$.fragment, local);
-    			transition_in(list.$$.fragment, local);
+    			transition_in(progressbar.$$.fragment, local);
+    			transition_in(walkroomanimation.$$.fragment, local);
+    			transition_in(button.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(navbar.$$.fragment, local);
-    			transition_out(fab.$$.fragment, local);
-    			transition_out(list.$$.fragment, local);
+    			transition_out(progressbar.$$.fragment, local);
+    			transition_out(walkroomanimation.$$.fragment, local);
+    			transition_out(button.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			destroy_component(navbar, detaching);
-    			if (detaching) detach_dev(t0);
-    			destroy_component(fab, detaching);
-    			if (detaching) detach_dev(t1);
-    			destroy_component(list, detaching);
+    			if (detaching) detach_dev(div2);
+    			destroy_component(progressbar);
+    			destroy_component(walkroomanimation);
+    			destroy_component(button);
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$4.name,
+    		id: create_default_slot_2.name,
     		type: "slot",
-    		source: "(5:0) <Page>",
+    		source: "(171:8) <Page>",
     		ctx
     	});
 
     	return block;
     }
 
-    function create_fragment$4(ctx) {
+    // (170:4) <Popup opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>
+    function create_default_slot_1$1(ctx) {
     	let page;
     	let current;
 
     	page = new Page({
     			props: {
-    				$$slots: { default: [create_default_slot$4] },
+    				$$slots: { default: [create_default_slot_2] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -85155,17 +78647,14 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			create_component(page.$$.fragment);
     		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
     		m: function mount(target, anchor) {
     			mount_component(page, target, anchor);
     			current = true;
     		},
-    		p: function update(ctx, [dirty]) {
+    		p: function update(ctx, dirty) {
     			const page_changes = {};
 
-    			if (dirty & /*$$scope*/ 1) {
+    			if (dirty & /*$$scope, currentRoomId*/ 2097160) {
     				page_changes.$$scope = { dirty, ctx };
     			}
 
@@ -85187,7 +78676,216 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$4.name,
+    		id: create_default_slot_1$1.name,
+    		type: "slot",
+    		source: "(170:4) <Popup opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (132:0) <Page>
+    function create_default_slot$3(ctx) {
+    	let navbar;
+    	let t0;
+    	let fab;
+    	let t1;
+    	let current_block_type_index;
+    	let if_block;
+    	let t2;
+    	let popup;
+    	let current;
+
+    	navbar = new Navbar({
+    			props: { title: "Rooms", backLink: true },
+    			$$inline: true
+    		});
+
+    	fab = new Fab({
+    			props: {
+    				position: "right-bottom",
+    				onClick: /*dialogInsertRoomName*/ ctx[5],
+    				text: "New",
+    				$$slots: { default: [create_default_slot_5] },
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	const if_block_creators = [create_if_block$1, create_else_block$1];
+    	const if_blocks = [];
+
+    	function select_block_type(ctx, dirty) {
+    		if (/*roomsLenght*/ ctx[2] > 0) return 0;
+    		return 1;
+    	}
+
+    	current_block_type_index = select_block_type(ctx);
+    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+
+    	popup = new Popup({
+    			props: {
+    				opened: /*popupOpened*/ ctx[0],
+    				onPopupClosed: /*func_2*/ ctx[10],
+    				backdrop: true,
+    				closeByBackdropClick: false,
+    				$$slots: { default: [create_default_slot_1$1] },
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			create_component(navbar.$$.fragment);
+    			t0 = space();
+    			create_component(fab.$$.fragment);
+    			t1 = space();
+    			if_block.c();
+    			t2 = space();
+    			create_component(popup.$$.fragment);
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(navbar, target, anchor);
+    			insert_dev(target, t0, anchor);
+    			mount_component(fab, target, anchor);
+    			insert_dev(target, t1, anchor);
+    			if_blocks[current_block_type_index].m(target, anchor);
+    			insert_dev(target, t2, anchor);
+    			mount_component(popup, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const fab_changes = {};
+
+    			if (dirty & /*$$scope*/ 2097152) {
+    				fab_changes.$$scope = { dirty, ctx };
+    			}
+
+    			fab.$set(fab_changes);
+    			let previous_block_index = current_block_type_index;
+    			current_block_type_index = select_block_type(ctx);
+
+    			if (current_block_type_index === previous_block_index) {
+    				if_blocks[current_block_type_index].p(ctx, dirty);
+    			} else {
+    				group_outros();
+
+    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
+    					if_blocks[previous_block_index] = null;
+    				});
+
+    				check_outros();
+    				if_block = if_blocks[current_block_type_index];
+
+    				if (!if_block) {
+    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    					if_block.c();
+    				} else {
+    					if_block.p(ctx, dirty);
+    				}
+
+    				transition_in(if_block, 1);
+    				if_block.m(t2.parentNode, t2);
+    			}
+
+    			const popup_changes = {};
+    			if (dirty & /*popupOpened*/ 1) popup_changes.opened = /*popupOpened*/ ctx[0];
+    			if (dirty & /*popupOpened*/ 1) popup_changes.onPopupClosed = /*func_2*/ ctx[10];
+
+    			if (dirty & /*$$scope, currentRoomId*/ 2097160) {
+    				popup_changes.$$scope = { dirty, ctx };
+    			}
+
+    			popup.$set(popup_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(navbar.$$.fragment, local);
+    			transition_in(fab.$$.fragment, local);
+    			transition_in(if_block);
+    			transition_in(popup.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(navbar.$$.fragment, local);
+    			transition_out(fab.$$.fragment, local);
+    			transition_out(if_block);
+    			transition_out(popup.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(navbar, detaching);
+    			if (detaching) detach_dev(t0);
+    			destroy_component(fab, detaching);
+    			if (detaching) detach_dev(t1);
+    			if_blocks[current_block_type_index].d(detaching);
+    			if (detaching) detach_dev(t2);
+    			destroy_component(popup, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot$3.name,
+    		type: "slot",
+    		source: "(132:0) <Page>",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$3(ctx) {
+    	let page;
+    	let current;
+
+    	page = new Page({
+    			props: {
+    				$$slots: { default: [create_default_slot$3] },
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			create_component(page.$$.fragment);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(page, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			const page_changes = {};
+
+    			if (dirty & /*$$scope, popupOpened, currentRoomId, rooms, roomsLenght*/ 2097167) {
+    				page_changes.$$scope = { dirty, ctx };
+    			}
+
+    			page.$set(page_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(page.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(page.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(page, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$3.name,
     		type: "component",
     		source: "",
     		ctx
@@ -85196,38 +78894,179 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$4($$self, $$props, $$invalidate) {
+    function instance$3($$self, $$props, $$invalidate) {
+    	let $webSocket;
+    	validate_store(webSocket, 'webSocket');
+    	component_subscribe($$self, webSocket, $$value => $$invalidate(11, $webSocket = $$value));
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('RoomsPage', slots, []);
+    	let popupOpened = false;
+    	let rooms = [];
+    	let roomsLenght = 0;
+
+    	onMount(() => {
+    		socketSetup();
+    		getRooms();
+    	});
+
+    	onDestroy(() => {
+    		socketDestroy();
+    	});
+
+    	function socketSetup() {
+    		$webSocket.addEventListener("message", onSocketMessage);
+    	}
+
+    	// Socket functions
+    	function onSocketMessage(event) {
+    		let message = JSON.parse(event.data);
+
+    		switch (message.type) {
+    			case "ROOMS":
+    				$$invalidate(1, rooms = message.rooms);
+    				$$invalidate(2, roomsLenght = rooms.length);
+    				console.log(message);
+    				break;
+    		}
+    	}
+
+    	function socketDestroy() {
+    		$webSocket.removeEventListener("message", onSocketMessage);
+    	}
+
+    	function getRooms() {
+    		$webSocket.send(JSON.stringify({ type: "ROOMS_REQUEST" }));
+    	}
+
+    	function setRoom(roomId) {
+    		$webSocket.send(JSON.stringify({ type: "CREATE_ROOM", roomId }));
+    	}
+
+    	function deleteRoom(roomId) {
+    		f7.dialog.confirm("Do you really want to delete " + roomId + "? All the saved fingerprints will be lost.", "Multiroom Audio", () => {
+    			$webSocket.send(JSON.stringify({ type: "DELETE_ROOM", roomId }));
+    		});
+    	}
+
+    	function dialogInsertRoomName() {
+    		f7.dialog.prompt("Insert room name", "Multiroom Audio", value => {
+    			if (value.trim()) {
+    				value = value.substring(0, 15);
+    				console.log("New room: " + value);
+    				setRoom(value);
+    				startMisuration(value);
+    			} else {
+    				dialogInsertRoomName();
+    			}
+    		});
+    	}
+
+    	function startMisuration(roomId) {
+    		f7.dialog.confirm("Do you want to start scanning " + roomId + "?", "Multiroom Audio", () => {
+    			$$invalidate(0, popupOpened = true);
+    			startScan(roomId);
+    		});
+    	}
+
+    	let currentRoomId = "";
+
+    	function startScan(roomId) {
+    		$$invalidate(3, currentRoomId = roomId);
+
+    		$webSocket.send(JSON.stringify({
+    			type: "SCAN_ROOM",
+    			roomId,
+    			startScan: true
+    		}));
+    	}
+
+    	function stopScan() {
+    		$webSocket.send(JSON.stringify({
+    			type: "SCAN_ROOM",
+    			roomId: currentRoomId,
+    			startScan: false
+    		}));
+    	}
+
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<RoomsPage> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<RoomsPage> was created with unknown prop '${key}'`);
     	});
 
+    	const func = room => startMisuration(room.roomId);
+    	const func_1 = room => deleteRoom(room.roomId);
+    	const func_2 = () => $$invalidate(0, popupOpened = false);
+
     	$$self.$capture_state = () => ({
+    		onMount,
+    		onDestroy,
     		Page,
     		Navbar,
     		Fab,
     		Icon,
     		Link,
     		ListItem: List_item,
-    		List
+    		List,
+    		f7,
+    		Popup,
+    		Button,
+    		Progressbar,
+    		WalkRoomAnimation,
+    		webSocket,
+    		popupOpened,
+    		rooms,
+    		roomsLenght,
+    		socketSetup,
+    		onSocketMessage,
+    		socketDestroy,
+    		getRooms,
+    		setRoom,
+    		deleteRoom,
+    		dialogInsertRoomName,
+    		startMisuration,
+    		currentRoomId,
+    		startScan,
+    		stopScan,
+    		$webSocket
     	});
 
-    	return [];
+    	$$self.$inject_state = $$props => {
+    		if ('popupOpened' in $$props) $$invalidate(0, popupOpened = $$props.popupOpened);
+    		if ('rooms' in $$props) $$invalidate(1, rooms = $$props.rooms);
+    		if ('roomsLenght' in $$props) $$invalidate(2, roomsLenght = $$props.roomsLenght);
+    		if ('currentRoomId' in $$props) $$invalidate(3, currentRoomId = $$props.currentRoomId);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [
+    		popupOpened,
+    		rooms,
+    		roomsLenght,
+    		currentRoomId,
+    		deleteRoom,
+    		dialogInsertRoomName,
+    		startMisuration,
+    		stopScan,
+    		func,
+    		func_1,
+    		func_2
+    	];
     }
 
     class RoomsPage extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$4, create_fragment$4, safe_not_equal, {});
+    		init(this, options, instance$3, create_fragment$3, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "RoomsPage",
     			options,
-    			id: create_fragment$4.name
+    			id: create_fragment$3.name
     		});
     	}
     }
@@ -85238,7 +79077,7 @@ var MultiRoomAudio = (function () {
     const file$2 = "src\\pages\\SpeakerPage.svelte";
 
     // (169:0) <Page>
-    function create_default_slot$3(ctx) {
+    function create_default_slot$2(ctx) {
     	let div3;
     	let div0;
     	let t0;
@@ -85272,14 +79111,14 @@ var MultiRoomAudio = (function () {
     			t2 = space();
     			create_component(nowplaying.$$.fragment);
     			attr_dev(div0, "class", "navbar-bg svelte-2u5o7c");
-    			add_location(div0, file$2, 170, 8, 4878);
+    			add_location(div0, file$2, 170, 8, 4861);
     			attr_dev(div1, "class", "title svelte-2u5o7c");
-    			add_location(div1, file$2, 172, 12, 4961);
+    			add_location(div1, file$2, 172, 12, 4944);
     			attr_dev(div2, "class", "navbar-inner sliding svelte-2u5o7c");
-    			add_location(div2, file$2, 171, 8, 4913);
+    			add_location(div2, file$2, 171, 8, 4896);
     			attr_dev(div3, "class", "navbar");
     			attr_dev(div3, "data-f7-slot", "fixed");
-    			add_location(div3, file$2, 169, 4, 4827);
+    			add_location(div3, file$2, 169, 4, 4810);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -85318,7 +79157,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$3.name,
+    		id: create_default_slot$2.name,
     		type: "slot",
     		source: "(169:0) <Page>",
     		ctx
@@ -85327,13 +79166,13 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function create_fragment$3(ctx) {
+    function create_fragment$2(ctx) {
     	let page;
     	let current;
 
     	page = new Page({
     			props: {
-    				$$slots: { default: [create_default_slot$3] },
+    				$$slots: { default: [create_default_slot$2] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -85375,7 +79214,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$3.name,
+    		id: create_fragment$2.name,
     		type: "component",
     		source: "",
     		ctx
@@ -85384,7 +79223,7 @@ var MultiRoomAudio = (function () {
     	return block;
     }
 
-    function instance$3($$self, $$props, $$invalidate) {
+    function instance$2($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('SpeakerPage', slots, []);
     	let socket = null;
@@ -85523,7 +79362,7 @@ var MultiRoomAudio = (function () {
     			if (audio.currentTime > message.fromTimeSec + syncWindow / 2 || audio.currentTime < message.fromTimeSec - syncWindow / 2) audio.currentTime = message.fromTimeSec;
     			if (audio.paused) audio.play();
     		}
-    	} //console.log("Current time " + audio.currentTime);
+    	} //console.log("Current time " + audio.currentTime)
     	//console.log(message.fromTimeSec)
 
     	function pause() {
@@ -85606,855 +79445,11 @@ var MultiRoomAudio = (function () {
     class SpeakerPage extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$3, create_fragment$3, safe_not_equal, {});
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "SpeakerPage",
-    			options,
-    			id: create_fragment$3.name
-    		});
-    	}
-    }
-
-    /* src\pages\CalibrationPage.svelte generated by Svelte v3.44.0 */
-
-    // (68:2) <NavRight>
-    function create_default_slot_10(ctx) {
-    	let link;
-    	let current;
-
-    	link = new Link({
-    			props: {
-    				iconMd: "material:home",
-    				iconOnly: true,
-    				href: "/musiclist/"
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(link.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(link, target, anchor);
-    			current = true;
-    		},
-    		p: noop,
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(link.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(link.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(link, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_10.name,
-    		type: "slot",
-    		source: "(68:2) <NavRight>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (67:4) <Navbar title="Add room"  backLink="back" on:clickBack={() => {backClick()}}>
-    function create_default_slot_9(ctx) {
-    	let navright;
-    	let current;
-
-    	navright = new Nav_right({
-    			props: {
-    				$$slots: { default: [create_default_slot_10] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(navright.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(navright, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const navright_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				navright_changes.$$scope = { dirty, ctx };
-    			}
-
-    			navright.$set(navright_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(navright.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(navright.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(navright, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_9.name,
-    		type: "slot",
-    		source: "(67:4) <Navbar title=\\\"Add room\\\"  backLink=\\\"back\\\" on:clickBack={() => {backClick()}}>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (75:4) <List noHairlinesMd>
-    function create_default_slot_8(ctx) {
-    	let listinput;
-    	let updating_value;
-    	let current;
-
-    	function listinput_value_binding(value) {
-    		/*listinput_value_binding*/ ctx[5](value);
-    	}
-
-    	let listinput_props = {
-    		outline: true,
-    		label: "Room name",
-    		floatingLabel: true,
-    		type: "text",
-    		placeholder: "Bed room"
-    	};
-
-    	if (/*inputVal*/ ctx[0] !== void 0) {
-    		listinput_props.value = /*inputVal*/ ctx[0];
-    	}
-
-    	listinput = new List_input({ props: listinput_props, $$inline: true });
-    	binding_callbacks.push(() => bind(listinput, 'value', listinput_value_binding));
-
-    	const block = {
-    		c: function create() {
-    			create_component(listinput.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(listinput, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const listinput_changes = {};
-
-    			if (!updating_value && dirty & /*inputVal*/ 1) {
-    				updating_value = true;
-    				listinput_changes.value = /*inputVal*/ ctx[0];
-    				add_flush_callback(() => updating_value = false);
-    			}
-
-    			listinput.$set(listinput_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(listinput.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(listinput.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(listinput, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_8.name,
-    		type: "slot",
-    		source: "(75:4) <List noHairlinesMd>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (78:4) <BlockTitle>
-    function create_default_slot_7(ctx) {
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			t = text$1("Calibration nuovo");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, t, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(t);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_7.name,
-    		type: "slot",
-    		source: "(78:4) <BlockTitle>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (82:10) <Button id="start" class="col button button-raised" on:click={startClick} >
-    function create_default_slot_6(ctx) {
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			t = text$1("start");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, t, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(t);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_6.name,
-    		type: "slot",
-    		source: "(82:10) <Button id=\\\"start\\\" class=\\\"col button button-raised\\\" on:click={startClick} >",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (81:8) <Col tag="span">
-    function create_default_slot_5(ctx) {
-    	let button;
-    	let current;
-
-    	button = new Button({
-    			props: {
-    				id: "start",
-    				class: "col button button-raised",
-    				$$slots: { default: [create_default_slot_6] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	button.$on("click", /*startClick*/ ctx[1]);
-
-    	const block = {
-    		c: function create() {
-    			create_component(button.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(button, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const button_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				button_changes.$$scope = { dirty, ctx };
-    			}
-
-    			button.$set(button_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(button.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(button.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(button, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_5.name,
-    		type: "slot",
-    		source: "(81:8) <Col tag=\\\"span\\\">",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (85:10) <Button col class="col button button-raised" on:click={stopClick} >
-    function create_default_slot_4(ctx) {
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			t = text$1("stop");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, t, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(t);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_4.name,
-    		type: "slot",
-    		source: "(85:10) <Button col class=\\\"col button button-raised\\\" on:click={stopClick} >",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (84:8) <Col tag="span">
-    function create_default_slot_3(ctx) {
-    	let button;
-    	let current;
-
-    	button = new Button({
-    			props: {
-    				col: true,
-    				class: "col button button-raised",
-    				$$slots: { default: [create_default_slot_4] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	button.$on("click", /*stopClick*/ ctx[3]);
-
-    	const block = {
-    		c: function create() {
-    			create_component(button.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(button, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const button_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				button_changes.$$scope = { dirty, ctx };
-    			}
-
-    			button.$set(button_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(button.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(button.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(button, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_3.name,
-    		type: "slot",
-    		source: "(84:8) <Col tag=\\\"span\\\">",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (80:6) <Row tag="p">
-    function create_default_slot_2(ctx) {
-    	let col0;
-    	let t;
-    	let col1;
-    	let current;
-
-    	col0 = new Col({
-    			props: {
-    				tag: "span",
-    				$$slots: { default: [create_default_slot_5] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	col1 = new Col({
-    			props: {
-    				tag: "span",
-    				$$slots: { default: [create_default_slot_3] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(col0.$$.fragment);
-    			t = space();
-    			create_component(col1.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(col0, target, anchor);
-    			insert_dev(target, t, anchor);
-    			mount_component(col1, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const col0_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				col0_changes.$$scope = { dirty, ctx };
-    			}
-
-    			col0.$set(col0_changes);
-    			const col1_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				col1_changes.$$scope = { dirty, ctx };
-    			}
-
-    			col1.$set(col1_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(col0.$$.fragment, local);
-    			transition_in(col1.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(col0.$$.fragment, local);
-    			transition_out(col1.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(col0, detaching);
-    			if (detaching) detach_dev(t);
-    			destroy_component(col1, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_2.name,
-    		type: "slot",
-    		source: "(80:6) <Row tag=\\\"p\\\">",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (79:4) <Block strong>
-    function create_default_slot_1$1(ctx) {
-    	let row;
-    	let current;
-
-    	row = new Row({
-    			props: {
-    				tag: "p",
-    				$$slots: { default: [create_default_slot_2] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(row.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(row, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const row_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				row_changes.$$scope = { dirty, ctx };
-    			}
-
-    			row.$set(row_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(row.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(row.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(row, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_1$1.name,
-    		type: "slot",
-    		source: "(79:4) <Block strong>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (65:0) <Page>
-    function create_default_slot$2(ctx) {
-    	let navbar;
-    	let t0;
-    	let list;
-    	let t1;
-    	let blocktitle;
-    	let t2;
-    	let block;
-    	let current;
-
-    	navbar = new Navbar({
-    			props: {
-    				title: "Add room",
-    				backLink: "back",
-    				$$slots: { default: [create_default_slot_9] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	navbar.$on("clickBack", /*clickBack_handler*/ ctx[4]);
-
-    	list = new List({
-    			props: {
-    				noHairlinesMd: true,
-    				$$slots: { default: [create_default_slot_8] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	blocktitle = new Block_title({
-    			props: {
-    				$$slots: { default: [create_default_slot_7] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	block = new Block({
-    			props: {
-    				strong: true,
-    				$$slots: { default: [create_default_slot_1$1] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	const block_1 = {
-    		c: function create() {
-    			create_component(navbar.$$.fragment);
-    			t0 = space();
-    			create_component(list.$$.fragment);
-    			t1 = space();
-    			create_component(blocktitle.$$.fragment);
-    			t2 = space();
-    			create_component(block.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(navbar, target, anchor);
-    			insert_dev(target, t0, anchor);
-    			mount_component(list, target, anchor);
-    			insert_dev(target, t1, anchor);
-    			mount_component(blocktitle, target, anchor);
-    			insert_dev(target, t2, anchor);
-    			mount_component(block, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const navbar_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				navbar_changes.$$scope = { dirty, ctx };
-    			}
-
-    			navbar.$set(navbar_changes);
-    			const list_changes = {};
-
-    			if (dirty & /*$$scope, inputVal*/ 1025) {
-    				list_changes.$$scope = { dirty, ctx };
-    			}
-
-    			list.$set(list_changes);
-    			const blocktitle_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				blocktitle_changes.$$scope = { dirty, ctx };
-    			}
-
-    			blocktitle.$set(blocktitle_changes);
-    			const block_changes = {};
-
-    			if (dirty & /*$$scope*/ 1024) {
-    				block_changes.$$scope = { dirty, ctx };
-    			}
-
-    			block.$set(block_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(navbar.$$.fragment, local);
-    			transition_in(list.$$.fragment, local);
-    			transition_in(blocktitle.$$.fragment, local);
-    			transition_in(block.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(navbar.$$.fragment, local);
-    			transition_out(list.$$.fragment, local);
-    			transition_out(blocktitle.$$.fragment, local);
-    			transition_out(block.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(navbar, detaching);
-    			if (detaching) detach_dev(t0);
-    			destroy_component(list, detaching);
-    			if (detaching) detach_dev(t1);
-    			destroy_component(blocktitle, detaching);
-    			if (detaching) detach_dev(t2);
-    			destroy_component(block, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block: block_1,
-    		id: create_default_slot$2.name,
-    		type: "slot",
-    		source: "(65:0) <Page>",
-    		ctx
-    	});
-
-    	return block_1;
-    }
-
-    function create_fragment$2(ctx) {
-    	let page;
-    	let current;
-
-    	page = new Page({
-    			props: {
-    				$$slots: { default: [create_default_slot$2] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(page.$$.fragment);
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(page, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, [dirty]) {
-    			const page_changes = {};
-
-    			if (dirty & /*$$scope, inputVal*/ 1025) {
-    				page_changes.$$scope = { dirty, ctx };
-    			}
-
-    			page.$set(page_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(page.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(page.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(page, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$2.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$2($$self, $$props, $$invalidate) {
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('CalibrationPage', slots, []);
-    	const urlParams = new URLSearchParams(window.location.search);
-    	let clientId = urlParams.get('clientId');
-    	let inputVal = null;
-    	let isStart = false;
-    	var timeOutFunctionId;
-
-    	async function startClick() {
-    		if (isStart) return;
-
-    		if (inputVal === null) {
-    			alert("Inserisci un nome per la stanza");
-    			return;
-    		}
-
-    		let res = await fetch("http://" + location.hostname + ":80/offline/start", {
-    			method: 'PUT',
-    			body: JSON.stringify({
-    				type: "offline",
-    				id: clientId,
-    				room: inputVal
-    			})
-    		});
-
-    		let json = await res.json();
-
-    		if (json["status"] === "KO") {
-    			alert("Stai già scansionando");
-    		} else if (json["status"] === "OK") {
-    			document.getElementById("start").className = "col button button-raised button-fill";
-    			isStart = !isStart;
-    		}
-    	}
-
-    	async function backClick() {
-    		if (!isStart) return;
-    		isStart = !isStart;
-
-    		await fetch("http://" + location.hostname + ":80/offline/stop", {
-    			method: 'PUT',
-    			body: JSON.stringify({
-    				type: "offline",
-    				id: clientId,
-    				room: inputVal
-    			})
-    		});
-    	}
-
-    	async function stopClick() {
-    		if (!isStart) return;
-    		isStart = !isStart;
-    		document.getElementById("start").className = "col button button-raised";
-
-    		await fetch("http://" + location.hostname + ":80/offline/stop", {
-    			method: 'PUT',
-    			body: JSON.stringify({
-    				type: "offline",
-    				id: clientId,
-    				room: inputVal
-    			})
-    		});
-
-    		$$invalidate(0, inputVal = null);
-    	}
-
-    	const writable_props = [];
-
-    	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<CalibrationPage> was created with unknown prop '${key}'`);
-    	});
-
-    	const clickBack_handler = () => {
-    		backClick();
-    	};
-
-    	function listinput_value_binding(value) {
-    		inputVal = value;
-    		$$invalidate(0, inputVal);
-    	}
-
-    	$$self.$capture_state = () => ({
-    		Page,
-    		Navbar,
-    		NavRight: Nav_right,
-    		Link,
-    		List,
-    		ListInput: List_input,
-    		BlockTitle: Block_title,
-    		Block,
-    		Button,
-    		ListItem: List_item,
-    		Row,
-    		Col,
-    		urlParams,
-    		clientId,
-    		inputVal,
-    		isStart,
-    		timeOutFunctionId,
-    		startClick,
-    		backClick,
-    		stopClick
-    	});
-
-    	$$self.$inject_state = $$props => {
-    		if ('clientId' in $$props) clientId = $$props.clientId;
-    		if ('inputVal' in $$props) $$invalidate(0, inputVal = $$props.inputVal);
-    		if ('isStart' in $$props) isStart = $$props.isStart;
-    		if ('timeOutFunctionId' in $$props) timeOutFunctionId = $$props.timeOutFunctionId;
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	return [
-    		inputVal,
-    		startClick,
-    		backClick,
-    		stopClick,
-    		clickBack_handler,
-    		listinput_value_binding
-    	];
-    }
-
-    class CalibrationPage extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
     		init(this, options, instance$2, create_fragment$2, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "CalibrationPage",
+    			tagName: "SpeakerPage",
     			options,
     			id: create_fragment$2.name
     		});
@@ -86477,8 +79472,8 @@ var MultiRoomAudio = (function () {
     			t1 = space();
     			p1 = element("p");
     			p1.textContent = "BELLA.";
-    			add_location(p0, file$1, 10, 8, 207);
-    			add_location(p1, file$1, 11, 8, 229);
+    			add_location(p0, file$1, 10, 8, 206);
+    			add_location(p1, file$1, 11, 8, 228);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, p0, anchor);
@@ -86661,7 +79656,7 @@ var MultiRoomAudio = (function () {
     /* src\App.svelte generated by Svelte v3.44.0 */
     const file = "src\\App.svelte";
 
-    // (61:2) {:else}
+    // (57:4) {:else}
     function create_else_block(ctx) {
     	let h1;
 
@@ -86669,7 +79664,7 @@ var MultiRoomAudio = (function () {
     		c: function create() {
     			h1 = element("h1");
     			h1.textContent = "Open Multiroom Audio on your pc";
-    			add_location(h1, file, 61, 4, 1677);
+    			add_location(h1, file, 57, 8, 1606);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, h1, anchor);
@@ -86685,15 +79680,15 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(61:2) {:else}",
+    		source: "(57:4) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (59:22) 
-    function create_if_block_3(ctx) {
+    // (55:24) 
+    function create_if_block_2(ctx) {
     	let view;
     	let current;
 
@@ -86730,59 +79725,16 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_3.name,
-    		type: "if",
-    		source: "(59:22) ",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (57:24) 
-    function create_if_block_2(ctx) {
-    	let view;
-    	let current;
-
-    	view = new View({
-    			props: { url: "/musiclist" },
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(view.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(view, target, anchor);
-    			current = true;
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(view.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(view.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(view, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(57:24) ",
+    		source: "(55:24) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (55:21) 
+    // (53:23) 
     function create_if_block_1(ctx) {
     	let view;
     	let current;
@@ -86818,14 +79770,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(55:21) ",
+    		source: "(53:23) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (53:2) {#if clientConnection}
+    // (51:4) {#if clientConnection}
     function create_if_block(ctx) {
     	let view;
     	let current;
@@ -86857,36 +79809,27 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(53:2) {#if clientConnection}",
+    		source: "(51:4) {#if clientConnection}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (52:0) <App {...f7Params} themeDark={themeDark}>
+    // (50:0) <App {...f7Params} {themeDark}>
     function create_default_slot(ctx) {
     	let current_block_type_index;
     	let if_block;
     	let if_block_anchor;
     	let current;
-
-    	const if_block_creators = [
-    		create_if_block,
-    		create_if_block_1,
-    		create_if_block_2,
-    		create_if_block_3,
-    		create_else_block
-    	];
-
+    	const if_block_creators = [create_if_block, create_if_block_1, create_if_block_2, create_else_block];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
-    		if (/*clientConnection*/ ctx[4]) return 0;
+    		if (/*clientConnection*/ ctx[3]) return 0;
     		if (/*isClient*/ ctx[0]) return 1;
-    		if (/*isNewClient*/ ctx[2]) return 2;
-    		if (/*isSpeaker*/ ctx[1]) return 3;
-    		return 4;
+    		if (/*isSpeaker*/ ctx[1]) return 2;
+    		return 3;
     	}
 
     	current_block_type_index = select_block_type(ctx);
@@ -86944,7 +79887,7 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(52:0) <App {...f7Params} themeDark={themeDark}>",
+    		source: "(50:0) <App {...f7Params} {themeDark}>",
     		ctx
     	});
 
@@ -86954,7 +79897,7 @@ var MultiRoomAudio = (function () {
     function create_fragment(ctx) {
     	let app;
     	let current;
-    	const app_spread_levels = [/*f7Params*/ ctx[3], { themeDark: /*themeDark*/ ctx[5] }];
+    	const app_spread_levels = [/*f7Params*/ ctx[2], { themeDark: /*themeDark*/ ctx[4] }];
 
     	let app_props = {
     		$$slots: { default: [create_default_slot] },
@@ -86979,14 +79922,14 @@ var MultiRoomAudio = (function () {
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			const app_changes = (dirty & /*f7Params, themeDark*/ 40)
+    			const app_changes = (dirty & /*f7Params, themeDark*/ 20)
     			? get_spread_update(app_spread_levels, [
-    					dirty & /*f7Params*/ 8 && get_spread_object(/*f7Params*/ ctx[3]),
-    					dirty & /*themeDark*/ 32 && { themeDark: /*themeDark*/ ctx[5] }
+    					dirty & /*f7Params*/ 4 && get_spread_object(/*f7Params*/ ctx[2]),
+    					dirty & /*themeDark*/ 16 && { themeDark: /*themeDark*/ ctx[4] }
     				])
     			: {};
 
-    			if (dirty & /*$$scope, isClient, isNewClient, isSpeaker*/ 135) {
+    			if (dirty & /*$$scope, isClient, isSpeaker*/ 67) {
     				app_changes.$$scope = { dirty, ctx };
     			}
 
@@ -87024,30 +79967,24 @@ var MultiRoomAudio = (function () {
     	const f7Params = {
     		routes: [
     			{
-    				path: '/musiclist',
-    				component: MusicListPage
+    				path: "/musiclist",
+    				component: ClientPage
     			},
-    			{ path: '/rooms', component: RoomsPage },
-    			{
-    				path: '/calibration',
-    				component: CalibrationPage
-    			},
-    			{ path: '/speaker', component: SpeakerPage },
-    			{ path: '/load', component: AboutPage }
+    			{ path: "/rooms", component: RoomsPage },
+    			{ path: "/speaker", component: SpeakerPage },
+    			{ path: "/load", component: AboutPage }
     		]
     	};
 
     	const urlParams = new URLSearchParams(window.location.search);
     	let isClient = false;
     	let isSpeaker = false;
-    	let isNewClient = false;
     	let clientConnection = false;
+    	deviceId.set(urlParams.get("clientId"));
 
-    	if (urlParams.get('type') != null && (urlParams.get('type') === 'client' || urlParams.get('type') === 'rejected')) {
+    	if (urlParams.get("type") && (urlParams.get("type") === "client" || urlParams.get("type") === "rejected")) {
     		isClient = true;
-    	} else if (urlParams.get('type') != null && urlParams.get('type') === 'newclient') {
-    		isNewClient = true;
-    	} else if (urlParams.get('type') != null && urlParams.get('type') === 'speaker') {
+    	} else if (urlParams.get("type") && urlParams.get("type") === "speaker") {
     		isSpeaker = true;
     	}
 
@@ -87061,16 +79998,15 @@ var MultiRoomAudio = (function () {
     	$$self.$capture_state = () => ({
     		App,
     		View,
-    		MusicListPage,
+    		ClientPage,
     		RoomsPage,
     		SpeakerPage,
-    		CalibrationPage,
     		AboutPage,
+    		deviceId,
     		f7Params,
     		urlParams,
     		isClient,
     		isSpeaker,
-    		isNewClient,
     		clientConnection,
     		themeDark
     	});
@@ -87078,16 +80014,15 @@ var MultiRoomAudio = (function () {
     	$$self.$inject_state = $$props => {
     		if ('isClient' in $$props) $$invalidate(0, isClient = $$props.isClient);
     		if ('isSpeaker' in $$props) $$invalidate(1, isSpeaker = $$props.isSpeaker);
-    		if ('isNewClient' in $$props) $$invalidate(2, isNewClient = $$props.isNewClient);
-    		if ('clientConnection' in $$props) $$invalidate(4, clientConnection = $$props.clientConnection);
-    		if ('themeDark' in $$props) $$invalidate(5, themeDark = $$props.themeDark);
+    		if ('clientConnection' in $$props) $$invalidate(3, clientConnection = $$props.clientConnection);
+    		if ('themeDark' in $$props) $$invalidate(4, themeDark = $$props.themeDark);
     	};
 
     	if ($$props && "$$inject" in $$props) {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [isClient, isSpeaker, isNewClient, f7Params, clientConnection, themeDark];
+    	return [isClient, isSpeaker, f7Params, clientConnection, themeDark];
     }
 
     class App_1 extends SvelteComponentDev {

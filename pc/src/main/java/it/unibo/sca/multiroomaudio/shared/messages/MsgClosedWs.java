@@ -6,5 +6,4 @@ public class MsgClosedWs extends Msg{
         super("CLOSED_WS");
         //TODO Auto-generated constructor stub
     }
-    
 }
