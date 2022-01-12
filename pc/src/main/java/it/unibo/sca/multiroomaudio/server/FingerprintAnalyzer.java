@@ -1,11 +1,14 @@
 package it.unibo.sca.multiroomaudio.server;
 
+import it.unibo.sca.multiroomaudio.shared.dto.Client;
+
 public class FingerprintAnalyzer extends Thread{
     
-    private final DatabaseManager dbm;
+    private final Client client;
+    
 
-    public FingerprintAnalyzer(DatabaseManager dbm) {
-        this.dbm = dbm;
+    public FingerprintAnalyzer(Client client) {
+        this.client = client;
     }
 
     @Override

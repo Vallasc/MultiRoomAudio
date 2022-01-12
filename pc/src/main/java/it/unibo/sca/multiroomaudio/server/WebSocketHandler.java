@@ -53,12 +53,19 @@ public class WebSocketHandler {
         } else{ 
             Device connected = dbm.getConnectedWebDevice(session);
             if(connected != null && connected instanceof Client) {
+                Client client = (Client) connected;
                 if( msgType.equals("PLAY") ){ // Client want to play
+                    //start sending fingerprints again
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
+                    client.setPlay(true);
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
+                    client.setPlay(false);
+                    //stop sending the fingerprints 
                     musicManager.pauseCurrentSong();
                 } else if( msgType.equals("STOP") ){ // Client want to stop
+                    client.setPlay(false);
+                    //stop sending the fingerprints 
                     musicManager.stopCurrentSong();
                 } else if( msgType.equals("NEXT") ){ // Client want next song
                     musicManager.nextSong();

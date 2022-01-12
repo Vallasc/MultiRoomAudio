@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import it.unibo.sca.multiroomaudio.shared.messages.MyMsgHandler;
 
@@ -66,10 +65,9 @@ public class DiscoveryService {
 
     private void getSpecs(){
         Enumeration<NetworkInterface> ni = null;
-        boolean flagFound = false;
         try {
             ni = NetworkInterface.getNetworkInterfaces();
-            while (ni.hasMoreElements() && !flagFound) {
+            while (ni.hasMoreElements()) {
                 NetworkInterface n = ni.nextElement();
                 if(n.isUp() && !n.isLoopback() && !n.isVirtual()){
                     List<InterfaceAddress> addresses = n.getInterfaceAddresses();
@@ -94,7 +92,7 @@ public class DiscoveryService {
                             this.mac = buildMac(n.getHardwareAddress());
                             this.broadcast = addr.getBroadcast();
                             this.ip=addr.getAddress().getHostAddress();
-
+                            return;
                           }catch(IOException e) {
                                 System.err.println("socket is still bound");
                                 continue;
@@ -107,7 +105,7 @@ public class DiscoveryService {
             e.printStackTrace();
         }
     }
-    //private static Couple specs;
+
     public void discover(){
         byte[] data = null;
         byte[] byteBuffer1 = new byte[bufferSize];  
