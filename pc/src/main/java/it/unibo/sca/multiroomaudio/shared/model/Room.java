@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import io.github.vallasc.APInfo;
-
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
     private final String id;
@@ -31,7 +29,7 @@ public class Room {
                         .map((scan) -> scan.size())
                         .reduce(0, (tot, element) -> tot + element);
     }
-    public synchronized void putClientFingerprints(List<APInfo> scans){
+    /*public synchronized void putClientFingerprints(ScanResult scans){
         //server tenerli ordinati?
         List<ScanResult> list;
         for(APInfo ap : scans){
@@ -44,6 +42,18 @@ public class Room {
                 list.add(new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
             }
         }
+    }*/
+
+    public synchronized void putClientFingerprints(ScanResult result){
+        List<ScanResult> list;
+            list = fingerprints.get(result.getBSSID());
+            if(list == null){
+                List<ScanResult> results = new ArrayList<>();
+                results.add(result);
+                fingerprints.put(result.getBSSID(), results);
+            }else{
+                list.add(result);
+            }
     }
 
     public void printFingerprints() {

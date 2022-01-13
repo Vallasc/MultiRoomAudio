@@ -2,14 +2,14 @@ package it.unibo.sca.multiroomaudio.server;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
-
 import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 /*HashMap<id, Device> (tutti i device)
@@ -186,7 +186,35 @@ public class DatabaseManager {
     public void putScans(String clientId, String roomId, List<APInfo> scans){
         roomId = roomId.toLowerCase();
         //here i should calculate the average and eventually the mean square error
-        clientScans.get(clientId).get(roomId).putClientFingerprints(scans);
+        Map<String, List<Double>> signals = new HashMap<>();
+        Map<String, ScanResult> results = new HashMap<>();
+        for(APInfo ap : scans){
+            List<Double> listSignals = signals.get(ap.getBSSID());
+            results.putIfAbsent(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), 0d, ap.getFrequency(), System.currentTimeMillis(), 0d));
+            if(listSignals == null){
+                listSignals = new ArrayList<>();
+                listSignals.add(ap.getSignal());
+                signals.put(ap.getBSSID(), listSignals);
+            }else{
+                listSignals.add(ap.getSignal());
+            }
+        }
+        
+        for(String key : signals.keySet()){
+            double sum = signals.get(key).stream().reduce(0d, Double::sum);
+            double mean = sum/signals.get(key).size();
+            List<Double> listSignals = signals.get(key);
+            sum = 0;
+            for(Double d : listSignals){
+                Double diff = d - mean;
+                sum += diff*diff;
+            }
+            Double rmse = Math.sqrt((sum/listSignals.size()));
+            ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp(), rmse);
+            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
+        }       
+
+
     }
 
     public void removeScans(String clientId, String roomId){
