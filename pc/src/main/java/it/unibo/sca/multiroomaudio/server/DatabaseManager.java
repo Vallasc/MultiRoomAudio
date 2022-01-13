@@ -185,6 +185,7 @@ public class DatabaseManager {
 
     public void putScans(String clientId, String roomId, List<APInfo> scans){
         roomId = roomId.toLowerCase();
+        //here i should calculate the average and eventually the mean square error
         clientScans.get(clientId).get(roomId).putClientFingerprints(scans);
     }
 

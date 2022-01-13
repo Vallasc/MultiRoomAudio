@@ -19,7 +19,8 @@
     let popupOpened = false
     let rooms = []
     let roomsLenght = 0
-
+    let nscan = 0
+    const maxScan = 4
     onMount(() => {
         socketSetup()
         getRooms()
@@ -94,27 +95,37 @@
         })
     }
 
+    let currentRoomId = ""
+
     function startMisuration(roomId) {
         f7.dialog.confirm(
             "Do you want to start scanning "+ roomId + "?",
             "Multiroom Audio",
             () => {
                 popupOpened = true
-                startScan(roomId)
+                currentRoomId = roomId
+                //startScan(roomId)
             }
         )
     }
 
-    let currentRoomId = ""
-    function startScan(roomId){
-        currentRoomId = roomId
-        $webSocket.send(
+    function startScan(){
+        if(nscan >= maxScan){
+            console.log("maxScan")
+            return
+        }
+        else{
+            nscan++
+            $webSocket.send(
             JSON.stringify({
                 type: "SCAN_ROOM",
-                roomId: roomId,
+                roomId: currentRoomId,
                 startScan: true
-            })
-        )
+                })
+            )
+            setTimeout(() => { stopScan(); }, 2000);
+        }
+        
     }
 
     function stopScan() {
@@ -171,14 +182,25 @@
         <Page>
             <div class="center">
                 <Progressbar infinite></Progressbar>
-                <div class="block text-title">Walk around the perimeter of the room slowly</div>
+                <div class="block text-title">Go to a corner of the room</div>
                 <WalkRoomAnimation roomName={currentRoomId.substring(0, 9)} />
-                <div class="button-stop">
-                    <Button icon="material:stop" 
-                        large fill color="red" 
-                        popupClose 
-                        onClick={stopScan}>STOP</Button>
-                </div>
+                {#if nscan<maxScan}
+                    <div class="button-start">
+                        <Button icon="material:start" 
+                            large fill color="blue" 
+                            onClick={startScan}>Start</Button>
+                            
+                    </div>
+                {:else}
+                    <script>nscan=0</script>
+
+                    <div class="button-stop">
+                        <Button icon="material:close" 
+                            large fill color="red" 
+                            popupClose 
+                            onClick={()=>function(){console.log(nscan)}}>Close</Button>
+                    </div>
+                {/if}
             </div>
         </Page>
     </Popup>
