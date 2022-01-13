@@ -2,6 +2,7 @@ package it.unibo.sca.multiroomaudio.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -41,7 +42,7 @@ public class FingerprintService extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Fingerprint sercice: RUNNING");
+        System.out.println("Fingerprint service: RUNNING");
         //client info always through websocket tho
         isRunning = true;
         
@@ -73,14 +74,20 @@ public class FingerprintService extends Thread {
                     //if stop read again
                     if(msgO.getStart()){
                         //if start send
-                        APInfo[] APs = scanner.scanNetworks();
-                        dOut.writeUTF(gson.toJson(APs));
+                        try{
+                            APInfo[] APs = scanner.scanNetworks();
+                            dOut.writeUTF(gson.toJson(APs));
+                        }catch(com.google.gson.JsonSyntaxException e){
+                            System.out.println("Disconnected badly 2");
+                            isRunning = false;
+                            continue;
+                        }catch(EOFException e) {
+                            System.out.println("Disconnected badly");
+                            isRunning = false;
+                        }
                         dOut.flush();
                         //then wait for ack, a dIn is enough tbh
-                        MsgAck msgA = gson.fromJson(dIn.readUTF(), MsgAck.class);
-                        if(msgA.getType().equals("ACK")){
-                            System.out.println("ACK: " + msgA.getN());
-                        }
+                        dIn.readUTF();
                         try {
                             Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
                         } catch (InterruptedException e) {
@@ -91,6 +98,7 @@ public class FingerprintService extends Thread {
             } catch(SocketException e) {
                 System.out.println("Closed connection");
                 isRunning = false;
+           
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;

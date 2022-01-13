@@ -3,6 +3,8 @@ package it.unibo.sca.multiroomaudio.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -27,7 +29,7 @@ public class WebSocketHandler {
     private final DatabaseManager dbm;  
     private final MusicOrchestrationManager musicManager;
     private final SpeakerManager speakerManager;
-
+    ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public WebSocketHandler(DatabaseManager dbm, MusicOrchestrationManager musicManager, SpeakerManager speakerManager) {
         this.dbm = dbm;
@@ -60,12 +62,20 @@ public class WebSocketHandler {
         } else{ 
             Device connected = dbm.getConnectedWebDevice(session);
             if(connected != null && connected instanceof Client) {
+                Client client = (Client)connected;
                 if( msgType.equals("PLAY") ){ // Client want to play
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
+                    System.out.println("DEBUG: Start play");
+                    client.setPlay(true);
+                    //pool.execute(new FingerprintAnalyzer(client, dbm));
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
+                    System.out.println("DEBUG: Stop play");
+                    client.setPlay(false);
                     musicManager.pauseCurrentSong();
                 } else if( msgType.equals("STOP") ){ // Client want to stop
+                    System.out.println("DEBUG: pause play");
+                    client.setPlay(false);
                     musicManager.stopCurrentSong();
                 } else if( msgType.equals("NEXT") ){ // Client want next song
                     musicManager.nextSong();
@@ -80,20 +90,19 @@ public class WebSocketHandler {
                 } else if( msgType.equals("CREATE_ROOM")){
                     MsgCreateRoom msg = gson.fromJson(message, MsgCreateRoom.class);
                     dbm.setClientRoom(connected.getId(), msg.getRoomId());
-
                     sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 } else if( msgType.equals("DELETE_ROOM")){
                     MsgDeleteRoom msg = gson.fromJson(message, MsgDeleteRoom.class);
+                    System.out.println("DEBUG: Delete room");
                     dbm.deleteClientRoom(connected.getId(), msg.getRoomId());
-
                     sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 } else if( msgType.equals("SCAN_ROOM")){
                     MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
                     if(msg.getStartScan()){
-                        System.out.print("DEBUG: Start scan");
+                        System.out.println("DEBUG: Start scan");
                         dbm.setDeviceStart(connected.getId(), msg.getRoomId());
                     } else {
-                        System.out.print("DEBUG: Stop scan");
+                        System.out.println("DEBUG: Stop scan");
                         dbm.setDeviceStop(connected.getId());
                         sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                     }

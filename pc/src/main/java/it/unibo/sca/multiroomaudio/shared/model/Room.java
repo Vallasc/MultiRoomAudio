@@ -47,6 +47,11 @@ public class Room {
     }
 
     public void printFingerprints() {
-        System.out.println(fingerprints.keySet().size());
+        for(String bssid:fingerprints.keySet()){
+            for(int i = 0; i <fingerprints.get(bssid).size(); i++){
+                System.out.println(fingerprints.get(bssid).get(i).getSSID() + " " + fingerprints.get(bssid).get(i).getSignal());
+            }
+        }
+        //System.out.println(fingerprints.keySet().size());
     }
 }

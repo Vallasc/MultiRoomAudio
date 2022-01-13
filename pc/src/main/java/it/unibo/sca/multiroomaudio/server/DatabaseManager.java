@@ -143,6 +143,7 @@ public class DatabaseManager {
     }
 
     public boolean isConnectedSocket(String clientId){
+
         return connectedSocketDevices.containsKey(clientId);
     }
 
@@ -186,6 +187,11 @@ public class DatabaseManager {
     public void putScans(String clientId, String roomId, APInfo[] scans){
         roomId = roomId.toLowerCase();
         clientScans.get(clientId).get(roomId).putClientFingerprints(scans);
+    }
+
+    public void removeScans(String clientId, String roomId){
+        roomId = roomId.toLowerCase();
+        clientScans.get(clientId).remove(roomId);
     }
 
     public void printFingerprintDb(String clientId){

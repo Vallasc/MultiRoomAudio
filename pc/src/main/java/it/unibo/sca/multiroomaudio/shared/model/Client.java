@@ -22,7 +22,7 @@ public class Client extends Device {
     }
 
     public Client( String ip) {
-        super(ip); // TODO I think ipis not id
+        super(ip); //TODO I think ip is not id
         this.ip = ip;
     }
     

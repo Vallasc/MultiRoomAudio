@@ -55,7 +55,8 @@ public class SocketHandler extends Thread{
 
         Client myDevice = (Client) dbm.getDevice(clientId); 
         boolean currentStart;
-        String roomId;
+        boolean flagDebug = false;
+        String roomId = "";
         while(isRunning){
             try {
                 int i = 0;
@@ -79,7 +80,6 @@ public class SocketHandler extends Thread{
                             dbm.putScans(clientId, roomId, gson.fromJson(dIn.readUTF(), APInfo[].class));
                         }
                         //send the ack
-                        System.out.println("ACK: " + i);
                         dOut.writeUTF(gson.toJson(new MsgAck(i)));
                         i++;
                         dOut.flush();
@@ -87,7 +87,16 @@ public class SocketHandler extends Thread{
                         //here the client is sleeping
                         dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentStart)));
                         dOut.flush();
+                        if(!dbm.isConnectedSocket(clientId)){
+                            isRunning = false;
+                            currentStart = false;
+                            dbm.setDeviceStop(clientId);
+                            dOut.writeUTF(gson.toJson(new MsgClosedWs()));
+                            dOut.flush();
+                            dbm.removeScans(clientId, roomId);
+                        }
                     }while(currentStart);
+                    flagDebug = true;
                     //stopped, send stop to the client
                 }else{
                         clientSocket.setSoTimeout(1000);
@@ -97,6 +106,11 @@ public class SocketHandler extends Thread{
                             dbm.removeConnectedSocketClient(clientId);
                         }
                     }catch(SocketTimeoutException e){}
+
+                    if(flagDebug){
+                        dbm.printFingerprintDb(clientId);
+                        flagDebug = false;
+                    }
                 }
             } catch (SocketException e) {
                 //e.printStackTrace();
