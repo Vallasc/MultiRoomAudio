@@ -31,7 +31,7 @@ public class Room {
                         .map((scan) -> scan.size())
                         .reduce(0, (tot, element) -> tot + element);
     }
-    public synchronized void putClientFingerprints(APInfo[] scans){
+    public synchronized void putClientFingerprints(List<APInfo> scans){
         //server tenerli ordinati?
         List<ScanResult> list;
         for(APInfo ap : scans){

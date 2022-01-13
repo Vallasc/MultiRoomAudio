@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.google.gson.Gson;
 
@@ -55,15 +58,18 @@ public class SocketHandler extends Thread{
 
         Client myDevice = (Client) dbm.getDevice(clientId); 
         boolean currentStart;
-        boolean flagDebug = false;
-        String roomId = "";
+        boolean flagCrash = false;
+        String roomId = null;
+        List<APInfo> tempAPInfo = new ArrayList<>();
         while(isRunning){
             try {
                 int i = 0;
                 //find a change in the start/stop state
                 currentStart = myDevice.getStart();
-                roomId = myDevice.getActiveRoom();
                 if(currentStart){
+                    if(roomId == null)
+                        roomId = myDevice.getActiveRoom();
+                        System.out.println(roomId);
                     try {
                         clientSocket.setSoTimeout(0);
                     } catch (SocketException e) {}
@@ -77,7 +83,8 @@ public class SocketHandler extends Thread{
                             myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
                         //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
                         else{
-                            dbm.putScans(clientId, roomId, gson.fromJson(dIn.readUTF(), APInfo[].class));
+                            tempAPInfo.addAll(Arrays.asList(gson.fromJson(dIn.readUTF(), APInfo[].class)));
+                            //dbm.putScans(clientId, roomId, gson.fromJson(dIn.readUTF(), APInfo[].class));
                         }
                         //send the ack
                         dOut.writeUTF(gson.toJson(new MsgAck(i)));
@@ -90,13 +97,12 @@ public class SocketHandler extends Thread{
                         if(!dbm.isConnectedSocket(clientId)){
                             isRunning = false;
                             currentStart = false;
+                            flagCrash = true;
                             dbm.setDeviceStop(clientId);
                             dOut.writeUTF(gson.toJson(new MsgClosedWs()));
                             dOut.flush();
-                            dbm.removeScans(clientId, roomId);
                         }
                     }while(currentStart);
-                    flagDebug = true;
                     //stopped, send stop to the client
                 }else{
                         clientSocket.setSoTimeout(1000);
@@ -106,10 +112,12 @@ public class SocketHandler extends Thread{
                             dbm.removeConnectedSocketClient(clientId);
                         }
                     }catch(SocketTimeoutException e){}
-
-                    if(flagDebug){
-                        dbm.printFingerprintDb(clientId);
-                        flagDebug = false;
+                    if(!flagCrash && !tempAPInfo.isEmpty()){
+                        System.out.println(roomId);
+                        dbm.setClientRoom(clientId, roomId);
+                        dbm.putScans(clientId, roomId, tempAPInfo);
+                        roomId = null;
+                        tempAPInfo.clear();
                     }
                 }
             } catch (SocketException e) {

@@ -55,7 +55,6 @@ public class DatabaseManager {
     public boolean setDeviceStart(String clientId, String roomId){
         setDeviceStop(clientId);
         try{
-            setClientRoom(clientId, roomId);
             ((Client) devices.get(clientId)).setStart(true, roomId);
             return true;
         }catch(ClassCastException e){
@@ -184,7 +183,7 @@ public class DatabaseManager {
         return new ArrayList<>(rooms.values());
     }
 
-    public void putScans(String clientId, String roomId, APInfo[] scans){
+    public void putScans(String clientId, String roomId, List<APInfo> scans){
         roomId = roomId.toLowerCase();
         clientScans.get(clientId).get(roomId).putClientFingerprints(scans);
     }
