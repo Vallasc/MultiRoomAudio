@@ -45041,7 +45041,7 @@ var MultiRoomAudio = (function () {
     const file$n = "node_modules\\framework7-svelte\\esm\\svelte\\button.svelte";
 
     // (163:0) {:else}
-    function create_else_block_1$4(ctx) {
+    function create_else_block_1$3(ctx) {
     	let a;
     	let current_block_type_index;
     	let if_block;
@@ -45152,7 +45152,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1$4.name,
+    		id: create_else_block_1$3.name,
     		type: "else",
     		source: "(163:0) {:else}",
     		ctx
@@ -46126,7 +46126,7 @@ var MultiRoomAudio = (function () {
     	let if_block;
     	let if_block_anchor;
     	let current;
-    	const if_block_creators = [create_if_block$g, create_else_block_1$4];
+    	const if_block_creators = [create_if_block$g, create_else_block_1$3];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -57639,7 +57639,7 @@ var MultiRoomAudio = (function () {
     	badge_1 = new Badge({
     			props: {
     				color: /*badgeColor*/ ctx[11],
-    				$$slots: { default: [create_default_slot_6$2] },
+    				$$slots: { default: [create_default_slot_6$1] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -57689,7 +57689,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (763:22) <Badge color={badgeColor}>
-    function create_default_slot_6$2(ctx) {
+    function create_default_slot_6$1(ctx) {
     	let t_value = plainText(/*badge*/ ctx[10]) + "";
     	let t;
 
@@ -57710,7 +57710,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_6$2.name,
+    		id: create_default_slot_6$1.name,
     		type: "slot",
     		source: "(763:22) <Badge color={badgeColor}>",
     		ctx
@@ -58103,7 +58103,7 @@ var MultiRoomAudio = (function () {
     	let if_block1 = /*hasMedia*/ ctx[37] && create_if_block_23(ctx);
     	const inner_start_slot_template = /*#slots*/ ctx[69]["inner-start"];
     	const inner_start_slot = create_slot(inner_start_slot_template, ctx, /*$$scope*/ ctx[83], get_inner_start_slot_context);
-    	const if_block_creators = [create_if_block_6, create_else_block_1$3];
+    	const if_block_creators = [create_if_block_6, create_else_block_1$2];
     	const if_blocks = [];
 
     	function select_block_type_3(ctx, dirty) {
@@ -63404,7 +63404,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (428:16) {:else}
-    function create_else_block_1$3(ctx) {
+    function create_else_block_1$2(ctx) {
     	let t0;
     	let t1;
     	let t2;
@@ -63615,7 +63615,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1$3.name,
+    		id: create_else_block_1$2.name,
     		type: "else",
     		source: "(428:16) {:else}",
     		ctx
@@ -66784,7 +66784,7 @@ var MultiRoomAudio = (function () {
     const get_before_list_slot_context = ctx => ({});
 
     // (211:0) {:else}
-    function create_else_block_1$2(ctx) {
+    function create_else_block_1$1(ctx) {
     	let div;
     	let t0;
     	let current_block_type_index;
@@ -66943,7 +66943,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1$2.name,
+    		id: create_else_block_1$1.name,
     		type: "else",
     		source: "(211:0) {:else}",
     		ctx
@@ -67437,7 +67437,7 @@ var MultiRoomAudio = (function () {
     	let if_block;
     	let if_block_anchor;
     	let current;
-    	const if_block_creators = [create_if_block$a, create_else_block_1$2];
+    	const if_block_creators = [create_if_block$a, create_else_block_1$1];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -75842,7 +75842,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (212:8) <NavRight>
-    function create_default_slot_6$1(ctx) {
+    function create_default_slot_6(ctx) {
     	let link0;
     	let t;
     	let link1;
@@ -75898,7 +75898,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_6$1.name,
+    		id: create_default_slot_6.name,
     		type: "slot",
     		source: "(212:8) <NavRight>",
     		ctx
@@ -75914,7 +75914,7 @@ var MultiRoomAudio = (function () {
 
     	navright = new Nav_right({
     			props: {
-    				$$slots: { default: [create_default_slot_6$1] },
+    				$$slots: { default: [create_default_slot_6] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -76609,7 +76609,7 @@ var MultiRoomAudio = (function () {
     }
 
     // (321:12) {:else}
-    function create_else_block_1$1(ctx) {
+    function create_else_block_1(ctx) {
     	let listitem;
     	let current;
 
@@ -76669,7 +76669,7 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1$1.name,
+    		id: create_else_block_1.name,
     		type: "else",
     		source: "(321:12) {:else}",
     		ctx
@@ -76956,7 +76956,7 @@ var MultiRoomAudio = (function () {
     	let if_block1_anchor;
     	let current;
     	let if_block0 = show_if && create_if_block_2$1(ctx);
-    	const if_block_creators = [create_if_block_1$2, create_else_block_1$1];
+    	const if_block_creators = [create_if_block_1$2, create_else_block_1];
     	const if_blocks = [];
 
     	function select_block_type_2(ctx, dirty) {
@@ -78077,12 +78077,12 @@ var MultiRoomAudio = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[20] = list[i];
+    	child_ctx[19] = list[i];
     	return child_ctx;
     }
 
-    // (146:4) <Fab position="right-bottom" onClick={dialogInsertRoomName} text="New">
-    function create_default_slot_6(ctx) {
+    // (156:4) <Fab position="right-bottom" onClick={dialogInsertRoomName} text="New">
+    function create_default_slot_5(ctx) {
     	let icon;
     	let current;
 
@@ -78116,17 +78116,17 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_6.name,
+    		id: create_default_slot_5.name,
     		type: "slot",
-    		source: "(146:4) <Fab position=\\\"right-bottom\\\" onClick={dialogInsertRoomName} text=\\\"New\\\">",
+    		source: "(156:4) <Fab position=\\\"right-bottom\\\" onClick={dialogInsertRoomName} text=\\\"New\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (171:4) {:else}
-    function create_else_block_1(ctx) {
+    // (181:4) {:else}
+    function create_else_block$1(ctx) {
     	let div3;
     	let div0;
     	let t0;
@@ -78143,12 +78143,12 @@ var MultiRoomAudio = (function () {
     			div1.textContent = "Add a new room ↘️";
     			t2 = space();
     			div2 = element("div");
-    			add_location(div0, file$3, 172, 12, 4770);
+    			add_location(div0, file$3, 182, 12, 5182);
     			attr_dev(div1, "class", "no-rooms svelte-jwdyjs");
-    			add_location(div1, file$3, 173, 12, 4790);
-    			add_location(div2, file$3, 176, 12, 4881);
+    			add_location(div1, file$3, 183, 12, 5202);
+    			add_location(div2, file$3, 186, 12, 5293);
     			attr_dev(div3, "class", "center svelte-jwdyjs");
-    			add_location(div3, file$3, 171, 8, 4736);
+    			add_location(div3, file$3, 181, 8, 5148);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -78168,16 +78168,16 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1.name,
+    		id: create_else_block$1.name,
     		type: "else",
-    		source: "(171:4) {:else}",
+    		source: "(181:4) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (150:4) {#if roomsLenght > 0}
+    // (160:4) {#if roomsLenght > 0}
     function create_if_block_1$1(ctx) {
     	let list;
     	let current;
@@ -78185,7 +78185,7 @@ var MultiRoomAudio = (function () {
     	list = new List({
     			props: {
     				mediaList: true,
-    				$$slots: { default: [create_default_slot_5] },
+    				$$slots: { default: [create_default_slot_4] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -78202,7 +78202,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const list_changes = {};
 
-    			if (dirty & /*$$scope, rooms*/ 8388610) {
+    			if (dirty & /*$$scope, rooms*/ 4194306) {
     				list_changes.$$scope = { dirty, ctx };
     			}
 
@@ -78226,14 +78226,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block_1$1.name,
     		type: "if",
-    		source: "(150:4) {#if roomsLenght > 0}",
+    		source: "(160:4) {#if roomsLenght > 0}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (154:20) 
+    // (164:20) 
     function create_after_slot(ctx) {
     	let span;
     	let link0;
@@ -78247,7 +78247,7 @@ var MultiRoomAudio = (function () {
     	let current;
 
     	function func() {
-    		return /*func*/ ctx[9](/*room*/ ctx[20]);
+    		return /*func*/ ctx[9](/*room*/ ctx[19]);
     	}
 
     	link0 = new Link({
@@ -78256,7 +78256,7 @@ var MultiRoomAudio = (function () {
     		});
 
     	function func_1() {
-    		return /*func_1*/ ctx[10](/*room*/ ctx[20]);
+    		return /*func_1*/ ctx[10](/*room*/ ctx[19]);
     	}
 
     	link1 = new Link({
@@ -78280,11 +78280,11 @@ var MultiRoomAudio = (function () {
     			a1 = element("a");
     			t3 = space();
     			set_style(a0, "margin-left", "16px");
-    			add_location(a0, file$3, 157, 24, 4165);
+    			add_location(a0, file$3, 167, 24, 4577);
     			set_style(a1, "margin-left", "8px");
-    			add_location(a1, file$3, 165, 24, 4586);
+    			add_location(a1, file$3, 175, 24, 4998);
     			attr_dev(span, "slot", "after");
-    			add_location(span, file$3, 153, 20, 3877);
+    			add_location(span, file$3, 163, 20, 4289);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -78329,22 +78329,22 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_after_slot.name,
     		type: "slot",
-    		source: "(154:20) ",
+    		source: "(164:20) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (152:12) {#each rooms as room}
+    // (162:12) {#each rooms as room}
     function create_each_block(ctx) {
     	let listitem;
     	let current;
 
     	listitem = new List_item({
     			props: {
-    				title: /*room*/ ctx[20].roomId,
-    				subtitle: "" + (/*room*/ ctx[20].samples + " fingerpint" + (/*room*/ ctx[20].samples == 1 ? "" : "s")),
+    				title: /*room*/ ctx[19].roomId,
+    				subtitle: "" + (/*room*/ ctx[19].samples + " fingerpint" + (/*room*/ ctx[19].samples == 1 ? "" : "s")),
     				$$slots: { after: [create_after_slot] },
     				$$scope: { ctx }
     			},
@@ -78361,10 +78361,10 @@ var MultiRoomAudio = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const listitem_changes = {};
-    			if (dirty & /*rooms*/ 2) listitem_changes.title = /*room*/ ctx[20].roomId;
-    			if (dirty & /*rooms*/ 2) listitem_changes.subtitle = "" + (/*room*/ ctx[20].samples + " fingerpint" + (/*room*/ ctx[20].samples == 1 ? "" : "s"));
+    			if (dirty & /*rooms*/ 2) listitem_changes.title = /*room*/ ctx[19].roomId;
+    			if (dirty & /*rooms*/ 2) listitem_changes.subtitle = "" + (/*room*/ ctx[19].samples + " fingerpint" + (/*room*/ ctx[19].samples == 1 ? "" : "s"));
 
-    			if (dirty & /*$$scope, rooms*/ 8388610) {
+    			if (dirty & /*$$scope, rooms*/ 4194306) {
     				listitem_changes.$$scope = { dirty, ctx };
     			}
 
@@ -78388,15 +78388,15 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(152:12) {#each rooms as room}",
+    		source: "(162:12) {#each rooms as room}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (151:8) <List mediaList>
-    function create_default_slot_5(ctx) {
+    // (161:8) <List mediaList>
+    function create_default_slot_4(ctx) {
     	let each_1_anchor;
     	let current;
     	let each_value = /*rooms*/ ctx[1];
@@ -78482,94 +78482,16 @@ var MultiRoomAudio = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot_5.name,
+    		id: create_default_slot_4.name,
     		type: "slot",
-    		source: "(151:8) <List mediaList>",
+    		source: "(161:8) <List mediaList>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (194:16) {:else}
-    function create_else_block$1(ctx) {
-    	let script;
-    	let t1;
-    	let div;
-    	let button;
-    	let current;
-
-    	button = new Button({
-    			props: {
-    				icon: "material:close",
-    				large: true,
-    				fill: true,
-    				color: "red",
-    				popupClose: true,
-    				onClick: /*func_2*/ ctx[11],
-    				$$slots: { default: [create_default_slot_4] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			script = element("script");
-    			script.textContent = "nscan=0";
-    			t1 = space();
-    			div = element("div");
-    			create_component(button.$$.fragment);
-    			add_location(script, file$3, 194, 20, 5662);
-    			attr_dev(div, "class", "button-stop svelte-jwdyjs");
-    			add_location(div, file$3, 196, 20, 5710);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, script, anchor);
-    			insert_dev(target, t1, anchor);
-    			insert_dev(target, div, anchor);
-    			mount_component(button, div, null);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const button_changes = {};
-    			if (dirty & /*nscan*/ 8) button_changes.onClick = /*func_2*/ ctx[11];
-
-    			if (dirty & /*$$scope*/ 8388608) {
-    				button_changes.$$scope = { dirty, ctx };
-    			}
-
-    			button.$set(button_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(button.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(button.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(script);
-    			if (detaching) detach_dev(t1);
-    			if (detaching) detach_dev(div);
-    			destroy_component(button);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block$1.name,
-    		type: "else",
-    		source: "(194:16) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (187:16) {#if nscan<maxScan}
+    // (197:16) {#if nscan<maxScan}
     function create_if_block$1(ctx) {
     	let div;
     	let button;
@@ -78577,6 +78499,7 @@ var MultiRoomAudio = (function () {
 
     	button = new Button({
     			props: {
+    				id: "start-button",
     				icon: "material:start",
     				large: true,
     				fill: true,
@@ -78593,7 +78516,7 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			create_component(button.$$.fragment);
     			attr_dev(div, "class", "button-start");
-    			add_location(div, file$3, 187, 20, 5357);
+    			add_location(div, file$3, 197, 20, 5780);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -78603,7 +78526,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const button_changes = {};
 
-    			if (dirty & /*$$scope*/ 8388608) {
+    			if (dirty & /*$$scope*/ 4194304) {
     				button_changes.$$scope = { dirty, ctx };
     			}
 
@@ -78628,41 +78551,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_if_block$1.name,
     		type: "if",
-    		source: "(187:16) {#if nscan<maxScan}",
+    		source: "(197:16) {#if nscan<maxScan}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (198:24) <Button icon="material:close"                               large fill color="red"                               popupClose                               onClick={()=>function(){console.log(nscan)}}>
-    function create_default_slot_4(ctx) {
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			t = text("Close");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, t, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(t);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_4.name,
-    		type: "slot",
-    		source: "(198:24) <Button icon=\\\"material:close\\\"                               large fill color=\\\"red\\\"                               popupClose                               onClick={()=>function(){console.log(nscan)}}>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (189:24) <Button icon="material:start"                               large fill color="blue"                               onClick={startScan}>
+    // (199:24) <Button id="start-button" icon="material:start"                               large fill color="blue"                               onClick={startScan}>
     function create_default_slot_3(ctx) {
     	let t;
 
@@ -78682,14 +78578,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_3.name,
     		type: "slot",
-    		source: "(189:24) <Button icon=\\\"material:start\\\"                               large fill color=\\\"blue\\\"                               onClick={startScan}>",
+    		source: "(199:24) <Button id=\\\"start-button\\\" icon=\\\"material:start\\\"                               large fill color=\\\"blue\\\"                               onClick={startScan}>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (182:8) <Page>
+    // (192:8) <Page>
     function create_default_slot_2(ctx) {
     	let div1;
     	let progressbar;
@@ -78698,8 +78594,6 @@ var MultiRoomAudio = (function () {
     	let t2;
     	let walkroomanimation;
     	let t3;
-    	let current_block_type_index;
-    	let if_block;
     	let current;
 
     	progressbar = new Progressbar({
@@ -78714,16 +78608,7 @@ var MultiRoomAudio = (function () {
     			$$inline: true
     		});
 
-    	const if_block_creators = [create_if_block$1, create_else_block$1];
-    	const if_blocks = [];
-
-    	function select_block_type_1(ctx, dirty) {
-    		if (/*nscan*/ ctx[3] < maxScan) return 0;
-    		return 1;
-    	}
-
-    	current_block_type_index = select_block_type_1(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    	let if_block = /*nscan*/ ctx[3] < maxScan && create_if_block$1(ctx);
 
     	const block = {
     		c: function create() {
@@ -78735,11 +78620,11 @@ var MultiRoomAudio = (function () {
     			t2 = space();
     			create_component(walkroomanimation.$$.fragment);
     			t3 = space();
-    			if_block.c();
+    			if (if_block) if_block.c();
     			attr_dev(div0, "class", "block text-title svelte-jwdyjs");
-    			add_location(div0, file$3, 184, 16, 5156);
+    			add_location(div0, file$3, 194, 16, 5579);
     			attr_dev(div1, "class", "center svelte-jwdyjs");
-    			add_location(div1, file$3, 182, 12, 5064);
+    			add_location(div1, file$3, 192, 12, 5487);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -78749,37 +78634,35 @@ var MultiRoomAudio = (function () {
     			append_dev(div1, t2);
     			mount_component(walkroomanimation, div1, null);
     			append_dev(div1, t3);
-    			if_blocks[current_block_type_index].m(div1, null);
+    			if (if_block) if_block.m(div1, null);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
     			const walkroomanimation_changes = {};
     			if (dirty & /*currentRoomId*/ 16) walkroomanimation_changes.roomName = /*currentRoomId*/ ctx[4].substring(0, 9);
     			walkroomanimation.$set(walkroomanimation_changes);
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type_1(ctx);
 
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
+    			if (/*nscan*/ ctx[3] < maxScan) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+
+    					if (dirty & /*nscan*/ 8) {
+    						transition_in(if_block, 1);
+    					}
+    				} else {
+    					if_block = create_if_block$1(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(div1, null);
+    				}
+    			} else if (if_block) {
     				group_outros();
 
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
     				});
 
     				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(div1, null);
     			}
     		},
     		i: function intro(local) {
@@ -78799,7 +78682,7 @@ var MultiRoomAudio = (function () {
     			if (detaching) detach_dev(div1);
     			destroy_component(progressbar);
     			destroy_component(walkroomanimation);
-    			if_blocks[current_block_type_index].d();
+    			if (if_block) if_block.d();
     		}
     	};
 
@@ -78807,14 +78690,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_2.name,
     		type: "slot",
-    		source: "(182:8) <Page>",
+    		source: "(192:8) <Page>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (181:4) <Popup opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>
+    // (191:4) <Popup id="popup" opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>
     function create_default_slot_1$1(ctx) {
     	let page;
     	let current;
@@ -78838,7 +78721,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const page_changes = {};
 
-    			if (dirty & /*$$scope, nscan, currentRoomId*/ 8388632) {
+    			if (dirty & /*$$scope, nscan, currentRoomId*/ 4194328) {
     				page_changes.$$scope = { dirty, ctx };
     			}
 
@@ -78862,14 +78745,14 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot_1$1.name,
     		type: "slot",
-    		source: "(181:4) <Popup opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>",
+    		source: "(191:4) <Popup id=\\\"popup\\\" opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (143:0) <Page>
+    // (153:0) <Page>
     function create_default_slot$3(ctx) {
     	let navbar;
     	let t0;
@@ -78891,13 +78774,13 @@ var MultiRoomAudio = (function () {
     				position: "right-bottom",
     				onClick: /*dialogInsertRoomName*/ ctx[6],
     				text: "New",
-    				$$slots: { default: [create_default_slot_6] },
+    				$$slots: { default: [create_default_slot_5] },
     				$$scope: { ctx }
     			},
     			$$inline: true
     		});
 
-    	const if_block_creators = [create_if_block_1$1, create_else_block_1];
+    	const if_block_creators = [create_if_block_1$1, create_else_block$1];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -78910,8 +78793,9 @@ var MultiRoomAudio = (function () {
 
     	popup = new Popup({
     			props: {
+    				id: "popup",
     				opened: /*popupOpened*/ ctx[0],
-    				onPopupClosed: /*func_3*/ ctx[12],
+    				onPopupClosed: /*func_2*/ ctx[11],
     				backdrop: true,
     				closeByBackdropClick: false,
     				$$slots: { default: [create_default_slot_1$1] },
@@ -78943,7 +78827,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, dirty) {
     			const fab_changes = {};
 
-    			if (dirty & /*$$scope*/ 8388608) {
+    			if (dirty & /*$$scope*/ 4194304) {
     				fab_changes.$$scope = { dirty, ctx };
     			}
 
@@ -78976,9 +78860,9 @@ var MultiRoomAudio = (function () {
 
     			const popup_changes = {};
     			if (dirty & /*popupOpened*/ 1) popup_changes.opened = /*popupOpened*/ ctx[0];
-    			if (dirty & /*popupOpened*/ 1) popup_changes.onPopupClosed = /*func_3*/ ctx[12];
+    			if (dirty & /*popupOpened*/ 1) popup_changes.onPopupClosed = /*func_2*/ ctx[11];
 
-    			if (dirty & /*$$scope, nscan, currentRoomId*/ 8388632) {
+    			if (dirty & /*$$scope, nscan, currentRoomId*/ 4194328) {
     				popup_changes.$$scope = { dirty, ctx };
     			}
 
@@ -79014,7 +78898,7 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot$3.name,
     		type: "slot",
-    		source: "(143:0) <Page>",
+    		source: "(153:0) <Page>",
     		ctx
     	});
 
@@ -79047,7 +78931,7 @@ var MultiRoomAudio = (function () {
     		p: function update(ctx, [dirty]) {
     			const page_changes = {};
 
-    			if (dirty & /*$$scope, popupOpened, nscan, currentRoomId, rooms, roomsLenght*/ 8388639) {
+    			if (dirty & /*$$scope, popupOpened, nscan, currentRoomId, rooms, roomsLenght*/ 4194335) {
     				page_changes.$$scope = { dirty, ctx };
     			}
 
@@ -79083,7 +78967,7 @@ var MultiRoomAudio = (function () {
     function instance$3($$self, $$props, $$invalidate) {
     	let $webSocket;
     	validate_store(webSocket, 'webSocket');
-    	component_subscribe($$self, webSocket, $$value => $$invalidate(13, $webSocket = $$value));
+    	component_subscribe($$self, webSocket, $$value => $$invalidate(12, $webSocket = $$value));
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('RoomsPage', slots, []);
     	let popupOpened = false;
@@ -79158,11 +79042,10 @@ var MultiRoomAudio = (function () {
     	}
 
     	function startScan() {
-    		if (nscan >= maxScan) {
-    			console.log("maxScan");
-    			return;
-    		} else {
-    			$$invalidate(3, nscan++, nscan);
+    		if (nscan < maxScan) {
+    			var btn = document.getElementById("start-button");
+    			btn.disabled = true;
+    			btn.style.visibility = "hidden";
 
     			$webSocket.send(JSON.stringify({
     				type: "SCAN_ROOM",
@@ -79170,21 +79053,36 @@ var MultiRoomAudio = (function () {
     				startScan: true
     			}));
 
+    			$$invalidate(3, nscan++, nscan);
+
     			setTimeout(
     				() => {
-    					stopScan();
+    					stopScan(nscan);
     				},
-    				2000
+    				10000
     			);
     		}
     	}
 
-    	function stopScan() {
+    	function stopScan(n) {
     		$webSocket.send(JSON.stringify({
     			type: "SCAN_ROOM",
     			roomId: currentRoomId,
     			startScan: false
     		}));
+
+    		var btn = document.getElementById("start-button");
+
+    		if (n < maxScan) {
+    			btn.disabled = false;
+    			btn.style.visibility = "visible";
+    		}
+
+    		if (nscan == maxScan) {
+    			$$invalidate(3, nscan = 0);
+    			console.log("FINISHED");
+    			$$invalidate(0, popupOpened = false);
+    		}
     	}
 
     	const writable_props = [];
@@ -79195,12 +79093,7 @@ var MultiRoomAudio = (function () {
 
     	const func = room => startMisuration(room.roomId);
     	const func_1 = room => deleteRoom(room.roomId);
-
-    	const func_2 = () => function () {
-    		console.log(nscan);
-    	};
-
-    	const func_3 = () => $$invalidate(0, popupOpened = false);
+    	const func_2 = () => $$invalidate(0, popupOpened = false);
 
     	$$self.$capture_state = () => ({
     		onMount,
@@ -79261,8 +79154,7 @@ var MultiRoomAudio = (function () {
     		startScan,
     		func,
     		func_1,
-    		func_2,
-    		func_3
+    		func_2
     	];
     }
 

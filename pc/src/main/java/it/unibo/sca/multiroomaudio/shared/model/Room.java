@@ -58,8 +58,9 @@ public class Room {
 
     public void printFingerprints() {
         for(String bssid:fingerprints.keySet()){
+            System.out.println(bssid + " ");
             for(int i = 0; i <fingerprints.get(bssid).size(); i++){
-                System.out.println(fingerprints.get(bssid).get(i).getSSID() + " " + fingerprints.get(bssid).get(i).getSignal());
+                System.out.println("\t" + fingerprints.get(bssid).get(i).getSignal() + " " + fingerprints.get(bssid).get(i).getMSQ());
             }
         }
         //System.out.println(fingerprints.keySet().size());
