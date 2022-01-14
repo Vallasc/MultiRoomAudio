@@ -89,6 +89,7 @@ public class WebSocketHandler {
                         sendMessage(session, new MsgRooms(new ArrayList<Room>()));
                 } else if( msgType.equals("CREATE_ROOM")){
                     MsgCreateRoom msg = gson.fromJson(message, MsgCreateRoom.class);
+                    dbm.deleteClientRoom(connected.getId(), msg.getRoomId());
                     dbm.setClientRoom(connected.getId(), msg.getRoomId());
                     sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 } else if( msgType.equals("DELETE_ROOM")){
@@ -100,10 +101,10 @@ public class WebSocketHandler {
                     MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
                     if(msg.getStartScan()){
                         System.out.println("DEBUG: Start scan");
-                        dbm.setDeviceStart(connected.getId(), msg.getRoomId());
+                        dbm.setDeviceStart(connected.getId(), msg.getRoomId(), msg.getNScan());
                     } else {
                         System.out.println("DEBUG: Stop scan");
-                        dbm.setDeviceStop(connected.getId());
+                        dbm.setDeviceStop(connected.getId(), msg.getNScan());
                         sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                     }
                 }

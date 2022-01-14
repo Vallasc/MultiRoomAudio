@@ -104,13 +104,11 @@
             () => {
                 popupOpened = true
                 currentRoomId = roomId
-                //startScan(roomId)
             }
         )
     }
 
     function startScan(){
-        
         if(nscan < maxScan){
             var btn = document.getElementById("start-button")
             btn.disabled = true
@@ -119,28 +117,27 @@
             JSON.stringify({
                 type: "SCAN_ROOM",
                 roomId: currentRoomId,
-                startScan: true
+                startScan: true, 
+                nScan : nscan
                 })
             )
             nscan++
-            setTimeout(() => { stopScan(nscan); }, 10000);
+            setTimeout(() => { stopScan(nscan, btn); }, 5000);
         }
         
     }
 
-    function stopScan(n) {
+    function stopScan(n, btn) {
         $webSocket.send(
             JSON.stringify({
                 type: "SCAN_ROOM",
                 roomId: currentRoomId,
-                startScan: false
+                startScan: false, 
+                nScan : n
             })
         )
-        var btn = document.getElementById("start-button")
-        if(n < maxScan){
-            btn.disabled = false
-            btn.style.visibility = "visible"
-        }
+        btn.disabled = false
+        btn.style.visibility = "visible"
         if(nscan == maxScan){
                 nscan = 0
                 console.log("FINISHED")
@@ -160,7 +157,7 @@
     {#if roomsLenght > 0}
         <List mediaList>
             {#each rooms as room}
-            <ListItem title="{room.roomId}" subtitle="{room.samples} fingerpint{room.samples == 1 ? "" : "s"}">
+            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
                     <span slot="after">
                         <Link iconMd="material:radar" onClick={() => startMisuration(room.roomId)} />
                         <!-- svelte-ignore a11y-missing-attribute -->

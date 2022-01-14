@@ -60,12 +60,14 @@ public class SocketHandler extends Thread{
         boolean currentStart;
         boolean flagCrash = false;
         String roomId = null;
+        int nScan = 0;
         List<APInfo> tempAPInfo = new ArrayList<>();
         while(isRunning){
             try {
                 int i = 0;
                 //find a change in the start/stop state
                 currentStart = myDevice.getStart();
+                nScan = myDevice.getNScan();
                 if(currentStart){
                     if(roomId == null)
                         roomId = myDevice.getActiveRoom();
@@ -98,7 +100,7 @@ public class SocketHandler extends Thread{
                             isRunning = false;
                             currentStart = false;
                             flagCrash = true;
-                            dbm.setDeviceStop(clientId);
+                            dbm.setDeviceStop(clientId, nScan);
                             dOut.writeUTF(gson.toJson(new MsgClosedWs()));
                             dOut.flush();
                         }
@@ -113,9 +115,8 @@ public class SocketHandler extends Thread{
                         }
                     }catch(SocketTimeoutException e){}
                     if(!flagCrash && !tempAPInfo.isEmpty()){
-                        System.out.println(roomId);
-                        dbm.setClientRoom(clientId, roomId);
-                        dbm.putScans(clientId, roomId, tempAPInfo);
+                        System.out.println("RoomID: " + roomId + " " + "NSCAN: " + nScan);
+                        dbm.putScans(clientId, roomId, tempAPInfo, nScan);
                         roomId = null;
                         tempAPInfo.clear();
                     }

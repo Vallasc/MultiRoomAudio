@@ -8,13 +8,16 @@ import java.util.List;
 public class Room {
     private final String id;
     private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
-    
+    private int nscan;
+
     public Room(String id){
         this.id = id;
+        this.nscan = 0;
         fingerprints = new HashMap<>();
     }
 
     public Room(String id, HashMap<String, List<ScanResult>> fingerprints) {
+        this.nscan = 0;
         this.id = id;
         this.fingerprints = fingerprints;
     }
@@ -30,7 +33,6 @@ public class Room {
                         .reduce(0, (tot, element) -> tot + element);
     }
     /*public synchronized void putClientFingerprints(ScanResult scans){
-        //server tenerli ordinati?
         List<ScanResult> list;
         for(APInfo ap : scans){
             list = fingerprints.get(ap.getBSSID());
@@ -54,6 +56,14 @@ public class Room {
             }else{
                 list.add(result);
             }
+    }
+
+    public synchronized void setNScan(int nscan){
+        this.nscan = nscan;
+    }
+
+    public int getNScan(){
+        return nscan;
     }
 
     public void printFingerprints() {

@@ -52,10 +52,10 @@ public class DatabaseManager {
         return devices.get(key);
     }
 
-    public boolean setDeviceStart(String clientId, String roomId){
-        setDeviceStop(clientId);
+    public boolean setDeviceStart(String clientId, String roomId, int nScan){
+        setDeviceStop(clientId, nScan);
         try{
-            ((Client) devices.get(clientId)).setStart(true, roomId);
+            ((Client) devices.get(clientId)).setStart(true, roomId, nScan);
             return true;
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
@@ -63,9 +63,9 @@ public class DatabaseManager {
         }
     }
 
-    public boolean setDeviceStop(String clientId){
+    public boolean setDeviceStop(String clientId, int nscan){
         try{
-            ((Client) devices.get(clientId)).setStart(false, null);
+            ((Client) devices.get(clientId)).setStart(false, null, nscan);
             return true;
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
@@ -163,18 +163,21 @@ public class DatabaseManager {
     public void setClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> newRoom = new ConcurrentHashMap<>();
         System.out.println("New room for client "+ clientId + ", roomID: " + roomId);
-        newRoom.putIfAbsent(roomId.toLowerCase(), new Room(roomId));
-        ConcurrentHashMap<String, Room> presentHM = clientScans.putIfAbsent(clientId, newRoom);
-        //there was already the hashmap
-        if(presentHM != null){
-            presentHM.putIfAbsent(roomId, new Room(roomId));
-        }
+        newRoom.put(roomId.toLowerCase(), new Room(roomId));
+        clientScans.put(clientId, newRoom);
     }
 
     public void deleteClientRoom(String clientId, String roomId){
-        ConcurrentHashMap<String, Room> rooms = clientScans.get(clientId);
+        ConcurrentHashMap<String, Room> rooms;
+        try{
+            rooms = clientScans.get(clientId);
+        }catch(NullPointerException e){
+            System.out.println("Delete unexisting client (can happen don't worry)");
+            return;
+        }
         if( rooms == null ) return;
-        rooms.remove(roomId);
+            rooms.remove(roomId);
+        
     }
 
     public List<Room> getClientRooms(String clientId){
@@ -183,7 +186,7 @@ public class DatabaseManager {
         return new ArrayList<>(rooms.values());
     }
 
-    public void putScans(String clientId, String roomId, List<APInfo> scans){
+    public void putScans(String clientId, String roomId, List<APInfo> scans, int nscan){
         roomId = roomId.toLowerCase();
         //here i should calculate the average and eventually the mean square error
         Map<String, List<Double>> signals = new HashMap<>();
@@ -212,14 +215,13 @@ public class DatabaseManager {
             Double rmse = Math.sqrt((sum/listSignals.size()));
             ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp(), rmse);
             clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
-        }       
-
-
+        }    
+        clientScans.get(clientId).get(roomId).setNScan(nscan);
     }
 
     public void removeScans(String clientId, String roomId){
         roomId = roomId.toLowerCase();
-        clientScans.get(clientId).remove(roomId);
+        System.out.println("removing room:" + roomId);
     }
 
     public void printFingerprintDb(String clientId){
