@@ -75,4 +75,8 @@ public class Room {
         }
         //System.out.println(fingerprints.keySet().size());
     }
+
+    public String[] getBSSID() {
+        return (String[])fingerprints.keySet().toArray();
+    }
 }
