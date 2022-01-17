@@ -86,6 +86,7 @@
         //console.log(message)
         switch (message.type) {
             case "PLAY":
+                console.log(message)
                 state = 1
                 playingSong = message
                 playingSong.song.albumImageUrl = makeImageurl(
@@ -148,6 +149,7 @@
     }
 
     async function play(song, fromTimeSec) {
+        console.log(song)
         console.log("Playing " + song.title)
         socket.send(
             JSON.stringify({

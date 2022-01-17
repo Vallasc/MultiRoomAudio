@@ -32,6 +32,7 @@ public class SpeakerManager {
         });
     }
 
+    //String speakerId?
     public void muteSpeaker(Speaker speaker){
         speaker.setMuted(true);
     }

@@ -4,19 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import io.github.vallasc.APInfo;
-
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
     private final String id;
     private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
-    
+    private int nscan;
+
     public Room(String id){
         this.id = id;
+        this.nscan = 0;
         fingerprints = new HashMap<>();
     }
 
     public Room(String id, HashMap<String, List<ScanResult>> fingerprints) {
+        this.nscan = 0;
         this.id = id;
         this.fingerprints = fingerprints;
     }
@@ -31,8 +32,7 @@ public class Room {
                         .map((scan) -> scan.size())
                         .reduce(0, (tot, element) -> tot + element);
     }
-    public synchronized void putClientFingerprints(APInfo[] scans){
-        //server tenerli ordinati?
+    /*public synchronized void putClientFingerprints(ScanResult scans){
         List<ScanResult> list;
         for(APInfo ap : scans){
             list = fingerprints.get(ap.getBSSID());
@@ -44,9 +44,35 @@ public class Room {
                 list.add(new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
             }
         }
+    }*/
+
+    public synchronized void putClientFingerprints(ScanResult result){
+        List<ScanResult> list;
+            list = fingerprints.get(result.getBSSID());
+            if(list == null){
+                List<ScanResult> results = new ArrayList<>();
+                results.add(result);
+                fingerprints.put(result.getBSSID(), results);
+            }else{
+                list.add(result);
+            }
+    }
+
+    public synchronized void setNScan(int nscan){
+        this.nscan = nscan;
+    }
+
+    public int getNScan(){
+        return nscan;
     }
 
     public void printFingerprints() {
-        System.out.println(fingerprints.keySet().size());
+        for(String bssid:fingerprints.keySet()){
+            System.out.println(bssid + " ");
+            for(int i = 0; i <fingerprints.get(bssid).size(); i++){
+                System.out.println("\t" + fingerprints.get(bssid).get(i).getSignal() + " " + fingerprints.get(bssid).get(i).getMSQ());
+            }
+        }
+        //System.out.println(fingerprints.keySet().size());
     }
 }

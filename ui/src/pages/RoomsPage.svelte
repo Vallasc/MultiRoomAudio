@@ -19,7 +19,8 @@
     let popupOpened = false
     let rooms = []
     let roomsLenght = 0
-
+    let nscan = 0
+    const maxScan = 4
     onMount(() => {
         socketSetup()
         getRooms()
@@ -86,7 +87,7 @@
             if(value.trim()){
                 value = value.substring(0, 15)
                 console.log("New room: " + value)
-                setRoom(value)
+                //setRoom(value)
                 startMisuration(value)
             } else {
                 dialogInsertRoomName()
@@ -94,39 +95,57 @@
         })
     }
 
+    let currentRoomId = ""
+
     function startMisuration(roomId) {
+        setRoom(roomId)
         f7.dialog.confirm(
             "Do you want to start scanning "+ roomId + "?",
             "Multiroom Audio",
             () => {
                 popupOpened = true
-                startScan(roomId)
+                currentRoomId = roomId
             }
         )
     }
 
-    let currentRoomId = ""
-    function startScan(roomId){
-        currentRoomId = roomId
-        $webSocket.send(
+    function startScan(){
+        if(nscan < maxScan){
+            var btn = document.getElementById("start-button")
+            btn.disabled = true
+            btn.style.visibility = "hidden"
+            $webSocket.send(
             JSON.stringify({
                 type: "SCAN_ROOM",
-                roomId: roomId,
-                startScan: true
-            })
-        )
+                roomId: currentRoomId,
+                startScan: true, 
+                nScan : nscan
+                })
+            )
+            nscan++
+            setTimeout(() => { stopScan(nscan, btn); }, 10000);
+        }
+        
     }
 
-    function stopScan() {
+    function stopScan(n, btn) {
         $webSocket.send(
             JSON.stringify({
                 type: "SCAN_ROOM",
                 roomId: currentRoomId,
-                startScan: false
+                startScan: false, 
+                nScan : n
             })
         )
-    }
-
+        btn.disabled = false
+        btn.style.visibility = "visible"
+        if(nscan == maxScan){
+                nscan = 0
+                console.log("FINISHED")
+                popupOpened = false
+            }
+        
+    }  
 </script>
 
 <Page>
@@ -139,7 +158,7 @@
     {#if roomsLenght > 0}
         <List mediaList>
             {#each rooms as room}
-            <ListItem title="{room.roomId}" subtitle="{room.samples} fingerpint{room.samples == 1 ? "" : "s"}">
+            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
                     <span slot="after">
                         <Link iconMd="material:radar" onClick={() => startMisuration(room.roomId)} />
                         <!-- svelte-ignore a11y-missing-attribute -->
@@ -167,18 +186,19 @@
         </div>
     {/if}
 
-    <Popup opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>
+    <Popup id="popup" opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>
         <Page>
             <div class="center">
                 <Progressbar infinite></Progressbar>
-                <div class="block text-title">Walk around the perimeter of the room slowly</div>
+                <div class="block text-title">Go to a corner of the room</div>
                 <WalkRoomAnimation roomName={currentRoomId.substring(0, 9)} />
-                <div class="button-stop">
-                    <Button icon="material:stop" 
-                        large fill color="red" 
-                        popupClose 
-                        onClick={stopScan}>STOP</Button>
-                </div>
+                {#if nscan<maxScan}
+                    <div class="button-start">
+                        <Button id="start-button" icon="material:start" 
+                            large fill color="blue" 
+                            onClick={startScan}>Start</Button>
+                    </div>           
+                {/if}
             </div>
         </Page>
     </Popup>

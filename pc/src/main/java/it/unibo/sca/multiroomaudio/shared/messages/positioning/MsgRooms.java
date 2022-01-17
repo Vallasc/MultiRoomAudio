@@ -25,9 +25,10 @@ public class MsgRooms extends Msg {
 class RoomDTO {
     String roomId;
     int samples;
-
+    int nscan;
     RoomDTO(Room room){
         this.roomId = room.getId();
         this.samples = room.getFingerprintsSize();
+        this.nscan = room.getNScan();
     }
 }
