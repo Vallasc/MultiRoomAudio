@@ -32,7 +32,7 @@ public class FingerprintAnalyzer implements Runnable{
                         tmp++;
                 }
             }
-            if(tmp > max){
+            if(tmp >= max){
                 max = tmp;
                 roomKey = r.getId();
             }
@@ -42,49 +42,15 @@ public class FingerprintAnalyzer implements Runnable{
 
     @Override
     public void run(){
-        String speakerId = ""; //comes from the distance algorithm
-        String oldSpeakerId = null;
-        String newSpeakerId = null;
-        Speaker oldSpeaker = null;
         while(client.getPlay()){
             //do whatever computation u need
             //distance = computeDistance();
-            speakerId = MaxMatch();
-            if(speakerId == null)
+            String roomkey = MaxMatch();
+            if(roomkey == null)
                 continue;
 
-            if(oldSpeakerId == null){
-                try{
-                    oldSpeaker = (Speaker)dbm.getDevice(speakerId);
-                }
-                catch(ClassCastException e){
-                    System.err.println("Casting something that's not a speaker (oldspeaker)");
-                }
-                oldSpeakerId = oldSpeaker.getId();
-                oldSpeaker.setMuted(false);
-                oldSpeaker.incNumberNowPlaying();
-            }else{
-                //should create a new speaker and break the reference that's created below*
-                Speaker newSpeaker = null;
-                try{
-                    oldSpeaker = (Speaker)dbm.getDevice(oldSpeakerId);
-                    newSpeaker = (Speaker)dbm.getDevice(speakerId);
-                }catch(ClassCastException e){
-                    System.err.println("Casting something that's not a speaker (newspeaker)");
-                }
-                newSpeakerId = newSpeaker.getId();
-                //changed room
-                if(!oldSpeakerId.equals(newSpeakerId)){
-                    newSpeaker.setMuted(false);
-                    //dec and if n is 0 mutes the speaker
-                    oldSpeaker.decNumberNowPlaying();
-                    newSpeaker.incNumberNowPlaying();
-                    //*reference
-                    oldSpeakerId = newSpeakerId;
-                    newSpeakerId = null;
-                }
-            }
-            
+            List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
+            speakers.forEach(speaker -> speaker.setMuted(false));
         }
     }
     

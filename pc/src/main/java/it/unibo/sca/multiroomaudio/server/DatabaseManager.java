@@ -100,6 +100,15 @@ public class DatabaseManager {
                     .findAny().get().getRight();
     }
 
+    public List<Speaker> getConnectedSpeakerRoom(String roomId){
+        List<Speaker> ret = new ArrayList<>();
+        getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight() instanceof Speaker)
+                    .filter(pair -> ((Speaker)pair.getRight()).getRoom().equals(roomId))
+                    .collect(Collectors.toList()).forEach(pair -> ret.add((Speaker)pair.getRight()));
+        return ret;
+    }
+
     public List<Pair<Session, Device>> getConnectedWebDevices(){
         return connectedWebDevices.entrySet().stream()
                                     .map( (entry) -> new ImmutablePair<Session, Device>(entry.getKey(), entry.getValue()))
