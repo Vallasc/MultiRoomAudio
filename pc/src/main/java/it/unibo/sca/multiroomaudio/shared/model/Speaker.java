@@ -4,9 +4,10 @@ public class Speaker extends Device {
     private String name;
     private boolean isMuted = false; //true by default
     private int numberNowPlaying = 0;
-
+    private String roomId;
     public Speaker(String id, String name) {
         super(id);
+        roomId = null;
         this.name = name;
     }
 
@@ -34,5 +35,13 @@ public class Speaker extends Device {
     
     public synchronized int getNumberNowPlaying() {
         return numberNowPlaying;
+    }
+
+    public String getRoom(){
+        return roomId;
+    }
+
+    public synchronized void setRoom(String roomId){
+        this.roomId = roomId;
     }
 }

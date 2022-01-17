@@ -74,10 +74,16 @@ public class DatabaseManager {
     }
 
     //--------------------------------CONNECTEDWEBDEVICES----------------------------------------------------
-
     public List<Pair<Session, Device>> getConnectedWebSpeakers(){
         return getConnectedWebDevices().stream()
                     .filter(pair -> pair.getRight() instanceof Speaker)
+                    .collect(Collectors.toList());
+    }
+
+    public List<String> getConnectedWebSpeakersName(){
+        return getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight() instanceof Speaker)
+                    .map(pair -> ((Speaker)pair.getRight()).getName())
                     .collect(Collectors.toList());
     }
 
@@ -87,6 +93,12 @@ public class DatabaseManager {
                     .collect(Collectors.toList());
     }
 
+    public Speaker getConnectedSpeaker(String id){
+        return (Speaker) getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight() instanceof Speaker)
+                    .filter(pair -> ((Speaker)pair.getRight()).getId().equals(id))
+                    .findAny().get().getRight();
+    }
 
     public List<Pair<Session, Device>> getConnectedWebDevices(){
         return connectedWebDevices.entrySet().stream()

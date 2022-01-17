@@ -13,7 +13,7 @@ public class Room {
     public Room(String id){
         this.id = id;
         this.nscan = 0;
-        fingerprints = new HashMap<>();
+        this.fingerprints = new HashMap<>();
     }
 
     public Room(String id, HashMap<String, List<ScanResult>> fingerprints) {
