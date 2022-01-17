@@ -24,12 +24,12 @@ public class Speaker extends Device {
 
     public synchronized void decNumberNowPlaying() {
         this.numberNowPlaying = this.numberNowPlaying - 1;
+        if(numberNowPlaying == 0)
+            this.isMuted = true;
     }
 
     public synchronized void incNumberNowPlaying() {
         this.numberNowPlaying = this.numberNowPlaying + 1;
-        if(numberNowPlaying == 0)
-            this.isMuted = true;
     }
     
     public synchronized int getNumberNowPlaying() {

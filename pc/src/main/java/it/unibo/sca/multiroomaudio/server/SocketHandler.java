@@ -80,11 +80,10 @@ public class SocketHandler extends Thread{
                     dOut.flush();
                     do{
                         //if room id is null and start it means that i'm in the online phase cause idk which room i'm in
-                        //wait do i need another thread for the computations on the fingerprints?
                         if(myDevice.getPlay())
                             myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
-                        //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
                         else{
+                            //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
                             tempAPInfo.addAll(Arrays.asList(gson.fromJson(dIn.readUTF(), APInfo[].class)));
                             //dbm.putScans(clientId, roomId, gson.fromJson(dIn.readUTF(), APInfo[].class));
                         }
