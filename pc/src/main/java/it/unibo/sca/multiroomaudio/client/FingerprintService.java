@@ -87,7 +87,8 @@ public class FingerprintService extends Thread {
                         }
                         dOut.flush();
                         //then wait for ack, a dIn is enough tbh
-                        dIn.readUTF();
+                        MsgAck ack = gson.fromJson(dIn.readUTF(), MsgAck.class);
+                        System.out.println("received  ack: "  + ack.getN());
                         try {
                             Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
                         } catch (InterruptedException e) {

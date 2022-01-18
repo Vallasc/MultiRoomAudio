@@ -1,6 +1,7 @@
 package it.unibo.sca.multiroomaudio.server;
 
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -227,7 +228,8 @@ public class DatabaseManager {
         }
         //orering the keys for the reference point so that the values are ordered for accesspoint id
         //helpful later
-        String[] orderedKeys = ((String[]) signals.keySet().toArray());
+        String[] orderedKeys = new String[signals.size()];
+        signals.keySet().toArray(orderedKeys);
         Arrays.sort(orderedKeys);
         clientScans.get(clientId).get(roomId).setNScan(nscan);
         for(String key : orderedKeys){
