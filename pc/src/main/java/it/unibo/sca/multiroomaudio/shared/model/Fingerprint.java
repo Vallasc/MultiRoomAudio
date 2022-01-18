@@ -15,7 +15,7 @@ public class Fingerprint {
 
     public Fingerprint(APInfo ap){
         map = new HashMap<String, ScanResult>();
-        map.put(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis(), 0d));
+        map.put(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
     }
 
     public void add(ScanResult result){

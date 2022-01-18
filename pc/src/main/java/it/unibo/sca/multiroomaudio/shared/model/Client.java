@@ -1,5 +1,7 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
+import java.util.Arrays;
+
 import io.github.vallasc.APInfo;
 
 public class Client extends Device {
@@ -12,7 +14,7 @@ public class Client extends Device {
 
     private final String ip;
     private String mac;
-    private APInfo[] fingerprints;
+    private ScanResult[] fingerprints;
     //is true if start is clicked, false otherwise
     private SharedState state = new SharedState();
 
@@ -31,11 +33,15 @@ public class Client extends Device {
         return ip;
     }
 
-    public synchronized void setFingerprints(APInfo[] fingerprints) {
-        this.fingerprints = fingerprints;
+    public synchronized void setFingerprints(APInfo[] aps) {
+        fingerprints = new ScanResult[aps.length];
+        for(int i = 0; i < aps.length; i++) {
+            fingerprints[i] = new ScanResult(aps[i]);
+        }
+        Arrays.sort(fingerprints);
     }
 
-    public synchronized APInfo[] getFingerprints() {
+    public synchronized ScanResult[] getFingerprints() {
         return fingerprints;
     }
 

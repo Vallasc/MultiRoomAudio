@@ -2,6 +2,7 @@ package it.unibo.sca.multiroomaudio.server;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,10 +75,16 @@ public class DatabaseManager {
     }
 
     //--------------------------------CONNECTEDWEBDEVICES----------------------------------------------------
-
     public List<Pair<Session, Device>> getConnectedWebSpeakers(){
         return getConnectedWebDevices().stream()
                     .filter(pair -> pair.getRight() instanceof Speaker)
+                    .collect(Collectors.toList());
+    }
+
+    public List<String> getConnectedWebSpeakersName(){
+        return getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight() instanceof Speaker)
+                    .map(pair -> ((Speaker)pair.getRight()).getName())
                     .collect(Collectors.toList());
     }
 
@@ -87,6 +94,21 @@ public class DatabaseManager {
                     .collect(Collectors.toList());
     }
 
+    public Speaker getConnectedSpeaker(String id){
+        return (Speaker) getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight() instanceof Speaker)
+                    .filter(pair -> ((Speaker)pair.getRight()).getId().equals(id))
+                    .findAny().get().getRight();
+    }
+
+    public List<Speaker> getConnectedSpeakerRoom(String roomId){
+        List<Speaker> ret = new ArrayList<>();
+        getConnectedWebDevices().stream()
+                    .filter(pair -> pair.getRight() instanceof Speaker)
+                    .filter(pair -> ((Speaker)pair.getRight()).getRoom().equals(roomId))
+                    .collect(Collectors.toList()).forEach(pair -> ret.add((Speaker)pair.getRight()));
+        return ret;
+    }
 
     public List<Pair<Session, Device>> getConnectedWebDevices(){
         return connectedWebDevices.entrySet().stream()
@@ -188,12 +210,13 @@ public class DatabaseManager {
 
     public void putScans(String clientId, String roomId, List<APInfo> scans, int nscan){
         roomId = roomId.toLowerCase();
-        //here i should calculate the average and eventually the mean square error
-        Map<String, List<Double>> signals = new HashMap<>();
-        Map<String, ScanResult> results = new HashMap<>();
+    
+        Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
+        Map<String, ScanResult> results = new HashMap<>(); //utility map to retrieve info later on
         for(APInfo ap : scans){
+            //create a list of results for each scan
             List<Double> listSignals = signals.get(ap.getBSSID());
-            results.putIfAbsent(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), 0d, ap.getFrequency(), System.currentTimeMillis(), 0d));
+            results.putIfAbsent(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), 0d, ap.getFrequency(), System.currentTimeMillis()));
             if(listSignals == null){
                 listSignals = new ArrayList<>();
                 listSignals.add(ap.getSignal());
@@ -202,21 +225,17 @@ public class DatabaseManager {
                 listSignals.add(ap.getSignal());
             }
         }
-        
-        for(String key : signals.keySet()){
-            double sum = signals.get(key).stream().reduce(0d, Double::sum);
-            double mean = sum/signals.get(key).size();
-            List<Double> listSignals = signals.get(key);
-            sum = 0;
-            for(Double d : listSignals){
-                Double diff = d - mean;
-                sum += diff*diff;
-            }
-            Double rmse = Math.sqrt((sum/listSignals.size()));
-            ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp(), rmse);
-            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
-        }    
+        //orering the keys for the reference point so that the values are ordered for accesspoint id
+        //helpful later
+        String[] orderedKeys = ((String[]) signals.keySet().toArray());
+        Arrays.sort(orderedKeys);
         clientScans.get(clientId).get(roomId).setNScan(nscan);
+        for(String key : orderedKeys){
+            //compute the mean for each scan
+            double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
+            ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
+            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult, nscan);
+        }    
     }
 
     public void removeScans(String clientId, String roomId){

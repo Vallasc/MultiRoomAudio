@@ -20,7 +20,7 @@
     let rooms = []
     let roomsLenght = 0
     let nscan = 0
-    const maxScan = 4
+    const _maxScan = 4
     onMount(() => {
         socketSetup()
         getRooms()
@@ -41,7 +41,6 @@
             case "ROOMS":
                 rooms = message.rooms
                 roomsLenght = rooms.length
-                console.log(message)
                 break
         }
     }
@@ -53,7 +52,7 @@
     function getRooms() {
         $webSocket.send(
             JSON.stringify({
-                type: "ROOMS_REQUEST",
+                type: "ROOMS_REQUEST"
             })
         )
     }
@@ -110,7 +109,7 @@
     }
 
     function startScan(){
-        if(nscan < maxScan){
+        if(nscan < _maxScan){
             var btn = document.getElementById("start-button")
             btn.disabled = true
             btn.style.visibility = "hidden"
@@ -139,13 +138,15 @@
         )
         btn.disabled = false
         btn.style.visibility = "visible"
-        if(nscan == maxScan){
+        if(nscan == _maxScan){
                 nscan = 0
                 console.log("FINISHED")
                 popupOpened = false
             }
         
     }  
+
+
 </script>
 
 <Page>
@@ -192,7 +193,7 @@
                 <Progressbar infinite></Progressbar>
                 <div class="block text-title">Go to a corner of the room</div>
                 <WalkRoomAnimation roomName={currentRoomId.substring(0, 9)} />
-                {#if nscan<maxScan}
+                {#if nscan<_maxScan}
                     <div class="button-start">
                         <Button id="start-button" icon="material:start" 
                             large fill color="blue" 
@@ -202,6 +203,7 @@
             </div>
         </Page>
     </Popup>
+
 </Page>
 
 

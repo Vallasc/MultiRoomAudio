@@ -15,6 +15,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgCreateRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgRooms;
@@ -68,7 +69,7 @@ public class WebSocketHandler {
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
                     System.out.println("DEBUG: Start play");
                     client.setPlay(true);
-                    //pool.execute(new FingerprintAnalyzer(client, dbm));
+                    pool.execute(new MinimizeRSSErr(client, dbm, false));
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
                     System.out.println("DEBUG: Stop play");
@@ -108,6 +109,12 @@ public class WebSocketHandler {
                         dbm.setDeviceStop(connected.getId(), msg.getNScan());
                         sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                     }
+                } else if( msgType.equals("BIND_SPEAKER")){
+                    MsgBindSpeaker msg = gson.fromJson(message, MsgBindSpeaker.class);
+                    Speaker speaker = dbm.getConnectedSpeaker(msg.getSpeakerId());
+                    speaker.setRoom(msg.getRoomId());
+                    System.out.println("DEBUG: bind speaker\n" + speaker.getRoom());
+                    //check if the speaker is already bound to another room 
                 }
             }
         }

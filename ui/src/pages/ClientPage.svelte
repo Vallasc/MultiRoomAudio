@@ -81,6 +81,9 @@
     let state = 0 // 0 stop, 1 play, 2 pause
     let playingSong = null
     let progress = 0
+    let popupRoomsOpened = false
+    let rooms = []
+    let roomsLenght = 0
 
     function processMessage(message) {
         //console.log(message)
@@ -113,7 +116,34 @@
             case "SPEAKER_LIST":
                 speakerList = message.speakerList
                 break
+            case "ROOMS":
+                rooms = message.rooms
+                roomsLenght = rooms.length
+                break
         }
+    }
+
+    let currentSpeaker = null
+
+    function getRooms(curr) {
+        currentSpeaker  = curr
+        $webSocket.send(
+            JSON.stringify({
+                type: "ROOMS_REQUEST"
+            })
+        )
+        popupRoomsOpened = true
+    }
+
+    function bindSpeaker(roomid){
+        $webSocket.send(
+            JSON.stringify({
+                type: "BIND_SPEAKER",
+                speakerId: currentSpeaker,
+                roomId: roomid
+            })
+        )
+        popupRoomsOpened = false
     }
 
     async function fetchSongs() {
@@ -169,6 +199,8 @@
         )
     }
 
+    
+
     function stop() {
         console.log("Stop playing " + playingSong.song.title)
         socket.send(
@@ -221,11 +253,13 @@
                     {#if speaker.isMuted}
                         <Chip
                             text={speaker.name}
+                            onClick={() => getRooms(speaker.id)}
                             iconMd="material:volume_mute"
                         />
                     {:else}
                         <Chip
                             text={speaker.name}
+                            onClick={() => getRooms(speaker.id)}
                             color="#6200ee"
                             iconMd="material:volume_up"
                         />
@@ -370,6 +404,32 @@
             songDuration={0}
         />
     {/if}
+</Popup>
+
+<Popup id="popup" opened={popupRoomsOpened} onPopupClosed={() => (popupRoomsOpened = false)} backdrop closeByBackdropClick = {true}>
+    <Page>
+        {#if roomsLenght > 0}
+        <List mediaList>
+            {#each rooms as room}
+            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
+                    <span slot="after">
+                        <Link iconMd="material:done" onClick={() => bindSpeaker(room.roomId)} />
+                        <!-- svelte-ignore a11y-missing-attribute -->
+                        <!-- svelte-ignore a11y-missing-content -->
+                    </span>
+                </ListItem>
+            {/each}
+        </List>
+        {:else}
+            <div class="center">
+                <div/>
+                <div class="no-rooms">
+                    Non ci sono stanze
+                </div>
+                <div/>
+            </div>
+        {/if}
+    </Page>
 </Popup>
 
 <style>
