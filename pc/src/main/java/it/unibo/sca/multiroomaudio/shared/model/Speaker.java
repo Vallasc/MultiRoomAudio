@@ -2,7 +2,7 @@ package it.unibo.sca.multiroomaudio.shared.model;
 
 public class Speaker extends Device {
     private String name;
-    private boolean isMuted = false; //true by default
+    private boolean isMuted = true; //true by default
     private int numberNowPlaying = 0;
     private String roomId;
     public Speaker(String id, String name) {

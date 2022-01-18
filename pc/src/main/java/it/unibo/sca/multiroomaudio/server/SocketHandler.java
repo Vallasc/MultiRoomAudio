@@ -85,9 +85,9 @@ public class SocketHandler extends Thread{
                         else{
                             //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
                             tempAPInfo.addAll(Arrays.asList(gson.fromJson(dIn.readUTF(), APInfo[].class)));
-                            //dbm.putScans(clientId, roomId, gson.fromJson(dIn.readUTF(), APInfo[].class));
                         }
                         //send the ack
+                        System.out.println("Send ACK: " + i);
                         dOut.writeUTF(gson.toJson(new MsgAck(i)));
                         i++;
                         dOut.flush();
