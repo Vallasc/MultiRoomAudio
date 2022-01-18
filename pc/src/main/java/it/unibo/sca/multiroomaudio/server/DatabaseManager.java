@@ -209,12 +209,13 @@ public class DatabaseManager {
 
     public void putScans(String clientId, String roomId, List<APInfo> scans, int nscan){
         roomId = roomId.toLowerCase();
-        //here i should calculate the average and eventually the mean square error
-        Map<String, List<Double>> signals = new HashMap<>();
-        Map<String, ScanResult> results = new HashMap<>();
+        
+        Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
+        Map<String, ScanResult> results = new HashMap<>(); //utility map to retrieve info later on
         for(APInfo ap : scans){
+            //create a list of results for each scan
             List<Double> listSignals = signals.get(ap.getBSSID());
-            results.putIfAbsent(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), 0d, ap.getFrequency(), System.currentTimeMillis(), 0d));
+            results.putIfAbsent(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), 0d, ap.getFrequency(), System.currentTimeMillis()));
             if(listSignals == null){
                 listSignals = new ArrayList<>();
                 listSignals.add(ap.getSignal());
@@ -223,10 +224,11 @@ public class DatabaseManager {
                 listSignals.add(ap.getSignal());
             }
         }
-        
         for(String key : signals.keySet()){
-            double sum = signals.get(key).stream().reduce(0d, Double::sum);
-            double mean = sum/signals.get(key).size();
+            //compute the mean for each scan
+            double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
+            /*don't think there's the nead for the mse on the same reference point
+            
             List<Double> listSignals = signals.get(key);
             sum = 0;
             for(Double d : listSignals){
@@ -234,7 +236,8 @@ public class DatabaseManager {
                 sum += diff*diff;
             }
             Double rmse = Math.sqrt((sum/listSignals.size()));
-            ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp(), rmse);
+            */
+            ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
             clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
         }    
         clientScans.get(clientId).get(roomId).setNScan(nscan);
