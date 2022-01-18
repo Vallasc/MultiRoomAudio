@@ -71,7 +71,6 @@ public class SocketHandler extends Thread{
                 if(currentStart){
                     if(roomId == null)
                         roomId = myDevice.getActiveRoom();
-                        System.out.println(roomId);
                     try {
                         clientSocket.setSoTimeout(0);
                     } catch (SocketException e) {}
@@ -80,10 +79,12 @@ public class SocketHandler extends Thread{
                     dOut.flush();
                     do{
                         //if room id is null and start it means that i'm in the online phase cause idk which room i'm in
-                        if(myDevice.getPlay())
+                        if(myDevice.getPlay()){
+                            System.out.println("PLAY IN SOCKET");
                             myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
-                        else{
+                        }else{
                             //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
+                            System.out.println("SCAN IN  SOCKET");
                             tempAPInfo.addAll(Arrays.asList(gson.fromJson(dIn.readUTF(), APInfo[].class)));
                         }
                         //send the ack
@@ -104,6 +105,7 @@ public class SocketHandler extends Thread{
                             dOut.flush();
                         }
                     }while(currentStart);
+                    System.out.println("CONDITION: " + flagCrash + "  " + tempAPInfo.isEmpty());
                     //stopped, send stop to the client
                 }else{
                         clientSocket.setSoTimeout(1000);
