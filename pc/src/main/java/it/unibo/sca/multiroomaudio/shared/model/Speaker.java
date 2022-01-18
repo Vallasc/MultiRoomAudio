@@ -31,6 +31,7 @@ public class Speaker extends Device {
 
     public synchronized void incNumberNowPlaying() {
         this.numberNowPlaying = this.numberNowPlaying + 1;
+        this.isMuted = false;
     }
     
     public synchronized int getNumberNowPlaying() {

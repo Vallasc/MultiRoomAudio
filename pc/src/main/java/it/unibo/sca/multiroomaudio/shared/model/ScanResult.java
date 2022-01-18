@@ -2,7 +2,7 @@ package it.unibo.sca.multiroomaudio.shared.model;
 
 import io.github.vallasc.APInfo;
 
-public class ScanResult{
+public class ScanResult implements Comparable{
     private final String BSSID;
     private final String SSID;
     private final double signal;//mean
@@ -44,4 +44,11 @@ public class ScanResult{
     public String getSSID() {
         return SSID;
     }
+
+    @Override
+    public int compareTo(Object o) {
+        return ((ScanResult)o).getBSSID().compareTo(this.getBSSID());
+    }
+
+    
 }

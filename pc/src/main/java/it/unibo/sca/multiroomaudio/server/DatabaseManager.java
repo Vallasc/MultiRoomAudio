@@ -2,6 +2,7 @@ package it.unibo.sca.multiroomaudio.server;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -209,7 +210,7 @@ public class DatabaseManager {
 
     public void putScans(String clientId, String roomId, List<APInfo> scans, int nscan){
         roomId = roomId.toLowerCase();
-        
+    
         Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
         Map<String, ScanResult> results = new HashMap<>(); //utility map to retrieve info later on
         for(APInfo ap : scans){
@@ -224,23 +225,17 @@ public class DatabaseManager {
                 listSignals.add(ap.getSignal());
             }
         }
-        for(String key : signals.keySet()){
+        //orering the keys for the reference point so that the values are ordered for accesspoint id
+        //helpful later
+        String[] orderedKeys = ((String[]) signals.keySet().toArray());
+        Arrays.sort(orderedKeys);
+        clientScans.get(clientId).get(roomId).setNScan(nscan);
+        for(String key : orderedKeys){
             //compute the mean for each scan
             double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
-            /*don't think there's the nead for the mse on the same reference point
-            
-            List<Double> listSignals = signals.get(key);
-            sum = 0;
-            for(Double d : listSignals){
-                Double diff = d - mean;
-                sum += diff*diff;
-            }
-            Double rmse = Math.sqrt((sum/listSignals.size()));
-            */
             ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
-            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
+            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult, nscan);
         }    
-        clientScans.get(clientId).get(roomId).setNScan(nscan);
     }
 
     public void removeScans(String clientId, String roomId){

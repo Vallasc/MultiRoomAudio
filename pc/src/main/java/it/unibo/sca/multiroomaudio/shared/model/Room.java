@@ -46,16 +46,31 @@ public class Room {
         }
     }*/
 
-    public synchronized void putClientFingerprints(ScanResult result){
+    public synchronized void putClientFingerprints(ScanResult result, int nscan){
+        //nscan = [1, maxscan]
         List<ScanResult> list;
-            list = fingerprints.get(result.getBSSID());
-            if(list == null){
-                List<ScanResult> results = new ArrayList<>();
-                results.add(result);
-                fingerprints.put(result.getBSSID(), results);
-            }else{
-                list.add(result);
-            }
+        list = fingerprints.get(result.getBSSID());
+        if(list == null){
+            //here nscan is 1 
+            List<ScanResult> results = new ArrayList<>();
+            if(nscan > 1)
+                for(int i = 0; i<nscan-1; i++)
+                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -120, result.getFrequency(), result.getTimestamp()));
+            results.add(nscan-1, result);
+            fingerprints.put(result.getBSSID(), results);
+                
+        }else{
+            int len = list.size();
+            if(len < nscan)
+                for(int i = len; i<nscan-1; i++){
+                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -120, result.getFrequency(), result.getTimestamp()));
+                }
+            list.add(nscan-1, result);
+        }
+    }
+
+    public ScanResult[] getFingerprints(String bssid){
+        return (ScanResult[]) fingerprints.get(bssid).toArray();
     }
 
     public synchronized void setNScan(int nscan){

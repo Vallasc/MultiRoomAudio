@@ -2,55 +2,54 @@ package it.unibo.sca.multiroomaudio.server;
 
 import java.util.List;
 
-import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
+import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
-public class FingerprintAnalyzer implements Runnable{
+public abstract class FingerprintAnalyzer implements Runnable{
     
-    private final Client client;
-    private final DatabaseManager dbm;
+    protected final Client client;
+    protected final DatabaseManager dbm;
+    private static final double ALPHA = 24;
+    protected static final int MIN_STRENGTH = -120;
 
     public FingerprintAnalyzer(Client client, DatabaseManager dbm) {
         this.client = client;
         this.dbm = dbm;
     }
 
-    private String MaxMatch(){
-        APInfo[] online = client.getFingerprints();
-        List<Room> offline = dbm.getClientRooms(client.getId());
-        int max = 0;
-        String roomKey = null;
-        for(Room r : offline){
-            int tmp = 0;
-            String[] keys = r.getBSSID();
-            //this could be done better if we sort the two lists maybe, need to see how < and > work on string (if it works at all)
-            for(String key : keys){
-                for(APInfo ap : online){
-                    if(ap.getBSSID().equals(key))
-                        tmp++;
-                }
-            }
-            if(tmp >= max){
-                max = tmp;
-                roomKey = r.getId();
-            }
-        }
-        return roomKey;
+    protected static double positiveRepresentation(double inputSignal){
+        return inputSignal - MIN_STRENGTH;
     }
+
+    protected static double exponentialRepresentation(double inputSignal){
+        return Math.exp(inputSignal/ALPHA) / Math.exp(-MIN_STRENGTH/ALPHA);
+    }
+
+    abstract public String findRoomKey();//in case of max n returns max, in case of euclidean returns the min error for each ap
 
     @Override
     public void run(){
         while(client.getPlay()){
-            //do whatever computation u need
-            //distance = computeDistance();
-            String roomkey = MaxMatch();
+            String prevRoomKey = null;
+            String roomkey = findRoomKey();
+            System.out.println("ONLINE roomkey: " + roomkey);
             if(roomkey == null)
                 continue;
-
-            List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
-            speakers.forEach(speaker -> speaker.setMuted(false));
+            //unmute the room 
+            if(prevRoomKey == null){
+                List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
+                speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                prevRoomKey = roomkey;
+            }
+            if(!prevRoomKey.equals(roomkey)){
+                List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(prevRoomKey);
+                List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
+                speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
+                prevRoomKey = roomkey;
+            }
         }
     }
     
