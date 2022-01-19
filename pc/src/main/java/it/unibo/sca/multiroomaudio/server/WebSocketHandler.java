@@ -63,12 +63,11 @@ public class WebSocketHandler {
         } else{ 
             Device connected = dbm.getConnectedWebDevice(session);
             if(connected != null && connected instanceof Client) {
-                Client client = (Client)connected;
+                Client client = (Client)dbm.getDevice(connected.getId());
                 if( msgType.equals("PLAY") ){ // Client want to play
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
                     System.out.println("DEBUG: Start play");
-                    client.setPlay(true);
-                    pool.execute(new MinimizeRSSErr(client, dbm, false));
+                    pool.execute(new MinimizeRSSErr(speakerManager, client, dbm, false));
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
                     System.out.println("DEBUG: Stop play");

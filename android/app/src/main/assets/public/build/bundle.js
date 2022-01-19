@@ -79741,7 +79741,7 @@ var MultiRoomAudio = (function () {
     const { console: console_1 } = globals;
     const file$2 = "src\\pages\\SpeakerPage.svelte";
 
-    // (169:0) <Page>
+    // (173:0) <Page>
     function create_default_slot$2(ctx) {
     	let div3;
     	let div0;
@@ -79776,14 +79776,14 @@ var MultiRoomAudio = (function () {
     			t2 = space();
     			create_component(nowplaying.$$.fragment);
     			attr_dev(div0, "class", "navbar-bg svelte-2u5o7c");
-    			add_location(div0, file$2, 170, 8, 4861);
+    			add_location(div0, file$2, 174, 8, 4997);
     			attr_dev(div1, "class", "title svelte-2u5o7c");
-    			add_location(div1, file$2, 172, 12, 4944);
+    			add_location(div1, file$2, 176, 12, 5080);
     			attr_dev(div2, "class", "navbar-inner sliding svelte-2u5o7c");
-    			add_location(div2, file$2, 171, 8, 4896);
+    			add_location(div2, file$2, 175, 8, 5032);
     			attr_dev(div3, "class", "navbar");
     			attr_dev(div3, "data-f7-slot", "fixed");
-    			add_location(div3, file$2, 169, 4, 4810);
+    			add_location(div3, file$2, 173, 4, 4946);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -79824,7 +79824,7 @@ var MultiRoomAudio = (function () {
     		block,
     		id: create_default_slot$2.name,
     		type: "slot",
-    		source: "(169:0) <Page>",
+    		source: "(173:0) <Page>",
     		ctx
     	});
 
@@ -79893,6 +79893,7 @@ var MultiRoomAudio = (function () {
     	validate_slots('SpeakerPage', slots, []);
     	let socket = null;
     	const audio = new Audio();
+    	audio.muted = true;
     	let songId = -1;
     	let currentTimeSec = 0;
     	let songDurationSec = 0;
@@ -79994,6 +79995,9 @@ var MultiRoomAudio = (function () {
     				break;
     			case "STOP":
     				stop();
+    				break;
+    			case "MUTE":
+    				audio.muted = message.isMuted;
     				break;
     		}
     	}

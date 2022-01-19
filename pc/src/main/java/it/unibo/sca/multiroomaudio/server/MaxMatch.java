@@ -8,8 +8,8 @@ import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
 public class MaxMatch extends FingerprintAnalyzer{
 
-    public MaxMatch(Client client, DatabaseManager dbm) {
-        super(client, dbm);
+    public MaxMatch(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
+        super(speakerManager, client, dbm);
     }
 
     @Override

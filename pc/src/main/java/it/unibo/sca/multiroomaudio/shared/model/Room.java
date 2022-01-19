@@ -69,8 +69,8 @@ public class Room {
         }
     }
 
-    public ScanResult[] getFingerprints(String bssid){
-        return (ScanResult[]) fingerprints.get(bssid).toArray();
+    public synchronized ArrayList<ScanResult> getFingerprints(String bssid){
+        return (ArrayList<ScanResult>) fingerprints.get(bssid);
     }
 
     public synchronized void setNScan(int nscan){

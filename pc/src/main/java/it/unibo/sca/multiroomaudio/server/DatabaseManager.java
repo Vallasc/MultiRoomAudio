@@ -1,7 +1,6 @@
 package it.unibo.sca.multiroomaudio.server;
 
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -103,12 +102,7 @@ public class DatabaseManager {
     }
 
     public List<Speaker> getConnectedSpeakerRoom(String roomId){
-        List<Speaker> ret = new ArrayList<>();
-        getConnectedWebDevices().stream()
-                    .filter(pair -> pair.getRight() instanceof Speaker)
-                    .filter(pair -> ((Speaker)pair.getRight()).getRoom().equals(roomId))
-                    .collect(Collectors.toList()).forEach(pair -> ret.add((Speaker)pair.getRight()));
-        return ret;
+        return connectedWebDevices.values().stream().filter(d -> d instanceof Speaker).map(d -> (Speaker)d).collect(Collectors.toList());
     }
 
     public List<Pair<Session, Device>> getConnectedWebDevices(){
@@ -249,11 +243,6 @@ public class DatabaseManager {
             System.out.println("ROOM IDs: ");
             clientScans.get(clientId).keySet().forEach(k -> System.out.println("\t" + k + " "));
         }
-    }
-
-    public void removeScans(String clientId, String roomId){
-        roomId = roomId.toLowerCase();
-        System.out.println("removing room:" + roomId);
     }
 
     public void printFingerprintDb(String clientId){

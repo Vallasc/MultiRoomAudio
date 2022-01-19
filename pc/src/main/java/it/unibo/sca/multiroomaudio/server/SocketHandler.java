@@ -103,7 +103,7 @@ public class SocketHandler extends Thread{
                             dOut.flush();
                         }
                     }while(currentStart);
-                    System.out.println("CONDITION: crash =" + flagCrash + " empty = " + tempAPInfo.isEmpty());
+                    System.out.println("CONDITION: crash = " + flagCrash + " empty = " + tempAPInfo.isEmpty());
                     //stopped, send stop to the client
                 }else{
                         clientSocket.setSoTimeout(1000);
@@ -144,7 +144,7 @@ public class SocketHandler extends Thread{
             }
         }
         System.out.println("STOP");
-        dbm.printFingerprintDb(clientId);
+        //dbm.printFingerprintDb(clientId);
     }
 
 }
