@@ -184,10 +184,17 @@ public class DatabaseManager {
 
     //-------------------------------ROOMS-----------------------------------------
     public void setClientRoom(String clientId, String roomId){
-        ConcurrentHashMap<String, Room> newRoom = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, Room> rooms;
+        rooms = clientScans.get(clientId);
+        if(rooms == null){
+            rooms = new ConcurrentHashMap<String, Room>();
+            rooms.put(roomId.toLowerCase(), new Room(roomId));
+            clientScans.putIfAbsent(clientId, rooms);
+        }
+        else
+            rooms.put(roomId.toLowerCase(), new Room(roomId));
+
         System.out.println("New room for client "+ clientId + ", roomID: " + roomId);
-        newRoom.put(roomId.toLowerCase(), new Room(roomId));
-        clientScans.put(clientId, newRoom);
     }
 
     public void deleteClientRoom(String clientId, String roomId){
@@ -226,7 +233,7 @@ public class DatabaseManager {
                 listSignals.add(ap.getSignal());
             }
         }
-        //orering the keys for the reference point so that the values are ordered for accesspoint id
+        //ordering the keys for the reference point so that the values are ordered for accesspoint id
         //helpful later
         String[] orderedKeys = new String[signals.size()];
         signals.keySet().toArray(orderedKeys);
@@ -238,6 +245,10 @@ public class DatabaseManager {
             ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
             clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult, nscan);
         }    
+        if(nscan == 4){
+            System.out.println("ROOM IDs: ");
+            clientScans.get(clientId).keySet().forEach(k -> System.out.println("\t" + k + " "));
+        }
     }
 
     public void removeScans(String clientId, String roomId){
