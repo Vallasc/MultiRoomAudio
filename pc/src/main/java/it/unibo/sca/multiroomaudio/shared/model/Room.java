@@ -92,6 +92,7 @@ public class Room {
     }
 
     public String[] getBSSID() {
-        return (String[])fingerprints.keySet().toArray();
+        String[] bssid = new String[fingerprints.keySet().size()];
+        return fingerprints.keySet().toArray(bssid);
     }
 }

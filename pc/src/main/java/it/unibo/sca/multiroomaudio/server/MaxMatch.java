@@ -18,6 +18,8 @@ public class MaxMatch extends FingerprintAnalyzer{
         List<Room> offline = dbm.getClientRooms(client.getId());
         int max = 0;
         String roomKey = null;
+        if(online == null ) return null;
+        if(offline == null ) return null;
         for(Room r : offline){
             int tmp = 0;
             String[] keys = r.getBSSID();
@@ -33,6 +35,7 @@ public class MaxMatch extends FingerprintAnalyzer{
                 max = tmp;
                 roomKey = r.getId();
             }
+            System.out.println(r.getId() + " matches: " + tmp);
         }
         return roomKey;
     }

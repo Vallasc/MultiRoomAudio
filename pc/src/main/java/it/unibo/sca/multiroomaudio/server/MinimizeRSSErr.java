@@ -36,19 +36,24 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
                         //if the lenght of the offline list is > than the index it means we are good and we can just compute the error ezpz
                         //if there are value missing in the positions before the current one then it's fixed inside the putFingerprints
                         ScanResult offline = offlines.get(rpIndex);
-                        roomErr[rpIndex] += Math.pow(normalize(online.getSignal()) - normalize(offline.getSignal()), 2);
+                        roomErr[rpIndex] += Math.pow(online.getSignal() - offline.getSignal(), 2);
                     }else if(offlines.size() <= rpIndex){
                         //otherwise the value is missing, again, confront with the lowest value
                         roomErr[rpIndex] += Math.pow(normalize(online.getSignal()) - normalize(MIN_STRENGTH), 2);
                     }
                 }
-            else
+            /*else
                 //if there are no offline fingerprints for that ap then its error is given a huge value
                 //other option is to not consider the thing at all
                 for(int rpIndex = 0; rpIndex < nscan; rpIndex++){
                     roomErr[rpIndex] += Math.pow(normalize(online.getSignal()) - normalize(MIN_STRENGTH), 2);
-                }
+                }*/
         }
+        System.out.println("Error array");
+        for(double err: roomErr){
+            System.out.print("\t" + err + " ");
+        }
+        System.out.println("");
         min = Math.sqrt(roomErr[0]);
         for(int i = 1; i<roomErr.length; i++){
             double root = Math.sqrt(roomErr[i]);

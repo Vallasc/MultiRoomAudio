@@ -32,28 +32,34 @@ public abstract class FingerprintAnalyzer implements Runnable{
     @Override
     public void run(){
         client.setPlay(true);
+        String prevRoomKey = null;
         while(client.getPlay()){
-            String prevRoomKey = null;
             String roomkey = findRoomKey();
-            System.out.println("ROOMKEY: " + roomkey);
             if(roomkey == null){
              //   dbm.getConnectedWebSpeakers().forEach(p -> System.out.println("\t"+((Speaker)p.getRight()).getName() + " mute: " + ((Speaker)p.getRight()).isMuted())); 
                 continue;
             }
             //unmute the room 
             if(prevRoomKey == null){
+                System.out.println("PrevRoomKey is null, ROOMKEY: " + roomkey);
                 List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
                 if(speakers != null)
-                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                    speakers.forEach(speaker -> {System.out.println("inc speaker: " + speaker.getName()); speaker.incNumberNowPlaying();});
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 prevRoomKey = roomkey;
             }
             if(!prevRoomKey.equals(roomkey)){
+                System.out.println("PrevRoomKey is not null, ROOMKEY: " + roomkey + " PREV: " + prevRoomKey);
                 List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(prevRoomKey);
                 List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
                 if(prevspeakers != null)
-                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                    speakers.forEach(speaker -> speaker.decNumberNowPlaying());
                 if(speakers != null)
-                    prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
+                    prevspeakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
             speakerManager.updateAudioState();
