@@ -17,7 +17,6 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
 
     private double roomError(Room r){
         //max 4 reference points for each room
-        System.out.println("Client: " + client.getId());
         ScanResult[] onlines = client.getFingerprints();
         if(onlines == null){
             System.out.println("no online fingeprint ??");
@@ -57,6 +56,7 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
             //getting the rp that minimizes the error for the room
                 min = root;
         }
+        System.out.println("Error for room: " + r.getId() + " " + min);
         return min;
     }
 

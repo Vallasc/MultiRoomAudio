@@ -78707,12 +78707,12 @@ var MultiRoomAudio = (function () {
     			div1.textContent = "Add a new room ↘️";
     			t2 = space();
     			div2 = element("div");
-    			add_location(div0, file$3, 181, 12, 5115);
+    			add_location(div0, file$3, 181, 12, 5116);
     			attr_dev(div1, "class", "no-rooms svelte-jwdyjs");
-    			add_location(div1, file$3, 182, 12, 5135);
-    			add_location(div2, file$3, 185, 12, 5226);
+    			add_location(div1, file$3, 182, 12, 5136);
+    			add_location(div2, file$3, 185, 12, 5227);
     			attr_dev(div3, "class", "center svelte-jwdyjs");
-    			add_location(div3, file$3, 180, 8, 5081);
+    			add_location(div3, file$3, 180, 8, 5082);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -78844,11 +78844,11 @@ var MultiRoomAudio = (function () {
     			a1 = element("a");
     			t3 = space();
     			set_style(a0, "margin-left", "16px");
-    			add_location(a0, file$3, 166, 24, 4510);
+    			add_location(a0, file$3, 166, 24, 4511);
     			set_style(a1, "margin-left", "8px");
-    			add_location(a1, file$3, 174, 24, 4931);
+    			add_location(a1, file$3, 174, 24, 4932);
     			attr_dev(span, "slot", "after");
-    			add_location(span, file$3, 162, 20, 4222);
+    			add_location(span, file$3, 162, 20, 4223);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -79080,7 +79080,7 @@ var MultiRoomAudio = (function () {
     			div = element("div");
     			create_component(button.$$.fragment);
     			attr_dev(div, "class", "button-start");
-    			add_location(div, file$3, 196, 20, 5714);
+    			add_location(div, file$3, 196, 20, 5715);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -79186,9 +79186,9 @@ var MultiRoomAudio = (function () {
     			t3 = space();
     			if (if_block) if_block.c();
     			attr_dev(div0, "class", "block text-title svelte-jwdyjs");
-    			add_location(div0, file$3, 193, 16, 5512);
+    			add_location(div0, file$3, 193, 16, 5513);
     			attr_dev(div1, "class", "center svelte-jwdyjs");
-    			add_location(div1, file$3, 191, 12, 5420);
+    			add_location(div1, file$3, 191, 12, 5421);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -79626,7 +79626,7 @@ var MultiRoomAudio = (function () {
     				() => {
     					stopScan(nscan, btn);
     				},
-    				2000
+    				20000
     			);
     		}
     	}

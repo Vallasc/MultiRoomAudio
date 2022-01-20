@@ -64,7 +64,6 @@ public class SocketHandler extends Thread{
         List<APInfo> tempAPInfo = new ArrayList<>();
         while(isRunning){
             try {
-                int i = 0;
                 //find a change in the start/stop state
                 currentStart = myDevice.getStart();
                 nScan = myDevice.getNScan();
@@ -86,9 +85,7 @@ public class SocketHandler extends Thread{
                             tempAPInfo.addAll(Arrays.asList(gson.fromJson(dIn.readUTF(), APInfo[].class)));
                         }
                         //send the ack
-                        System.out.println("Send ACK: " + i);
-                        dOut.writeUTF(gson.toJson(new MsgAck(i)));
-                        i++;
+                        dOut.writeUTF(gson.toJson(new MsgAck()));
                         dOut.flush();
                         currentStart = myDevice.getStart();
                         //here the client is sleeping
