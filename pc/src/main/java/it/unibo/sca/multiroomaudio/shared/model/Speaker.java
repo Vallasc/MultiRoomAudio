@@ -25,7 +25,7 @@ public class Speaker extends Device {
 
     public synchronized void decNumberNowPlaying() {
         this.numberNowPlaying -= 1;
-        if(numberNowPlaying == 0)
+        if(this.numberNowPlaying == 0)
             this.isMuted = true;
     }
 

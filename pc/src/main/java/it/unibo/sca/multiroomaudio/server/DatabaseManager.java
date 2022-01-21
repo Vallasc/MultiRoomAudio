@@ -239,10 +239,6 @@ public class DatabaseManager {
             ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
             clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult, nscan);
         }    
-        if(nscan == 4){
-            System.out.println("ROOM IDs: ");
-            clientScans.get(clientId).keySet().forEach(k -> System.out.println("\t" + k + " "));
-        }
     }
 
     public void printFingerprintDb(String clientId){

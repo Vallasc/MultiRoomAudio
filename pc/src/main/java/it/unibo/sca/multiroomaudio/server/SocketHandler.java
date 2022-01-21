@@ -141,7 +141,7 @@ public class SocketHandler extends Thread{
             }
         }
         System.out.println("STOP");
-        //dbm.printFingerprintDb(clientId);
+        
     }
 
 }
