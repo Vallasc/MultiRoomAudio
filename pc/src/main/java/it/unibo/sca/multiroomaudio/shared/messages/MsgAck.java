@@ -8,6 +8,10 @@ public class MsgAck extends Msg{
         this.n = n;
     }
     
+    public MsgAck() {
+        super("ACK");
+    }
+    
     public int getN(){
         return n;
     }

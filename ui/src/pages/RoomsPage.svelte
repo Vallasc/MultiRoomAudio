@@ -122,7 +122,7 @@
                 })
             )
             nscan++
-            setTimeout(() => { stopScan(nscan, btn); }, 2000);
+            setTimeout(() => { stopScan(nscan, btn); }, 1000);
         }
         
     }

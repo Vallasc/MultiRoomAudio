@@ -79626,7 +79626,7 @@ var MultiRoomAudio = (function () {
     				() => {
     					stopScan(nscan, btn);
     				},
-    				2000
+    				1000
     			);
     		}
     	}

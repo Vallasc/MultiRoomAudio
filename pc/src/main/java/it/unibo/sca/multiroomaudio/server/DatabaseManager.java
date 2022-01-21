@@ -102,7 +102,7 @@ public class DatabaseManager {
     }
 
     public List<Speaker> getConnectedSpeakerRoom(String roomId){
-        return connectedWebDevices.values().stream().filter(d -> d instanceof Speaker).map(d -> (Speaker)d).collect(Collectors.toList());
+        return connectedWebDevices.values().stream().filter(d -> d instanceof Speaker).filter(d -> ((Speaker)d).getRoom().equals(roomId)).map(d -> (Speaker)d).collect(Collectors.toList());
     }
 
     public List<Pair<Session, Device>> getConnectedWebDevices(){
