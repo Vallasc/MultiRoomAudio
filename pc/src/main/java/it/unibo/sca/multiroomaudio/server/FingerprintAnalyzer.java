@@ -10,7 +10,7 @@ public abstract class FingerprintAnalyzer implements Runnable{
     protected final Client client;
     protected final DatabaseManager dbm;
     private static final double ALPHA = 24;
-    protected static final int MIN_STRENGTH = -120;
+    protected static final int MIN_STRENGTH = -80;
     protected int MAX_VALUE = 15000;
     protected SpeakerManager speakerManager;
     public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
@@ -36,30 +36,24 @@ public abstract class FingerprintAnalyzer implements Runnable{
         while(client.getPlay()){
             String roomkey = findRoomKey();
             if(roomkey == null){
-             //   dbm.getConnectedWebSpeakers().forEach(p -> System.out.println("\t"+((Speaker)p.getRight()).getName() + " mute: " + ((Speaker)p.getRight()).isMuted())); 
                 continue;
             }
-            //unmute the room 
+            //System.out.println("Roomkey: " + roomkey);
             if(prevRoomKey == null){
-                System.out.println("PrevRoomKey is null, ROOMKEY: " + roomkey);
+                //System.out.println("PrevRoomKey is null, ROOMKEY: " + roomkey);
                 List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
                 if(speakers != null)
-                    speakers.forEach(speaker -> {System.out.println("inc speaker: " + speaker.getName()); speaker.incNumberNowPlaying();});
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
             if(!prevRoomKey.equals(roomkey)){
-                System.out.println("PrevRoomKey is not null, ROOMKEY: " + roomkey + " PREV: " + prevRoomKey);
+               // System.out.println("PrevRoomKey is not null, ROOMKEY: " + roomkey + " PREV: " + prevRoomKey);
                 List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(prevRoomKey);
                 List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
                 if(prevspeakers != null)
-                    speakers.forEach(speaker -> speaker.decNumberNowPlaying());
+                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 if(speakers != null)
-                    prevspeakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                    prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
             speakerManager.updateAudioState();

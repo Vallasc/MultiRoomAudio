@@ -78742,12 +78742,21 @@ var MultiRoomAudio = (function () {
     			div1.textContent = "Add a new room ↘️";
     			t2 = space();
     			div2 = element("div");
+<<<<<<< HEAD
     			add_location(div0, file$3, 185, 12, 5065);
     			attr_dev(div1, "class", "no-rooms svelte-1ii4kax");
     			add_location(div1, file$3, 186, 12, 5084);
     			add_location(div2, file$3, 189, 12, 5172);
     			attr_dev(div3, "class", "center svelte-1ii4kax");
     			add_location(div3, file$3, 184, 8, 5032);
+=======
+    			add_location(div0, file$3, 181, 12, 5116);
+    			attr_dev(div1, "class", "no-rooms svelte-jwdyjs");
+    			add_location(div1, file$3, 182, 12, 5136);
+    			add_location(div2, file$3, 185, 12, 5227);
+    			attr_dev(div3, "class", "center svelte-jwdyjs");
+    			add_location(div3, file$3, 180, 8, 5082);
+>>>>>>> 09bc1ee4c0bff23eba14ccf32209dc2cd42b192b
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -78879,11 +78888,19 @@ var MultiRoomAudio = (function () {
     			a1 = element("a");
     			t3 = space();
     			set_style(a0, "margin-left", "16px");
+<<<<<<< HEAD
     			add_location(a0, file$3, 170, 24, 4475);
     			set_style(a1, "margin-left", "8px");
     			add_location(a1, file$3, 178, 24, 4888);
     			attr_dev(span, "slot", "after");
     			add_location(span, file$3, 166, 20, 4191);
+=======
+    			add_location(a0, file$3, 166, 24, 4511);
+    			set_style(a1, "margin-left", "8px");
+    			add_location(a1, file$3, 174, 24, 4932);
+    			attr_dev(span, "slot", "after");
+    			add_location(span, file$3, 162, 20, 4223);
+>>>>>>> 09bc1ee4c0bff23eba14ccf32209dc2cd42b192b
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -79102,7 +79119,14 @@ var MultiRoomAudio = (function () {
 
     	const block = {
     		c: function create() {
+<<<<<<< HEAD
     			create_component(progressbar.$$.fragment);
+=======
+    			div = element("div");
+    			create_component(button.$$.fragment);
+    			attr_dev(div, "class", "button-start");
+    			add_location(div, file$3, 196, 20, 5715);
+>>>>>>> 09bc1ee4c0bff23eba14ccf32209dc2cd42b192b
     		},
     		m: function mount(target, anchor) {
     			mount_component(progressbar, target, anchor);
@@ -79247,6 +79271,7 @@ var MultiRoomAudio = (function () {
     			t2 = space();
     			create_component(walkroomanimation.$$.fragment);
     			t3 = space();
+<<<<<<< HEAD
     			div1 = element("div");
     			create_component(button0.$$.fragment);
     			t4 = space();
@@ -79260,6 +79285,13 @@ var MultiRoomAudio = (function () {
     			add_location(div2, file$3, 205, 20, 5928);
     			attr_dev(div3, "class", "center svelte-1ii4kax");
     			add_location(div3, file$3, 195, 12, 5360);
+=======
+    			if (if_block) if_block.c();
+    			attr_dev(div0, "class", "block text-title svelte-jwdyjs");
+    			add_location(div0, file$3, 193, 16, 5513);
+    			attr_dev(div1, "class", "center svelte-jwdyjs");
+    			add_location(div1, file$3, 191, 12, 5421);
+>>>>>>> 09bc1ee4c0bff23eba14ccf32209dc2cd42b192b
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -79697,6 +79729,7 @@ var MultiRoomAudio = (function () {
     	}
 
     	function startScan() {
+<<<<<<< HEAD
     		walkAnimationComponent.nextCorner();
     	} /*if(nscan < _maxScan){
         var btn = document.getElementById("start-button")
@@ -79713,6 +79746,48 @@ var MultiRoomAudio = (function () {
         nscan++
         setTimeout(() => { stopScan(nscan, btn); }, 1000);
     }*/
+=======
+    		if (nscan < _maxScan) {
+    			var btn = document.getElementById("start-button");
+    			btn.disabled = true;
+    			btn.style.visibility = "hidden";
+
+    			$webSocket.send(JSON.stringify({
+    				type: "SCAN_ROOM",
+    				roomId: currentRoomId,
+    				startScan: true,
+    				nScan: nscan
+    			}));
+
+    			$$invalidate(3, nscan++, nscan);
+
+    			setTimeout(
+    				() => {
+    					stopScan(nscan, btn);
+    				},
+    				10000
+    			);
+    		}
+    	}
+
+    	function stopScan(n, btn) {
+    		$webSocket.send(JSON.stringify({
+    			type: "SCAN_ROOM",
+    			roomId: currentRoomId,
+    			startScan: false,
+    			nScan: n
+    		}));
+
+    		btn.disabled = false;
+    		btn.style.visibility = "visible";
+
+    		if (nscan == _maxScan) {
+    			$$invalidate(3, nscan = 0);
+    			console.log("FINISHED");
+    			$$invalidate(0, popupOpened = false);
+    		}
+    	}
+>>>>>>> 09bc1ee4c0bff23eba14ccf32209dc2cd42b192b
 
     	const writable_props = [];
 

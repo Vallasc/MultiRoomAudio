@@ -38,7 +38,7 @@ public class Client extends Device {
         for(int i = 0; i < aps.length; i++) {
             fingerprints[i] = new ScanResult(aps[i]);
         }
-        Arrays.sort(fingerprints);
+        //Arrays.sort(fingerprints);
     }
 
     public synchronized ScanResult[] getFingerprints() {

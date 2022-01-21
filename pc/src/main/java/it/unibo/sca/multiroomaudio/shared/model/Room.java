@@ -53,9 +53,10 @@ public class Room {
         if(list == null){
             //here nscan is 1 
             List<ScanResult> results = new ArrayList<>();
-            if(nscan > 1)
+            if(nscan > 1){
                 for(int i = 0; i<nscan-1; i++)
-                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -120, result.getFrequency(), result.getTimestamp()));
+                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -80, result.getFrequency(), result.getTimestamp()));
+            }
             results.add(nscan-1, result);
             fingerprints.put(result.getBSSID(), results);
                 
@@ -63,9 +64,17 @@ public class Room {
             int len = list.size();
             if(len < nscan)
                 for(int i = len; i<nscan-1; i++){
-                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -120, result.getFrequency(), result.getTimestamp()));
+                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -80, result.getFrequency(), result.getTimestamp()));
                 }
             list.add(nscan-1, result);
+        }
+        if(nscan == 4){
+            System.out.println(result.getBSSID());
+            list = fingerprints.get(result.getBSSID());
+            for(ScanResult r : list){
+                System.out.println("\t" + r.getSignal());
+            }
+
         }
     }
 
