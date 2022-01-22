@@ -43,7 +43,6 @@ public class FingerprintService extends Thread {
     @Override
     public void run() {
         System.out.println("Fingerprint service: RUNNING");
-        //client info always through websocket tho
         isRunning = true;
         
         DataOutputStream dOut = null;
