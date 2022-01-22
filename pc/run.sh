@@ -5,16 +5,14 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-user=$(w | awk 'FNR==3' | cut -f 1 -d " ")
-
 JAR="target/multi_room_audio_client-0.0.1-jar-with-dependencies.jar"
 
 case "$1" in
     "server")
-        sudo --user="$user" java -cp "$JAR" it.unibo.sca.multiroomaudio.server.ServerMain
+        sudo java -cp "$JAR" it.unibo.sca.multiroomaudio.server.ServerMain
         ;;
     "client")
-        sudo --user="$user" java -cp "$JAR" it.unibo.sca.multiroomaudio.client.ClientMain
+        sudo java -cp "$JAR" it.unibo.sca.multiroomaudio.client.ClientMain
         ;;
     "speaker")
         java -cp "$JAR" it.unibo.sca.multiroomaudio.speaker.SpeakerMain
