@@ -2,6 +2,7 @@ package it.unibo.sca.multiroomaudio.utils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -25,7 +26,10 @@ public class Desktop {
     }
     private static void browseLinux(URI uri){
         try {
-            Runtime.getRuntime().exec("xdg-open " + uri.toASCIIString());
+            Process process = Runtime.getRuntime().exec("logname");
+            String USER = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            System.out.println("USER: " + USER);
+            Runtime.getRuntime().exec("sudo --user=" + USER + " xdg-open " + uri.toASCIIString());
         } catch (IOException e) {}
     }
     private static void browseMac(URI uri){
