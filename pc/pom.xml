@@ -42,7 +42,7 @@
     <dependency>
       <groupId>com.github.vallasc</groupId>
       <artifactId>WlanScanJava</artifactId>
-      <version>125bf14</version>
+      <version>5cafb4a</version>
     </dependency>
     <dependency>
         <groupId>org.apache.commons</groupId>
