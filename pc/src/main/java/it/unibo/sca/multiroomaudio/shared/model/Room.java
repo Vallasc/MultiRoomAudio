@@ -6,9 +6,11 @@ import java.util.List;
 
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
+    public static final int SCANS_FOR_EACH_POSITION = 4;
+    public static final int MAX_POSITION = 4;
     private final String id;
     private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
-    private int nscan;
+    private int nscan; // index scan position
 
     public Room(String id){
         this.id = id;
@@ -46,7 +48,11 @@ public class Room {
         }
     }*/
 
-    public synchronized void putClientFingerprints(ScanResult result, int nscan){
+    public synchronized void putClientFingerprints(ScanResult result){
+        if(nscan >= MAX_POSITION)
+            return;
+        nscan++;
+
         //nscan = [1, maxscan]
         List<ScanResult> list;
         list = fingerprints.get(result.getBSSID());
