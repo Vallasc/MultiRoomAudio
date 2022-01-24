@@ -15,7 +15,8 @@ import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class ClientMain {
     
-    public static void main(String[] args) {        
+    public static void main(String[] args) {
+        
         // Find ip and port with broadcast
         Gson gson = new Gson();
         MsgHelloBack msg = null;
@@ -44,7 +45,7 @@ public class ClientMain {
                     try {
                         Desktop.getDesktop().browse(uri);
                     } catch (Exception e) {
-                        it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
+                        //it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
                     }
                 }
             } catch (URISyntaxException e1) {}
