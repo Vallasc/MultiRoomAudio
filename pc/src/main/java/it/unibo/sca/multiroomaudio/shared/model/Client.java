@@ -9,6 +9,7 @@ public class Client extends Device {
         private boolean start = false;
         private boolean play = false;
         private String activeRoom = null;
+        private int nScan;
     }
 
     private final String ip;
@@ -59,9 +60,10 @@ public class Client extends Device {
 
     
     //---------------------STATE THINGS------------------------------------
-    public synchronized void setStart(boolean start, String activeRoom){
+    public synchronized void setStart(boolean start, String activeRoom, int nScan){
         state.start = start;
         state.activeRoom = activeRoom;
+        state.nScan = nScan;
     }
 
     public synchronized boolean getStart(){
@@ -95,6 +97,10 @@ public class Client extends Device {
 
     public synchronized String getActiveRoom(){
         return state.activeRoom;
+    }
+
+    public synchronized int getNScan(){
+        return state.nScan;
     }
 
 }

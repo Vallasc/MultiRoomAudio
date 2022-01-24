@@ -101,10 +101,10 @@ public class WebSocketHandler {
                     MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
                     if(msg.getStartScan()){
                         System.out.println("DEBUG: Start scan");
-                        dbm.setDeviceStart(connected.getId(), msg.getRoomId(), msg.getNCorners());
+                        dbm.setDeviceStart(connected.getId(), msg.getRoomId(), msg.getNScan());
                     } else {
                         System.out.println("DEBUG: Stop scan");
-                        dbm.setDeviceStop(connected.getId());
+                        dbm.setDeviceStop(connected.getId(), msg.getNScan());
                         sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                     }
                 } else if( msgType.equals("BIND_SPEAKER")){

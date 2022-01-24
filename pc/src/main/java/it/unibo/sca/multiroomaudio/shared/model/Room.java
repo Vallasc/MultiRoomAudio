@@ -8,16 +8,16 @@ import java.util.List;
 public class Room {
     private final String id;
     private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
-    private int nCorners;
+    private int nscan;
 
     public Room(String id){
         this.id = id;
-        this.nCorners = 0;
+        this.nscan = 0;
         this.fingerprints = new HashMap<>();
     }
 
     public Room(String id, HashMap<String, List<ScanResult>> fingerprints) {
-        this.nCorners = 0;
+        this.nscan = 0;
         this.id = id;
         this.fingerprints = fingerprints;
     }
@@ -46,49 +46,48 @@ public class Room {
         }
     }*/
 
-    public synchronized void putClientFingerprints(ScanResult result){
-        //nCorners = [1, maxscan]
+    public synchronized void putClientFingerprints(ScanResult result, int nscan){
+        //nscan = [1, maxscan]
         List<ScanResult> list;
         list = fingerprints.get(result.getBSSID());
         if(list == null){
-            //here nCorners is 1 
+            //here nscan is 1 
             List<ScanResult> results = new ArrayList<>();
-            if(nCorners > 1){
-                for(int i = 0; i<nCorners-1; i++)
+            if(nscan > 1){
+                for(int i = 0; i<nscan-1; i++)
                     results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -80, result.getFrequency(), result.getTimestamp()));
             }
-            results.add(nCorners-1, result);
+            results.add(nscan-1, result);
             fingerprints.put(result.getBSSID(), results);
                 
         }else{
             int len = list.size();
-            if(len < nCorners)
-                for(int i = len; i<nCorners-1; i++){
+            if(len < nscan)
+                for(int i = len; i<nscan-1; i++){
                     list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -80, result.getFrequency(), result.getTimestamp()));
                 }
-            list.add(nCorners-1, result);
+            list.add(nscan-1, result);
         }
-        /*Not a huge problem but we don't know the max number of corners so we aren't able to do this anymore
-        if(nCorners == 4){
+        if(nscan == 4){
             System.out.println(result.getBSSID());
             list = fingerprints.get(result.getBSSID());
             for(ScanResult r : list){
                 System.out.println("\t" + r.getSignal());
             }
 
-        }*/
+        }
     }
 
     public synchronized ArrayList<ScanResult> getFingerprints(String bssid){
         return (ArrayList<ScanResult>) fingerprints.get(bssid);
     }
 
-    public synchronized void setNCorners(int nCorners){
-        this.nCorners = nCorners;
+    public synchronized void setNScan(int nscan){
+        this.nscan = nscan;
     }
 
-    public int getNCorners(){
-        return nCorners;
+    public int getNScan(){
+        return nscan;
     }
 
     public void printFingerprints() {

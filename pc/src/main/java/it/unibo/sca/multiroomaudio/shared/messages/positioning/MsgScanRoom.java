@@ -5,12 +5,12 @@ import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 public class MsgScanRoom extends Msg{
     private String roomId;
     private boolean startScan;
-    private int nCorners;
-    public MsgScanRoom(boolean startScan, String roomId, int nCorners) {
+    private int nScan;
+    public MsgScanRoom(boolean startScan, String roomId, int nScan) {
         super("SCAN_ROOM");
         this.roomId = roomId;
         this.startScan = startScan;
-        this.nCorners = nCorners;
+        this.nScan = nScan;
     }
 
     public String getRoomId(){
@@ -21,7 +21,7 @@ public class MsgScanRoom extends Msg{
         return startScan;
     }
 
-    public int getNCorners(){
-        return nCorners;
+    public int getNScan(){
+        return nScan;
     }
 }

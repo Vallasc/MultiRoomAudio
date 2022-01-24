@@ -53,11 +53,10 @@ public class DatabaseManager {
         return devices.get(key);
     }
 
-    public boolean setDeviceStart(String clientId, String roomId, int nCorners){
-        setDeviceStop(clientId);
+    public boolean setDeviceStart(String clientId, String roomId, int nScan){
+        setDeviceStop(clientId, nScan);
         try{
-            ((Client) devices.get(clientId)).setStart(true, roomId);
-            clientScans.get(clientId).get(roomId).setNScan(nCorners);
+            ((Client) devices.get(clientId)).setStart(true, roomId, nScan);
             return true;
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
@@ -65,9 +64,9 @@ public class DatabaseManager {
         }
     }
 
-    public boolean setDeviceStop(String clientId){
+    public boolean setDeviceStop(String clientId, int nscan){
         try{
-            ((Client) devices.get(clientId)).setStart(false, null);
+            ((Client) devices.get(clientId)).setStart(false, null, nscan);
             return true;
         }catch(ClassCastException e){
             System.err.println("you casted a speaker to a client, what's going on?");
@@ -211,7 +210,7 @@ public class DatabaseManager {
         return new ArrayList<>(rooms.values());
     }
 
-    public void putScans(String clientId, String roomId, List<APInfo> scans){
+    public void putScans(String clientId, String roomId, List<APInfo> scans, int nscan){
         roomId = roomId.toLowerCase();
     
         Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
@@ -233,11 +232,12 @@ public class DatabaseManager {
         String[] orderedKeys = new String[signals.size()];
         signals.keySet().toArray(orderedKeys);
         Arrays.sort(orderedKeys);
+        clientScans.get(clientId).get(roomId).setNScan(nscan);
         for(String key : orderedKeys){
             //compute the mean for each scan
             double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
             ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
-            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
+            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult, nscan);
         }    
     }
 

@@ -29,6 +29,6 @@ class RoomDTO {
     RoomDTO(Room room){
         this.roomId = room.getId();
         this.samples = room.getFingerprintsSize();
-        this.nscan = room.getNCorners();
+        this.nscan = room.getNScan();
     }
 }
