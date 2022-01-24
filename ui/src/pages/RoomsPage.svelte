@@ -21,7 +21,7 @@
 
     let rooms = []
     let roomsLenght = 0
-    let nscan = 0
+    let ncorners = 0
     const _maxScan = 8
 
     onMount(() => {
@@ -113,7 +113,7 @@
 
     function startScan(){
         walkAnimationComponent.nextCorner()
-        if(nscan < _maxScan){
+        if(ncorners < _maxScan){
             var btn = document.getElementById("start-button")
             btn.disabled = true
             btn.style.visibility = "hidden"
@@ -122,11 +122,11 @@
                 type: "SCAN_ROOM",
                 roomId: currentRoomId,
                 startScan: true, 
-                nScan : nscan
+                nCorners : ncorners
                 })
             )
-            nscan++
-            setTimeout(() => { stopScan(nscan, btn); }, 10000);
+            ncorners++
+            setTimeout(() => { stopScan(ncorners, btn); }, 10000);
         }
         
     }
@@ -137,13 +137,13 @@
                 type: "SCAN_ROOM",
                 roomId: currentRoomId,
                 startScan: false, 
-                nScan : n
+                nCorners : n
             })
         )
         btn.disabled = false
         btn.style.visibility = "visible"
-        if(nscan == _maxScan){
-            nscan = 0
+        if(ncorners == _maxScan){
+            ncorners = 0
             console.log("FINISHED")
             popupOpened = false
         }
@@ -162,7 +162,7 @@
     {#if roomsLenght > 0}
         <List mediaList>
             {#each rooms as room}
-            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
+            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.ncorners} fingerpint{room.samples == 1 ? "" : "s"}">
                     <span slot="after">
                         <Link iconMd="material:radar" onClick={() => startMisuration(room.roomId)} />
                         <!-- svelte-ignore a11y-missing-attribute -->
@@ -198,7 +198,7 @@
                 {/if}
                 <div class="block text-title">Go to a corner of the room</div>
                 <WalkRoomAnimation roomName={currentRoomId.substring(0, 9)} bind:this={walkAnimationComponent} />
-                <!--{#if nscan<_maxScan && false}-->
+                <!--{#if ncorners<_maxScan && false}-->
                     <div class="button-stop">
                         <Button large fill color="red" onClick={stopScan}>No more corners</Button>
                     </div>
