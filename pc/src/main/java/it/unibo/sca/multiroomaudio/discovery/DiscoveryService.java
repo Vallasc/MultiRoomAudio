@@ -154,10 +154,11 @@ public class DiscoveryService {
             Object readObject = MyMsgHandler.dtgmInMsg(packetReceive.getData());
             if (readObject instanceof MsgDiscoveredServer) 
                 serverAddress = packetReceive.getAddress();  
-                MsgDiscoveredServer discovered = (MsgDiscoveredServer) readObject;
-                fingerprintPort = discovered.getFingerprintPort();
-                serverPort = discovered.getServerPort();
+            MsgDiscoveredServer discovered = (MsgDiscoveredServer) readObject;
+            fingerprintPort = discovered.getFingerprintPort();
+            serverPort = discovered.getServerPort();
         }catch (ClassNotFoundException | IOException e){
+            e.printStackTrace();
             socket.close();
             return;
         }
