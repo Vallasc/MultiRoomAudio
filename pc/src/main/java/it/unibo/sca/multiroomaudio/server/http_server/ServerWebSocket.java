@@ -32,7 +32,7 @@ public class ServerWebSocket {
 
     @OnWebSocketError
     public void throwError(Throwable error) {
-        System.out.println("Web socket error " + error.getMessage() );
+        //System.out.println("Web socket error " + error.getMessage() );
     }
 
 }

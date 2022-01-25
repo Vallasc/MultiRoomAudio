@@ -16,13 +16,12 @@
     import WalkRoomAnimation from "./WalkRoomAnimation.svelte"
     import { webSocket } from "../stores"
 
-    let popupOpened = false
-    let loading = false
+    let popup
 
     let rooms = []
     let roomsLenght = 0
-    let nscan = 0
-    const _maxScan = 8
+
+    let disableScan = false
 
     onMount(() => {
         socketSetup()
@@ -44,6 +43,15 @@
             case "ROOMS":
                 rooms = message.rooms
                 roomsLenght = rooms.length
+                break
+            case "SCAN_ROOM_DONE":
+                if(message.singlePositionDone)
+                    walkAnimationComponent.nextCorner()
+                if(message.allRoomDone) {
+                    popup.instance().close()
+                }
+                disableScan = false
+                console.log(message)
                 break
         }
     }
@@ -99,54 +107,36 @@
     let currentRoomId = ""
     let walkAnimationComponent;
     function startMisuration(roomId) {
-        //setRoom(roomId) TODO remove
+        setRoom(roomId)
         f7.dialog.confirm(
             "Do you want to start scanning "+ roomId + "?",
             "Multiroom Audio",
             () => {
-                popupOpened = true
-                console.log(popupOpened)
+                popup.instance().open()
                 currentRoomId = roomId
             }
         )
     }
 
     function startScan(){
-        walkAnimationComponent.nextCorner()
-        if(nscan < _maxScan){
-            var btn = document.getElementById("start-button")
-            btn.disabled = true
-            btn.style.visibility = "hidden"
-            $webSocket.send(
-            JSON.stringify({
-                type: "SCAN_ROOM",
-                roomId: currentRoomId,
-                startScan: true, 
-                nScan : nscan
-                })
-            )
-            nscan++
-            setTimeout(() => { stopScan(nscan, btn); }, 10000);
-        }
-        
-    }
-
-    function stopScan(n, btn) {
         $webSocket.send(
             JSON.stringify({
                 type: "SCAN_ROOM",
                 roomId: currentRoomId,
-                startScan: false, 
-                nScan : n
             })
         )
-        btn.disabled = false
-        btn.style.visibility = "visible"
-        if(nscan == _maxScan){
-            nscan = 0
-            console.log("FINISHED")
-            popupOpened = false
-        }
+        disableScan = true
+    }
+
+    function stopScan() {
+        $webSocket.send(
+            JSON.stringify({
+                type: "SCAN_ROOM",
+                roomId: null
+            })
+        )
+        disableScan = false
+        popup.instance().close()
     }  
 
 
@@ -190,20 +180,23 @@
         </div>
     {/if}
 
-    <Popup id="popup" opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>
+    <Popup id="popup" opened={false} backdrop closeByBackdropClick = {false} bind:this={popup}>
         <Page>
             <div class="center">
-                {#if loading}
+                {#if disableScan}
                     <Progressbar infinite></Progressbar>
                 {/if}
-                <div class="block text-title">Go to a corner of the room</div>
+                {#if disableScan}
+                    <div class="block text-title">Please wait...</div>
+                {:else}
+                    <div class="block text-title">Go to a corner of the room</div>
+                {/if}
                 <WalkRoomAnimation roomName={currentRoomId.substring(0, 9)} bind:this={walkAnimationComponent} />
-                <!--{#if nscan<_maxScan && false}-->
                     <div class="button-stop">
                         <Button large fill color="red" onClick={stopScan}>No more corners</Button>
                     </div>
                     <div class="button-scan">
-                        <Button large fill onClick={startScan}>Save this corner</Button>
+                        <Button large fill onClick={startScan} disabled={disableScan} >Save this corner</Button>
                     </div>          
             </div>
         </Page>
