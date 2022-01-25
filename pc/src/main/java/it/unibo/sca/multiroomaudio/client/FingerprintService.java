@@ -79,7 +79,10 @@ public class FingerprintService extends Thread {
                     sleep(MILLISECONDS_BETWEEN_SCANS);
                 } else {
                     sleep(500);
-                }          
+                } 
+            }catch(EOFException e){
+                System.out.println("All web sessions ended and the server killed the socket, bye");
+                isRunning = false;
             } catch(SocketException e) {
                 System.out.println("Closed connection");
                 isRunning = false;

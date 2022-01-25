@@ -35,8 +35,7 @@ public class MinimizeRSSErrMin extends FingerprintAnalyzer{
                 }   
             }
         }
-        double root = Math.sqrt(roomErr);
-        return root;
+        return Math.sqrt(roomErr);
     }
 
     @Override
@@ -54,6 +53,7 @@ public class MinimizeRSSErrMin extends FingerprintAnalyzer{
         double min = MAX_VALUE;
         for(Room room : rooms) {
             double app = roomError(room);
+            System.out.println("Error for: " + room.getId() + " = " + app);
             if(app == -1d) return null;
             if(min>app){
                 min = app;

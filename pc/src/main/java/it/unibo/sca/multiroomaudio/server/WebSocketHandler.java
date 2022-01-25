@@ -71,7 +71,7 @@ public class WebSocketHandler {
                 if( msgType.equals("PLAY") ){ // Client want to play
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
                     System.out.println("DEBUG: Start play");
-                    pool.execute(new MinimizeRSSErrMin(speakerManager, client, dbm, false));
+                    pool.execute(new MinimizeRSSErrCorners(speakerManager, client, dbm));
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
                     System.out.println("DEBUG: Stop play");
@@ -105,10 +105,10 @@ public class WebSocketHandler {
                     MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
                     if(msg.getRoomId() != null){
                         System.out.println("DEBUG: START scan");
-                        client.setActiveRoom(msg.getRoomId());
+                        client.setStart(true, msg.getRoomId());
                     } else {
                         System.out.println("DEBUG: STOP scan");
-                        client.setActiveRoom(null);
+                        client.setStart(false, null);
                     }
                 } else if( msgType.equals("BIND_SPEAKER")){
                     MsgBindSpeaker msg = gson.fromJson(message, MsgBindSpeaker.class);

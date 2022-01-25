@@ -20,7 +20,6 @@ public class MinimizeRSSErrCorners extends FingerprintAnalyzer{
         }
 
         List<Double> roomErr = new ArrayList<>(); 
-
         int i = 0;
         ScanResult online = onlines[i];
         if(online.getSignal() > -80){
@@ -31,6 +30,7 @@ public class MinimizeRSSErrCorners extends FingerprintAnalyzer{
         }
         i += 1; 
         while(i < onlines.length){ 
+            online = onlines[i];
             if(online.getSignal()>-80){
                 ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
                 if(offlines != null){
