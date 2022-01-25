@@ -1,7 +1,10 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -225,6 +228,7 @@ public class DatabaseManager {
                 client.setCurrentPositionScans(currentPositionScans);
             } else { // corner is full
                 // Save corner scans
+                room.setNScan(room.getNScan() + 1);
                 putScansUpdateRoom(client.getId(), roomId, client.getCurrentTmpScans());
                 try {
                     // Done scan corner
@@ -252,14 +256,13 @@ public class DatabaseManager {
 
         //System.out.println("CURRENT SCAN CORNER= " + room.getNScan());
         //System.out.println("CURRENT CORNER SCAN INDEX= " + currentPositionScans);
-
     }
 
     // Set scans for a room
     public void putScansUpdateRoom(String clientId, String roomId, List<APInfo> scans){ 
-        Room room = clientScans.get(clientId).get(roomId);
-        room.setNScan(room.getNScan() + 1);
-        /*Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
+        /*Room room = clientScans.get(clientId).get(roomId);
+        room.setNScan(room.getNScan() + 1);*/
+        Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
         Map<String, ScanResult> results = new HashMap<>(); //utility map to retrieve info later on
         for(APInfo ap : scans){
             //create a list of results for each scan
@@ -283,7 +286,7 @@ public class DatabaseManager {
             double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
             ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
             clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
-        }*/
+        }
     }
 
     public void printFingerprintDb(String clientId){

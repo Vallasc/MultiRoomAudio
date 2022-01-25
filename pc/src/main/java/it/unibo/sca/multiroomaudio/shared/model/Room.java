@@ -49,10 +49,6 @@ public class Room {
     }*/
 
     public synchronized void putClientFingerprints(ScanResult result){
-        if(nscan >= MAX_POSITION)
-            return;
-        nscan++;
-
         //nscan = [1, maxscan]
         List<ScanResult> list;
         list = fingerprints.get(result.getBSSID());
