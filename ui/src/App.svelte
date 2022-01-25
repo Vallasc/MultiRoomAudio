@@ -7,6 +7,7 @@
     import { deviceId } from "./stores"
 
     const f7Params = {
+        theme : "md",
         routes: [
             {
                 path: "/musiclist",

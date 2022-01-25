@@ -16,11 +16,13 @@
     import WalkRoomAnimation from "./WalkRoomAnimation.svelte"
     import { webSocket } from "../stores"
 
-    let popupOpened = false
+    let popup
+
     let rooms = []
     let roomsLenght = 0
-    let nscan = 0
-    const _maxScan = 4
+
+    let disableScan = false
+
     onMount(() => {
         socketSetup()
         getRooms()
@@ -41,6 +43,15 @@
             case "ROOMS":
                 rooms = message.rooms
                 roomsLenght = rooms.length
+                break
+            case "SCAN_ROOM_DONE":
+                if(message.singlePositionDone)
+                    walkAnimationComponent.nextCorner()
+                if(message.allRoomDone) {
+                    popup.instance().close()
+                }
+                disableScan = false
+                console.log(message)
                 break
         }
     }
@@ -86,7 +97,6 @@
             if(value.trim()){
                 value = value.substring(0, 15)
                 console.log("New room: " + value)
-                //setRoom(value)
                 startMisuration(value)
             } else {
                 dialogInsertRoomName()
@@ -95,55 +105,38 @@
     }
 
     let currentRoomId = ""
-
+    let walkAnimationComponent;
     function startMisuration(roomId) {
         setRoom(roomId)
         f7.dialog.confirm(
             "Do you want to start scanning "+ roomId + "?",
             "Multiroom Audio",
             () => {
-                popupOpened = true
+                popup.instance().open()
                 currentRoomId = roomId
             }
         )
     }
 
     function startScan(){
-        if(nscan < _maxScan){
-            var btn = document.getElementById("start-button")
-            btn.disabled = true
-            btn.style.visibility = "hidden"
-            $webSocket.send(
-            JSON.stringify({
-                type: "SCAN_ROOM",
-                roomId: currentRoomId,
-                startScan: true, 
-                nScan : nscan
-                })
-            )
-            nscan++
-            setTimeout(() => { stopScan(nscan, btn); }, 10000);
-        }
-        
-    }
-
-    function stopScan(n, btn) {
         $webSocket.send(
             JSON.stringify({
                 type: "SCAN_ROOM",
                 roomId: currentRoomId,
-                startScan: false, 
-                nScan : n
             })
         )
-        btn.disabled = false
-        btn.style.visibility = "visible"
-        if(nscan == _maxScan){
-                nscan = 0
-                console.log("FINISHED")
-                popupOpened = false
-            }
-        
+        disableScan = true
+    }
+
+    function stopScan() {
+        $webSocket.send(
+            JSON.stringify({
+                type: "SCAN_ROOM",
+                roomId: null
+            })
+        )
+        disableScan = false
+        popup.instance().close()
     }  
 
 
@@ -187,19 +180,24 @@
         </div>
     {/if}
 
-    <Popup id="popup" opened={popupOpened} onPopupClosed={() => (popupOpened = false)} backdrop closeByBackdropClick = {false}>
+    <Popup id="popup" opened={false} backdrop closeByBackdropClick = {false} bind:this={popup}>
         <Page>
             <div class="center">
-                <Progressbar infinite></Progressbar>
-                <div class="block text-title">Go to a corner of the room</div>
-                <WalkRoomAnimation roomName={currentRoomId.substring(0, 9)} />
-                {#if nscan<_maxScan}
-                    <div class="button-start">
-                        <Button id="start-button" icon="material:start" 
-                            large fill color="blue" 
-                            onClick={startScan}>Start</Button>
-                    </div>           
+                {#if disableScan}
+                    <Progressbar infinite></Progressbar>
                 {/if}
+                {#if disableScan}
+                    <div class="block text-title">Please wait...</div>
+                {:else}
+                    <div class="block text-title">Go to a corner of the room</div>
+                {/if}
+                <WalkRoomAnimation roomName={currentRoomId.substring(0, 9)} bind:this={walkAnimationComponent} />
+                    <div class="button-stop">
+                        <Button large fill color="red" onClick={stopScan}>No more corners</Button>
+                    </div>
+                    <div class="button-scan">
+                        <Button large fill onClick={startScan} disabled={disableScan} >Save this corner</Button>
+                    </div>          
             </div>
         </Page>
     </Popup>
@@ -222,12 +220,20 @@
         font-weight: 600;
     }
 
-    .button-stop {
+    .button-scan {
         margin-left: 16px;
         margin-right: 16px;
         margin-bottom: 13%;
         width: 70%;
         max-width: 900px;
+    }
+    .button-stop {
+        margin-left: 16px;
+        margin-right: 16px;
+        margin-bottom: 16px;
+        width: 30%;
+        max-width: 300px;
+        min-width: 150px;
     }
     .center {
         display: flex;

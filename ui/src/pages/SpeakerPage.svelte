@@ -7,7 +7,7 @@
 
     let socket = null
     const audio = new Audio()
-
+    audio.muted = true
     let songId = -1
     let currentTimeSec = 0
     let songDurationSec = 0
@@ -105,6 +105,9 @@
             case "STOP":
                 stop()
                 break
+            case "MUTE":
+                audio.muted = message.isMuted
+                break
         }    
     }
 
@@ -140,6 +143,7 @@
                 audio.currentTime = message.fromTimeSec
             if(audio.paused)
                 audio.play()
+                
         }
         //console.log("Current time " + audio.currentTime)
         //console.log(message.fromTimeSec)

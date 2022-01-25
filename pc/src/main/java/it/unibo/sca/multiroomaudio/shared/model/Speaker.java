@@ -24,13 +24,13 @@ public class Speaker extends Device {
     }
 
     public synchronized void decNumberNowPlaying() {
-        this.numberNowPlaying = this.numberNowPlaying - 1;
-        if(numberNowPlaying == 0)
+        this.numberNowPlaying -= 1;
+        if(this.numberNowPlaying == 0)
             this.isMuted = true;
     }
 
     public synchronized void incNumberNowPlaying() {
-        this.numberNowPlaying = this.numberNowPlaying + 1;
+        this.numberNowPlaying += 1;
         this.isMuted = false;
     }
     
@@ -39,7 +39,7 @@ public class Speaker extends Device {
     }
 
     public String getRoom(){
-        return roomId;
+        return roomId==null ? "" : roomId;
     }
 
     public synchronized void setRoom(String roomId){

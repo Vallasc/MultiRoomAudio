@@ -41,13 +41,10 @@ public class WebSocketHandler {
     public void handleClose(Session session){
         Device device = dbm.removeConnectedWebDevice(session);
         if(device != null){
-            if(device instanceof Client){
-                dbm.removeConnectedSocketClient(device.getId());
-            }
             if(device instanceof Speaker){
                 speakerManager.updateSpeakerList();
             }
-            System.out.println("Device [" + device.getId() + "] disconnected");
+            System.out.println("DEVICE [" + device.getId() + "]: disconnected");
         }
     }
 
@@ -57,19 +54,25 @@ public class WebSocketHandler {
         String msgType = gson.fromJson(message, JsonObject.class).get("type").getAsString();
         if( msgType.equals("HELLO") ){
             MsgHello msg = gson.fromJson(message, MsgHello.class);
+
+            if(!dbm.isConnectedSocket(msg.getId()) && msg.getDeviceType() == 0){ // Client doesnt have fingerprint service running
+                session.close();
+                return;
+            }
+
+            dbm.removeConnectedWebDevicesAndDisconnect(msg.getId()); // One web connection at time
             dbm.addConnectedWebDevice(session, msg);
-            System.out.println("Device [" + msg.getId() + "] connected");
+            System.out.println("DEVICE [" + msg.getId() + "]: connected");
             speakerManager.updateSpeakerList();
         } else{ 
             Device connected = dbm.getConnectedWebDevice(session);
             if(connected != null && connected instanceof Client) {
-                Client client = (Client) connected;
+                Client client = (Client)dbm.getDevice(connected.getId());
                 if( msgType.equals("PLAY") ){ // Client want to play
                     //start sending fingerprints again
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
                     System.out.println("DEBUG: Start play");
-                    client.setPlay(true);
-                    pool.execute(new MinimizeRSSErr(client, dbm, false));
+                    pool.execute(new MinimizeRSSErr(speakerManager, client, dbm, false));
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
                     System.out.println("DEBUG: Stop play");
@@ -101,19 +104,18 @@ public class WebSocketHandler {
                     sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 } else if( msgType.equals("SCAN_ROOM")){
                     MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
-                    if(msg.getStartScan()){
-                        System.out.println("DEBUG: Start scan");
-                        dbm.setDeviceStart(connected.getId(), msg.getRoomId(), msg.getNScan());
+                    if(msg.getRoomId() != null){
+                        System.out.println("DEBUG: START scan");
+                        client.setActiveRoom(msg.getRoomId());
                     } else {
-                        System.out.println("DEBUG: Stop scan");
-                        dbm.setDeviceStop(connected.getId(), msg.getNScan());
-                        sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                        System.out.println("DEBUG: STOP scan");
+                        client.setActiveRoom(null);
                     }
                 } else if( msgType.equals("BIND_SPEAKER")){
                     MsgBindSpeaker msg = gson.fromJson(message, MsgBindSpeaker.class);
                     Speaker speaker = dbm.getConnectedSpeaker(msg.getSpeakerId());
                     speaker.setRoom(msg.getRoomId());
-                    System.out.println("DEBUG: bind speaker\n" + speaker.getRoom());
+                    System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + "<->"+ speaker.getRoom() + " is muted: " + speaker.isMuted());
                     //check if the speaker is already bound to another room 
                 }
             }

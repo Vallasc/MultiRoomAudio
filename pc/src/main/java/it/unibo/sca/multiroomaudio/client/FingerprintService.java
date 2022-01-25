@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import io.github.vallasc.APInfo;
 import io.github.vallasc.WlanScanner;
@@ -16,7 +15,7 @@ import io.github.vallasc.WlanScanner.OperatingSystemNotDefinedException;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class FingerprintService extends Thread {
-    static final int SECONDS_BETWEEN_SCANS = 2;
+    static final int MILLISECONDS_BETWEEN_SCANS = 100;
 
     final WlanScanner scanner;
     boolean isRunning = false;
@@ -43,7 +42,6 @@ public class FingerprintService extends Thread {
     @Override
     public void run() {
         System.out.println("Fingerprint service: RUNNING");
-        //client info always through websocket tho
         isRunning = true;
         
         DataOutputStream dOut = null;
@@ -65,41 +63,26 @@ public class FingerprintService extends Thread {
         while (isRunning) {
             try {
                 String json = dIn.readUTF();
-                String type = gson.fromJson(json, JsonObject.class).get("type").getAsString();
-                if(type.equals("CLOSED_WS")){
-                    isRunning = false;
-                    socket.close();
-                }else{
-                    MsgOfflineServer msgO = gson.fromJson(json, MsgOfflineServer.class);
-                    //if stop read again
-                    if(msgO.getStart()){
-                        //if start send
-                        try{
-                            APInfo[] APs = scanner.scanNetworks();
-                            dOut.writeUTF(gson.toJson(APs));
-                        }catch(com.google.gson.JsonSyntaxException e){
-                            System.out.println("Disconnected badly 2");
-                            isRunning = false;
-                            continue;
-                        }catch(EOFException e) {
-                            System.out.println("Disconnected badly");
-                            isRunning = false;
-                        }
-                        dOut.flush();
-                        //then wait for ack, a dIn is enough tbh
-                        MsgAck ack = gson.fromJson(dIn.readUTF(), MsgAck.class);
-                        System.out.println("received  ack: "  + ack.getN());
-                        try {
-                            Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                MsgStartScan msg = gson.fromJson(json, MsgStartScan.class);
+                //if stop read again
+                if(msg.getStart()){
+                    //if start send
+                    try{
+                        APInfo[] APs = scanner.scanNetworks();
+                        dOut.writeUTF(gson.toJson(APs));
+                    }catch(com.google.gson.JsonSyntaxException | EOFException e){
+                        System.out.println("Disconnected badly");
+                        isRunning = false;
+                        continue;
                     }
-                }               
+                    dOut.flush();
+                    sleep(MILLISECONDS_BETWEEN_SCANS);
+                } else {
+                    sleep(500);
+                }          
             } catch(SocketException e) {
                 System.out.println("Closed connection");
                 isRunning = false;
-           
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 e.printStackTrace();
                 isRunning = false;
@@ -110,6 +93,14 @@ public class FingerprintService extends Thread {
 
     public void stopScanner(){
         isRunning = false;
+    }
+
+    public void sleep(int milliseconds){
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
     
 }

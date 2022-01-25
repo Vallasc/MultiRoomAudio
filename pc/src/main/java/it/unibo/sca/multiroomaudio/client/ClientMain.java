@@ -36,20 +36,22 @@ public class ClientMain {
             e.printStackTrace();
         }
         
-        if (Desktop.isDesktopSupported()) {
-            try {
-                if (Runtime.getRuntime().exec(new String[] { "which", "xdg-open" }).getInputStream().read() != -1) {
-                    Runtime.getRuntime().exec(new String[] {"xdg-open", "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath()});
-                }
-                /*Desktop.getDesktop().browse(
-                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath()));*/
-            } catch (IOException /*| URISyntaxException*/ e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath());
-        }
         if(!msg.getPath().equals("type=rejected")) {
+            String uriString = "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath();
+            URI uri;
+            try {
+                uri = new URI(uriString);
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().browse(uri);
+                    } catch (Exception e) {
+                        //it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
+                    }
+                }
+            } catch (URISyntaxException e1) {}
+    
+            System.out.println("If you are not redirected visit: " + uriString);
+
             (new FingerprintService(socket)).start();
         } else {
             try {

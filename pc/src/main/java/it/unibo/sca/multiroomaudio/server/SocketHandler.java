@@ -6,10 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.google.gson.Gson;
 
@@ -34,17 +31,16 @@ public class SocketHandler extends Thread{
         if(clientSocket == null)
             return;
 
-        String json;
-        
         String clientId;
         try {
             dOut = new DataOutputStream(clientSocket.getOutputStream());
             dIn = new DataInputStream(clientSocket.getInputStream());
-            json = dIn.readUTF();
+            String json = dIn.readUTF();
             MsgHello hello = gson.fromJson(json, MsgHello.class);
             clientId = hello.getId();
-            if(dbm.isConnectedSocket(clientId)){//already connected
+            if( clientId== null || (clientId!= null&& dbm.isConnectedSocket(clientId))){ //already connected
                 dOut.writeUTF(gson.toJson(new MsgHelloBack("type=rejected", clientId)));
+                dOut.close();
                 return;
             }
 
@@ -57,96 +53,55 @@ public class SocketHandler extends Thread{
         }
 
         Client myDevice = (Client) dbm.getDevice(clientId); 
-        boolean currentStart;
-        boolean flagCrash = false;
-        String roomId = null;
-        int nScan = 0;
-        List<APInfo> tempAPInfo = new ArrayList<>();
+        myDevice.setStart(true, null);
         while(isRunning){
             try {
-                int i = 0;
-                //find a change in the start/stop state
-                currentStart = myDevice.getStart();
-                nScan = myDevice.getNScan();
-                if(currentStart){
-                    if(roomId == null)
-                        roomId = myDevice.getActiveRoom();
-                    try {
-                        clientSocket.setSoTimeout(0);
-                    } catch (SocketException e) {}
+                // Find a change in the start/stop state
+                if(myDevice.getStart()){
                     //send start to the client
-                    dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentStart)));
+                    dOut.writeUTF(gson.toJson(new MsgStartScan(true)));
                     dOut.flush();
-                    do{
-                        //if room id is null and start it means that i'm in the online phase cause idk which room i'm in
-                        if(myDevice.getPlay()){
-                            System.out.println("PLAY IN SOCKET");
-                            myDevice.setFingerprints(gson.fromJson(dIn.readUTF(), APInfo[].class));
-                        }else{
-                            //otherwise i'm in the offline phase and i have to save the fingerprints for this client for that room    
-                            System.out.println("SCAN IN  SOCKET");
-                            tempAPInfo.addAll(Arrays.asList(gson.fromJson(dIn.readUTF(), APInfo[].class)));
+
+                    APInfo[] currentAPInfo = gson.fromJson(dIn.readUTF(), APInfo[].class);
+                    if(currentAPInfo != null){
+                        if(myDevice.getActiveRoom() == null) {
+                            //System.out.println("Current scan len:" + currentAPInfo.length);
+                            myDevice.setFingerprints(currentAPInfo);
+                        } else {
+                            dbm.putScans(myDevice, Arrays.asList(currentAPInfo));
                         }
-                        //send the ack
-                        System.out.println("Send ACK: " + i);
-                        dOut.writeUTF(gson.toJson(new MsgAck(i)));
-                        i++;
-                        dOut.flush();
-                        currentStart = myDevice.getStart();
-                        //here the client is sleeping
-                        dOut.writeUTF(gson.toJson(new MsgOfflineServer(currentStart)));
-                        dOut.flush();
-                        if(!dbm.isConnectedSocket(clientId)){
-                            isRunning = false;
-                            currentStart = false;
-                            flagCrash = true;
-                            dbm.setDeviceStop(clientId, nScan);
-                            dOut.writeUTF(gson.toJson(new MsgClosedWs()));
-                            dOut.flush();
-                        }
-                    }while(currentStart);
-                    System.out.println("CONDITION: " + flagCrash + "  " + tempAPInfo.isEmpty());
-                    //stopped, send stop to the client
-                }else{
-                        clientSocket.setSoTimeout(1000);
-                    try{
-                        if(clientSocket.getInputStream().read() == -1){
-                            isRunning = false;
-                            dbm.removeConnectedSocketClient(clientId);
-                        }
-                    }catch(SocketTimeoutException e){}
-                    if(!flagCrash && !tempAPInfo.isEmpty()){
-                        System.out.println("RoomID: " + roomId + " " + "NSCAN: " + nScan);
-                        dbm.putScans(clientId, roomId, tempAPInfo, nScan);
-                        roomId = null;
-                        tempAPInfo.clear();
                     }
                 }
             } catch (SocketException e) {
                 //e.printStackTrace();
                 System.out.println("Connection closed");
-                dbm.removeConnectedSocketClient(clientId);
                 isRunning = false;
-            }catch(EOFException e) {
+            } catch(EOFException e) {
                 System.out.println("EOF");
                 isRunning = false;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.err.println("Error while reading from the socket");
-                e.printStackTrace();
                 isRunning = false;
             }
-            if(!dbm.isConnectedSocket(clientId)){
+
+            if(!dbm.isConnectedSocket(clientId) || !isRunning){
                 isRunning = false;
+                //dbm.setDeviceStop(clientId, nScan);
+                myDevice.setStart(false, null);
+                myDevice.setActiveRoom(null);
+                myDevice.setPlay(false);
                 try {
-                    dOut.writeUTF(gson.toJson(new MsgClosedWs()));
+                    dOut.close();
                 }catch(IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-        System.out.println("STOP");
-        dbm.printFingerprintDb(clientId);
+        dbm.removeConnectedSocketClient(clientId);
+        // Close websocket session
+        dbm.removeConnectedWebDevicesAndDisconnect(clientId);
+        System.out.println("STOP SERVING: " + clientId);
+        
     }
 
 }

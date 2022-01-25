@@ -6,9 +6,11 @@ import java.util.List;
 
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
+    public static final int SCANS_FOR_EACH_POSITION = 4;
+    public static final int MAX_POSITION = 4;
     private final String id;
     private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
-    private int nscan;
+    private int nscan; // index scan position
 
     public Room(String id){
         this.id = id;
@@ -46,16 +48,17 @@ public class Room {
         }
     }*/
 
-    public synchronized void putClientFingerprints(ScanResult result, int nscan){
+    public synchronized void putClientFingerprints(ScanResult result){
         //nscan = [1, maxscan]
         List<ScanResult> list;
         list = fingerprints.get(result.getBSSID());
         if(list == null){
             //here nscan is 1 
             List<ScanResult> results = new ArrayList<>();
-            if(nscan > 1)
+            if(nscan > 1){
                 for(int i = 0; i<nscan-1; i++)
-                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -120, result.getFrequency(), result.getTimestamp()));
+                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -80, result.getFrequency(), result.getTimestamp()));
+            }
             results.add(nscan-1, result);
             fingerprints.put(result.getBSSID(), results);
                 
@@ -63,14 +66,22 @@ public class Room {
             int len = list.size();
             if(len < nscan)
                 for(int i = len; i<nscan-1; i++){
-                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -120, result.getFrequency(), result.getTimestamp()));
+                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), -80, result.getFrequency(), result.getTimestamp()));
                 }
             list.add(nscan-1, result);
         }
+        if(nscan == 4){
+            System.out.println(result.getBSSID());
+            list = fingerprints.get(result.getBSSID());
+            for(ScanResult r : list){
+                System.out.println("\t" + r.getSignal());
+            }
+
+        }
     }
 
-    public ScanResult[] getFingerprints(String bssid){
-        return (ScanResult[]) fingerprints.get(bssid).toArray();
+    public synchronized ArrayList<ScanResult> getFingerprints(String bssid){
+        return (ArrayList<ScanResult>) fingerprints.get(bssid);
     }
 
     public synchronized void setNScan(int nscan){
@@ -92,6 +103,7 @@ public class Room {
     }
 
     public String[] getBSSID() {
-        return (String[])fingerprints.keySet().toArray();
+        String[] bssid = new String[fingerprints.keySet().size()];
+        return fingerprints.keySet().toArray(bssid);
     }
 }
