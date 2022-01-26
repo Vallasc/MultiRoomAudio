@@ -76,9 +76,8 @@ public class Client extends Device {
     public synchronized boolean changeStart(boolean start){
         if(state.start != start){ 
             state.start = start;
-            return true;
         }
-        return false;
+        return state.start;
     }
 
     public synchronized boolean getPlay(){

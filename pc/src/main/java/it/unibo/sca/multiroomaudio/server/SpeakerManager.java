@@ -55,7 +55,6 @@ public class SpeakerManager {
             dbm.getConnectedWebDevices().stream()
             .filter(pair -> pair.getRight() instanceof Speaker)
             .forEach(pair -> {
-                System.out.println("Speaker: " + ((Speaker)pair.getRight()).getName() + " is muted: " + ((Speaker)pair.getRight()).isMuted());
                 try{
                     WebSocketHandler.sendMessage(pair.getLeft(), new MsgMute(((Speaker)pair.getRight()).isMuted()));
                 } catch(IOException e) {

@@ -51,9 +51,9 @@ public abstract class FingerprintAnalyzer implements Runnable{
                 List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(prevRoomKey);
                 List<Speaker> speakers = dbm.getConnectedSpeakerRoom(roomkey);
                 if(prevspeakers != null)
-                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
-                if(speakers != null)
                     prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
+                if(speakers != null)
+                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
             speakerManager.updateAudioState();

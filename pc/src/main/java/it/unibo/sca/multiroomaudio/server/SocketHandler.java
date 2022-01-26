@@ -93,6 +93,13 @@ public class SocketHandler extends Thread{
                     e.printStackTrace();
                 }
             }
+
+            if(dbm.getClientWebSession(clientId) == null){
+                isRunning = false;
+                try {
+                    clientSocket.close();
+                } catch (IOException e) {}
+            }
         }
         dbm.removeConnectedSocketClient(clientId);
         // Close websocket session

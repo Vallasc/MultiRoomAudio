@@ -50,4 +50,9 @@ public class ScanResult implements Comparable<ScanResult> {
                 ", timestamp=" + timestamp +
                 '}';
     }
+    
+    public static int compareByBSSID(ScanResult a, ScanResult b){
+        return a.getBSSID().compareTo(b.getBSSID());
+    }
+
 }

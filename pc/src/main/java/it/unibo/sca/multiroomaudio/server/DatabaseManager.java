@@ -278,10 +278,7 @@ public class DatabaseManager {
         }
         //ordering the keys for the reference point so that the values are ordered for accesspoint id
         //helpful later
-        String[] orderedKeys = new String[signals.size()];
-        signals.keySet().toArray(orderedKeys);
-        Arrays.sort(orderedKeys);
-        for(String key : orderedKeys){
+        for(String key : signals.keySet()){
             //compute the mean for each scan
             double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
             ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());

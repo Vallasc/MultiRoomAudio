@@ -8,38 +8,34 @@ import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
-public class MinimizeRSSErr extends FingerprintAnalyzer{
+public class MinimizeRSSErrMin extends FingerprintAnalyzer{
     private boolean exp;
-    public MinimizeRSSErr(SpeakerManager speakerManager, Client client, DatabaseManager dbm, boolean exp) {
+    public MinimizeRSSErrMin(SpeakerManager speakerManager, Client client, DatabaseManager dbm, boolean exp) {
         super(speakerManager, client, dbm);
         this.exp = exp;
     }
 
     private double roomError(Room r){
-        //max 4 reference points for each room
         ScanResult[] onlines = client.getFingerprints();
         if(onlines == null){
             return -1d;
         }
         double roomErr = 0; 
-        double min = MAX_VALUE;
 
         for(ScanResult online : onlines){
-            ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
-           // System.out.println("ONLINE: " + online.getBSSID() + " signal: " + online.getSignal());
-            if(offlines != null){
-                double minOffline = -100d;
-                for(ScanResult offline : offlines){
-                    if (minOffline < offline.getSignal())
-                        minOffline = offline.getSignal();
-                    //System.out.println("\t" + offline.getSignal() + " " + roomErr[i]);
-                    
-                }
-                roomErr += Math.pow(online.getSignal() - minOffline, 2);
-            }   
+            if(online.getSignal()>-80){
+                ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
+                if(offlines != null){
+                    double minOffline = Double.MIN_VALUE;
+                    for(ScanResult offline : offlines){
+                        if (minOffline < offline.getSignal())
+                            minOffline = offline.getSignal();
+                    }
+                    roomErr += Math.pow(online.getSignal() - minOffline, 2);
+                }   
+            }
         }
-        double root = Math.sqrt(roomErr);
-        return root;
+        return Math.sqrt(roomErr);
     }
 
     @Override
@@ -57,9 +53,9 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         double min = MAX_VALUE;
         for(Room room : rooms) {
             double app = roomError(room);
+            System.out.println("Error for: " + room.getId() + " = " + app);
             if(app == -1d) return null;
             if(min>app){
-                //System.out.println("min err: " + app + " room: " + room.getId());
                 min = app;
                 roomId = room.getId();                
             }
@@ -68,8 +64,7 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
     }
 
     private double normalize(double signalStrength){
-        double ret = positiveRepresentation(signalStrength);
-        return (exp) ? exponentialRepresentation(ret) : ret;
+        return (exp) ? exponentialRepresentation(signalStrength) : signalStrength;
     }
     
 }
