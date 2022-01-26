@@ -7,10 +7,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.*;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import it.unibo.sca.multiroomaudio.discovery.MsgDiscoveredServer;
 import it.unibo.sca.multiroomaudio.discovery.MsgDiscovery;
-import it.unibo.sca.multiroomaudio.shared.Pair;
-import it.unibo.sca.multiroomaudio.shared.messages.*;
+import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
 public class DatagramExecutor extends Thread {
 	private BlockingQueue<Pair<byte[], InetAddress>> requestQ;
@@ -20,7 +21,7 @@ public class DatagramExecutor extends Thread {
 		//should pass the data structure in which client parameters should be saved
 		requestQ  = new LinkedBlockingQueue<>();
         try {
-			data = MyMsgHandler.dtgmOutMsg(new MsgDiscoveredServer(8497, 80));
+			data = (new MsgDiscoveredServer(8497, 80)).toByteArray();
 		} catch (IOException e) {
 			System.err.println("error while creating the message");
 			e.printStackTrace();
@@ -46,8 +47,8 @@ public class DatagramExecutor extends Thread {
 		while(true) {
 			try {
 				Pair<byte[], InetAddress> pair = requestQ.take();
-				InetAddress sender = (InetAddress) pair.getV();
-                Object readObject = MyMsgHandler.dtgmInMsg((Object) pair.getU());
+				InetAddress sender = (InetAddress) pair.getRight();
+                Object readObject = Msg.fromByteArray(pair.getLeft());
 				//System.out.println(packet.getData());
                 if (readObject instanceof MsgDiscovery) {
 					System.out.println("Read a discovery msg");

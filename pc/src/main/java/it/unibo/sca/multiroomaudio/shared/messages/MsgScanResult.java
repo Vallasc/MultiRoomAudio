@@ -1,16 +1,16 @@
 package it.unibo.sca.multiroomaudio.shared.messages;
 
-import io.github.vallasc.APInfo;
+import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
-public class MsgApInfo extends Msg {
-    private APInfo[] apList;
+public class MsgScanResult extends Msg {
+    private ScanResult[] resultList;
 
-    public MsgApInfo(APInfo[] apList) {
+    public MsgScanResult(ScanResult[] resultList) {
         super("AP_INFO");
-        this.apList = apList;
+        this.resultList = resultList;
     }
 
-    public APInfo[] getApList() {
-        return apList;
+    public ScanResult[] getApList() {
+        return resultList;
     }
 }
