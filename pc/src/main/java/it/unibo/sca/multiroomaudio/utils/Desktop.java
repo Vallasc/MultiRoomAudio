@@ -29,7 +29,9 @@ public class Desktop {
             Process process = Runtime.getRuntime().exec("logname");
             String USER = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             System.out.println("USER: " + USER);
-            Runtime.getRuntime().exec("sudo --user=" + USER + " xdg-open " + uri.toASCIIString());
+            //Runtime.getRuntime().exec("sudo --user=" + USER + " xdg-open " + uri.toASCIIString());
+            process = Runtime.getRuntime().exec("runuser " + USER + " xdg-open \"" + uri.toASCIIString() + "\"");
+            System.out.println("Result: " + new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {}
     }
     private static void browseMac(URI uri){
