@@ -375,62 +375,62 @@
             {/if}
         {/each}
     </List>
-</Page>
 
-<Popup
-    opened={popupOpened}
-    onPopupClosed={() => (popupOpened = false)}
-    swipeToClose
->
-    {#if playingSong != null}
-        <NowPlaying
-            imageUrl={playingSong.song.albumImageUrl}
-            title={playingSong.song.title}
-            artist={playingSong.song.artist}
-            currentValue={playingSong.fromTimeSec}
-            songDuration={playingSong.song.durationMs / 1000}
-            onNext={next}
-            onPrev={prev}
-            onPlayPause={playPause}
-            playing={state == 1}
-            onValueChanged={(value) => play(playingSong.song, value)}
-        />
-    {:else}
-        <NowPlaying
-            imageUrl={blankSong}
-            title={"Waiting for music..."}
-            artist={""}
-            currentValue={0}
-            songDuration={0}
-        />
-    {/if}
-</Popup>
-
-<Popup id="popup" opened={popupRoomsOpened} onPopupClosed={() => (popupRoomsOpened = false)} backdrop closeByBackdropClick = {true}>
-    <Page>
-        {#if roomsLenght > 0}
-        <List mediaList>
-            {#each rooms as room}
-            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
-                    <span slot="after">
-                        <Link iconMd="material:done" onClick={() => bindSpeaker(room.roomId)} />
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <!-- svelte-ignore a11y-missing-content -->
-                    </span>
-                </ListItem>
-            {/each}
-        </List>
+    <Popup
+        opened={popupOpened}
+        onPopupClosed={() => (popupOpened = false)}
+        swipeToClose
+    >
+        {#if playingSong != null}
+            <NowPlaying
+                imageUrl={playingSong.song.albumImageUrl}
+                title={playingSong.song.title}
+                artist={playingSong.song.artist}
+                currentValue={playingSong.fromTimeSec}
+                songDuration={playingSong.song.durationMs / 1000}
+                onNext={next}
+                onPrev={prev}
+                onPlayPause={playPause}
+                playing={state == 1}
+                onValueChanged={(value) => play(playingSong.song, value)}
+            />
         {:else}
-            <div class="center">
-                <div/>
-                <div class="no-rooms">
-                    Non ci sono stanze
-                </div>
-                <div/>
-            </div>
+            <NowPlaying
+                imageUrl={blankSong}
+                title={"Waiting for music..."}
+                artist={""}
+                currentValue={0}
+                songDuration={0}
+            />
         {/if}
-    </Page>
-</Popup>
+    </Popup>
+
+    <Popup opened={popupRoomsOpened} 
+            onPopupClosed={() => (popupRoomsOpened = false)} 
+            backdrop closeByBackdropClick = {true}>
+        <Page>
+            {#if roomsLenght > 0}
+            <List mediaList>
+                {#each rooms as room}
+                <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
+                        <span slot="after">
+                            <Link iconMd="material:done" onClick={() => bindSpeaker(room.roomId)} />
+                        </span>
+                    </ListItem>
+                {/each}
+            </List>
+            {:else}
+                <div class="center">
+                    <div/>
+                        <div class="no-rooms">
+                            Non ci sono stanze
+                        </div>
+                    <div/>
+                </div>
+            {/if}
+        </Page>
+    </Popup>
+</Page>
 
 <style>
     .list-speakers {
@@ -459,14 +459,6 @@
     :global(.toolbar-bottom) {
         height: 70px !important;
     }
-
-    /*:global(.list ul:before) {
-    background-color: transparent;
-  }
-
-  :global(.list ul:after) {
-    background-color: transparent;
-  }*/
 
     :global(.item-title-row:before) {
         display: none !important;
