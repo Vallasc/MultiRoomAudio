@@ -1,6 +1,7 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,7 +205,7 @@ public class DatabaseManager {
         return new ArrayList<>(rooms.values());
     }
 
-    public void putScans(Client client, List<APInfo> scans){
+    public void putScans(Client client, ScanResult[] scans){
         if(client.getCurrentPositionScans() == 0){
             client.getCurrentTmpScans().clear();
         }
@@ -222,7 +223,7 @@ public class DatabaseManager {
         if(room.getNScan() < Room.MAX_POSITION){
             // If corner is not full
             if(currentPositionScans < Room.SCANS_FOR_EACH_POSITION){
-                client.getCurrentTmpScans().addAll(scans);
+                client.getCurrentTmpScans().addAll(Arrays.asList(scans));
                 currentPositionScans++;
                 client.setCurrentPositionScans(currentPositionScans);
             } else { // corner is full
@@ -258,21 +259,21 @@ public class DatabaseManager {
     }
 
     // Set scans for a room
-    public void putScansUpdateRoom(String clientId, String roomId, List<APInfo> scans){ 
+    public void putScansUpdateRoom(String clientId, String roomId, List<ScanResult> scans){ 
         /*Room room = clientScans.get(clientId).get(roomId);
         room.setNScan(room.getNScan() + 1);*/
         Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
         Map<String, ScanResult> results = new HashMap<>(); //utility map to retrieve info later on
-        for(APInfo ap : scans){
+        for(ScanResult scan : scans){
             //create a list of results for each scan
-            List<Double> listSignals = signals.get(ap.getBSSID());
-            results.putIfAbsent(ap.getBSSID(), new ScanResult(ap.getBSSID(), ap.getSSID(), 0d, ap.getFrequency(), System.currentTimeMillis()));
+            List<Double> listSignals = signals.get(scan.getBSSID());
+            results.putIfAbsent(scan.getBSSID(), scan);
             if(listSignals == null){
                 listSignals = new ArrayList<>();
-                listSignals.add(ap.getSignal());
-                signals.put(ap.getBSSID(), listSignals);
+                listSignals.add(scan.getSignal());
+                signals.put(scan.getBSSID(), listSignals);
             }else{
-                listSignals.add(ap.getSignal());
+                listSignals.add(scan.getSignal());
             }
         }
         
@@ -282,8 +283,6 @@ public class DatabaseManager {
             ScanResult finalResult;
             double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
             finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
-            double variance = signals.get(key).stream().map(s -> Math.pow(s - mean, 2)).reduce(0d, Double::sum)/(signals.get(key).size()-1);
-            finalResult = new ScanResult(key, results.get(key).getSSID(), mean, variance, results.get(key).getFrequency(), results.get(key).getTimestamp());
             clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
         }
     }

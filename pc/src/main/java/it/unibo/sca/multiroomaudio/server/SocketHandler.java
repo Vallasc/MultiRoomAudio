@@ -6,11 +6,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Arrays;
 
 import com.google.gson.Gson;
 
-import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 
@@ -39,13 +37,14 @@ public class SocketHandler extends Thread{
             MsgHello hello = gson.fromJson(json, MsgHello.class);
             clientId = hello.getId();
             if( clientId== null || (clientId!= null&& dbm.isConnectedSocket(clientId))){ //already connected
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("type=rejected", clientId)));
+                System.out.println("Client already connected");
+                dOut.writeUTF(gson.toJson(new MsgHelloBack("?type=rejected", clientId, true)));
                 dOut.close();
                 return;
             }
 
             dbm.addConnectedSocketClient(clientId, hello);
-            dOut.writeUTF(gson.toJson(new MsgHelloBack("type=client", clientId)));
+            dOut.writeUTF(gson.toJson(new MsgHelloBack("?type=client", clientId, false)));
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,14 +61,12 @@ public class SocketHandler extends Thread{
                     dOut.writeUTF(gson.toJson(new MsgStartScan(true)));
                     dOut.flush();
 
-                    APInfo[] currentAPInfo = gson.fromJson(dIn.readUTF(), APInfo[].class);
-                    if(currentAPInfo != null){
-                        if(myDevice.getActiveRoom() == null) {
-                            //System.out.println("Current scan len:" + currentAPInfo.length);
-                            myDevice.setFingerprints(currentAPInfo);
-                        } else {
-                            dbm.putScans(myDevice, Arrays.asList(currentAPInfo));
-                        }
+                    MsgScanResult resultMessage = gson.fromJson(dIn.readUTF(), MsgScanResult.class);
+                    if(myDevice.getActiveRoom() == null) {
+                        //System.out.println("Current scan len:" + currentAPInfo.length);
+                        myDevice.setFingerprints(resultMessage.getApList());
+                    } else {
+                        dbm.putScans(myDevice, resultMessage.getApList());
                     }
                 }
             } catch (SocketException e) {

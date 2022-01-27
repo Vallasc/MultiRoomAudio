@@ -3,7 +3,7 @@ package it.unibo.sca.multiroomaudio.shared.model;
 import java.util.HashMap;
 
 public class Fingerprint {
-    
+
     // Key = BSSID
     final HashMap<String, ScanResult> map;
 
@@ -17,5 +17,5 @@ public class Fingerprint {
 
     public HashMap<String, ScanResult> getMap(){
         return map;
-    }   
+    }
 }

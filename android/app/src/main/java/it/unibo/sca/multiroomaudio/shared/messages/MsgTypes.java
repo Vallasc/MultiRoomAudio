@@ -4,10 +4,14 @@ package it.unibo.sca.multiroomaudio.shared.messages;
   Describes the different messages between entities
  */
 public enum MsgTypes {
-	HELLO, //[client] announces itself to the server throught multicast
-	HELLO_BACK,//[server] answers to the client with its IP
+	DISCOVERY, //[client] announces itself to the server in broadcast
+	DISCOVEREDSERVER,//[server] answers to the client for main connection
+	HELLO, //[client] announces itself to the server in broadcast
+	HELLO_BACK,//[server] answers positively to a client asking a connection
+	REJECTED, //[server] answers negatively to a client connecting to do things
+	SPECS, //[client] sends it's MAC_ADDR and if it's a speaker or a client to the SLAC TODO:TOREMOVE
 	//position registering
-	REF_POINT, //[client] sends the different signals strength at a reference point during the offline phase
+	OFFLINE, //[client] sends the different signals strength at a reference point during the offline phase
 	SPEAKER_HERE, //[client] same as above but with the poisition of a speaker
 
 	//position handling 

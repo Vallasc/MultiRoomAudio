@@ -10,7 +10,7 @@ public class Client extends Device {
 
         // Offline phase
         private String activeRoom = null;
-        private List<ScanResult> currentTmpScans = new ArrayList<>();
+        private List<ScanResult> currentTmpScans = new ArrayList<ScanResult>();
         private int currentPositionScans = 0;
     }
 
@@ -31,7 +31,7 @@ public class Client extends Device {
         this.ip = null;
         this.mac = null;
     }
-    
+
     public String getIp() {
         return ip;
     }
@@ -53,7 +53,7 @@ public class Client extends Device {
         return ((String) o).equals(this.ip);
     }
 
-    
+
     //---------------------STATE THINGS------------------------------------
     /*public synchronized void setStart(boolean start, String activeRoom, int nScan){
         state.start = start;
@@ -74,10 +74,11 @@ public class Client extends Device {
      * @return: true if state changed, false otherwise
      */
     public synchronized boolean changeStart(boolean start){
-        if(state.start != start){ 
+        if(state.start != start){
             state.start = start;
+            return true;
         }
-        return state.start;
+        return false;
     }
 
     public synchronized boolean getPlay(){
