@@ -53,7 +53,6 @@ public class Room {
         List<ScanResult> list;
         list = fingerprints.get(result.getBSSID());
         if(list == null){
-            //here nscan is 1 
             List<ScanResult> results = new ArrayList<>();
             if(nscan > 1){
                 for(int i = 0; i<nscan-1; i++)
@@ -70,7 +69,7 @@ public class Room {
                 }
             list.add(nscan-1, result);
         }
-        /*if(nscan == 4){
+        /*if(nscan == SCANS_FOR_EACH_POSITION){
             System.out.println(result.getBSSID());
             list = fingerprints.get(result.getBSSID());
             for(ScanResult r : list){
@@ -105,5 +104,9 @@ public class Room {
     public String[] getBSSID() {
         String[] bssid = new String[fingerprints.keySet().size()];
         return fingerprints.keySet().toArray(bssid);
+    }
+
+    public HashMap<String, List<ScanResult>> getFingerprints() {
+        return fingerprints;
     }
 }

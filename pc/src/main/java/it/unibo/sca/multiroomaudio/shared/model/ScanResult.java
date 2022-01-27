@@ -6,6 +6,7 @@ public class ScanResult{
     private final String BSSID;
     private final String SSID;
     private final double signal;//mean
+    private final double variance;
     private final double frequency;
     private final long timestamp;
 
@@ -15,6 +16,16 @@ public class ScanResult{
         this.signal = signal;
         this.frequency = frequency;
         this.timestamp = timestamp;
+        this.variance = 0;
+    }
+
+    public ScanResult(String BSSID, String SSID, double signal, double variance, double frequency, long timestamp) {
+        this.BSSID = BSSID;
+        this.SSID = SSID;
+        this.signal = signal;
+        this.frequency = frequency;
+        this.timestamp = timestamp;
+        this.variance = variance;
     }
 
     public ScanResult(APInfo ap) {
@@ -23,6 +34,7 @@ public class ScanResult{
         this.signal = ap.getSignal();
         this.frequency = ap.getFrequency();
         this.timestamp = System.currentTimeMillis();
+        this.variance = 0;
     }
 
     public long getTimestamp() {
@@ -45,8 +57,11 @@ public class ScanResult{
         return SSID;
     }
 
+    public double getVariance(){
+        return variance;
+    }
+
     public static int compareByBSSID(ScanResult a, ScanResult b){
         return a.getBSSID().compareTo(b.getBSSID());
     }
-
 }

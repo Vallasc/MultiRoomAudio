@@ -71,7 +71,7 @@ public class WebSocketHandler {
                 if( msgType.equals("PLAY") ){ // Client want to play
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
                     System.out.println("DEBUG: Start play");
-                    pool.execute(new MinimizeRSSErrCorners(speakerManager, client, dbm));
+                    pool.execute(new Bayes(speakerManager, client, dbm));
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
                     System.out.println("DEBUG: Stop play");
