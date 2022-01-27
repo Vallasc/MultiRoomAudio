@@ -28,11 +28,9 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
 
         for(ScanResult online : onlines){
             ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
-            if(online.getSignal() > -80){
-                if(offlines != null){
-                    for(int i = 0; i < offlines.size(); i++){
-                        roomErr[i] +=  compute(online.getSignal(), offlines.get(i).getSignal());
-                    }
+            if(offlines != null){
+                for(int i = 0; i < offlines.size(); i++){
+                    roomErr[i] += compute(online.getSignal(), offlines.get(i).getSignal());
                 }
             }
         }

@@ -2,9 +2,9 @@ package it.unibo.sca.multiroomaudio.server;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
@@ -38,7 +38,9 @@ public class Bayes extends FingerprintAnalyzer{
                 mean.set(i, mean.get(i) + offlines.get(i).getSignal());
             }
         }
-        mean.stream().map(s -> s/fingerprints.size());
+        for(int i = 0; i < mean.size(); i++){
+            mean.set(i, mean.get(i)/fingerprints.size());
+        }
         return mean;
     }
 
@@ -54,7 +56,9 @@ public class Bayes extends FingerprintAnalyzer{
                 variance.set(i, variance.get(i) + Math.pow(offlines.get(i).getSignal() - mean.get(i), 2));
             }
         }
-        variance.stream().map(s -> s/fingerprints.size()-1).map(Math::sqrt);
+        for(int i = 0; i < variance.size(); i++){
+            variance.set(i,  variance.get(i)/(fingerprints.size()-1));
+        }
         return variance;
     }
 
@@ -68,17 +72,25 @@ public class Bayes extends FingerprintAnalyzer{
         List<Double> means = aggregateMean(r, fingerprints);
         List<Double> variance = aggregateVariance(r, means, fingerprints);
         
+        /*System.out.println("means : ");
+        for(double mean: means){
+            System.out.println("\t" + mean);
+        }
+
+        System.out.println("variance : ");
+        for(double var: variance){
+            System.out.println("\t" + var);
+        }*/
+
         double[] prob = new double[r.getNScan()];
         Arrays.fill(prob, 1);
 
         for(ScanResult online : onlines){
-            if(online.getSignal() > -80){
-                    for(int i = 0; i < r.getNScan(); i++){
-                        prob[i] *=  compute(online.getSignal(), means.get(i), variance.get(i));
-                }
+            for(int i = 0; i < r.getNScan(); i++){
+                prob[i] *=  compute(online.getSignal(), means.get(i), variance.get(i));
             }
         }
-        System.out.println("Probabilities: ");
+        System.out.println("Probabilities for " + r.getId() + ": ");
         for(int i = 0; i < prob.length; i++){
             System.out.println("\t" + prob[i]);
         }

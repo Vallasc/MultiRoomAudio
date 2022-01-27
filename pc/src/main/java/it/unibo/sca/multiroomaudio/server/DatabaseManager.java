@@ -275,16 +275,7 @@ public class DatabaseManager {
                 listSignals.add(ap.getSignal());
             }
         }
-        //ordering the keys for the reference point so that the values are ordered for accesspoint id
-        //helpful later
-        /*for(String key : signals.keySet()){
-            //compute the mean for each scan
-            double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
-            if(mean < -80)
-                mean = -80;
-            ScanResult finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
-            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
-        }*/
+        
         //if i want to put the variance in it 
         for(String key : signals.keySet()){
             //compute the mean for each scan+
@@ -292,11 +283,8 @@ public class DatabaseManager {
             double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
             finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
             double variance = signals.get(key).stream().map(s -> Math.pow(s - mean, 2)).reduce(0d, Double::sum)/(signals.get(key).size()-1);
-            if(variance == 0)
-                variance = 0.0001;
             finalResult = new ScanResult(key, results.get(key).getSSID(), mean, variance, results.get(key).getFrequency(), results.get(key).getTimestamp());
             clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
-
         }
     }
 
