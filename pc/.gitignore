@@ -1,5 +1,7 @@
 target
 bin
+lib
+out
 .vscode
 .settings
 .project
