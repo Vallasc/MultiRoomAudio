@@ -3,61 +3,97 @@ package it.unibo.sca.multiroomaudio;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.location.LocationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.Toast;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.services.FingerprintService;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getCanonicalName();
 
+    public static final String SEND_WEB_SERVER_URL = "sendWebServerUrl";
+    public static final String SERVER_ADDRESS = "serverAddress";
+    public static final String MAC_HOST = "macHost";
+    public static final String WEB_PORT = "webPort";
+    public static final String SOCKET_PORT = "socketPort";
+    public static final String COMPLETE_WEB_PATH = "completeWebPath";
 
+    private Handler handler = new Handler();
     private WebView webView;
-    private OfflinePhaseManager offlinePhaseManager;
-    private JavascriptBindings javascriptBindings;
+    private View chooseView;
+    private Button button_speakaer;
+    private Button button_client;
+
+    private boolean permissionGranted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        stopFingerprintService();
 
-        if(checkPermission()) {
-            Log.d(TAG, "Permissions granted");
-            WifiHandler wifiHandler = new WifiHandler(this); //TODO fare meglio
-            // Check if geolocalization is on
-            if(!wifiHandler.startScan()) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-                //wifiHandler.startScan(this);
-            }
-            initWebView();
-            startFingerprintService();
+        webView = findViewById(R.id.webView);
+        webView.setWebViewClient(new WebViewClient());
+        webView.getSettings().setJavaScriptEnabled(true);
+        //webView.loadUrl("file:///android_asset/public/index.html");
 
-        } else {
-            Log.d(TAG, "Granting permissions");
+        chooseView = findViewById(R.id.choose_layout);
+
+        permissionGranted = checkPermissionList();
+        if(!permissionGranted) {
+            grantPermissions();
         }
+
+        button_speakaer = findViewById(R.id.button_speaker);
+        button_speakaer.setOnClickListener(view -> {
+            if(checkLocationEnables() && permissionGranted){
+                main(false);
+            }
+        });
+
+        button_client = findViewById(R.id.button_client);
+        button_client.setOnClickListener(view -> {
+            if(checkLocationEnables() && permissionGranted){
+                main(true);
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //offlinePhaseManager.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(SEND_WEB_SERVER_URL);
+        LocalBroadcastManager.getInstance(this).registerReceiver(intentReceiver, intentFilter);
     }
 
     @Override
     public void onPause() {
-        //offlinePhaseManager.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(intentReceiver);
         super.onPause();
     }
 
@@ -70,57 +106,114 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1) {
-            Log.d(TAG, "Permissions granted result");
-            //initWifi();
-            initWebView();
-            startFingerprintService();
+        if (checkPermissionList()) {
+            Log.d(TAG, "Permissions granted");
+            permissionGranted = true;
+        } else {
+            // No permission, close the app
+            Log.d(TAG, "Permissions not granted, exit :(");
+            Toast.makeText(this, "Unable to get permissions", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
-    private boolean checkPermission() {
-        List<String> permissionsList = new ArrayList<String>();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED)
-            permissionsList.add(Manifest.permission.CHANGE_WIFI_STATE);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED)
-            permissionsList.add(Manifest.permission.ACCESS_WIFI_STATE);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            permissionsList.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)
-            permissionsList.add(Manifest.permission.INTERNET);
-        /*if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED)
-            permissionsList.add(Manifest.permission.ACTIVITY_RECOGNITION);*/
-
-        if (permissionsList.size() > 0) {
-            ActivityCompat.requestPermissions(this, permissionsList.toArray(new String[permissionsList.size()]),1);
-            return false;
+    BroadcastReceiver intentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received " + intent.getAction());
+            if(intent.getAction() == SEND_WEB_SERVER_URL) {
+                updateWebView(intent.getStringExtra(COMPLETE_WEB_PATH));
+            }
         }
-        return true;
+    };
+
+    private boolean checkPermissionList() {
+        boolean allGranted = true;
+        for(String permission : getPermissionList()) {
+            allGranted = allGranted &&
+                    ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+        }
+        return allGranted;
     }
 
-    private void initWifi() {
-        offlinePhaseManager = new OfflinePhaseManager(this);
-        JavascriptBindings.getInstance().setOfflinePhaseManager(offlinePhaseManager);
-        JavascriptBindings.getInstance().setWebView(webView);
-        webView.addJavascriptInterface(JavascriptBindings.getInstance(), "JSInterface");
-        webView.reload();
+    private List<String> getPermissionList(){
+        List<String> permissionsList = new ArrayList<>();
+        permissionsList.add(Manifest.permission.CHANGE_WIFI_STATE);
+        permissionsList.add(Manifest.permission.ACCESS_WIFI_STATE);
+        permissionsList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionsList.add(Manifest.permission.INTERNET);
+        return permissionsList;
     }
 
-    private void initWebView() {
-        // JavascriptBindings.getInstance().setOfflinePhaseManager(offlinePhaseManager);
-        // JavascriptBindings.getInstance().setWebView(webView);
-
-        webView = findViewById(R.id.webView);
-        webView.addJavascriptInterface(JavascriptBindings.getInstance(), "JSInterface");
-        webView.setWebViewClient(new WebViewClient());
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.clearCache(true);
-        webView.loadUrl("file:///android_asset/public/index.html");
+    private void grantPermissions(){
+        ActivityCompat.requestPermissions(this, getPermissionList()
+                .toArray(new String[getPermissionList().size()]),1);
     }
 
-    public void startFingerprintService(){
+    private boolean checkLocationEnables() {
+        boolean locationEnabled = isLocationEnabled(this);
+        if(!locationEnabled){
+            Toast.makeText(this, "Enable location service", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
+        }
+        return locationEnabled;
+    }
+
+    private boolean isLocationEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return LocationManagerCompat.isLocationEnabled(locationManager);
+    }
+
+
+    private void updateWebView(String url) {
+        runOnUiThread(() -> webView.loadUrl(url));
+        setViewInvisible();
+    }
+
+    private void setViewInvisible(){
+        handler.postDelayed(() -> {
+            chooseView.setVisibility(View.GONE);
+        }, 1000);
+    }
+
+    private void main(boolean isClient) {
+        // Find ip and port with broadcast
+        new Thread(()->{
+            DiscoveryService discoveryService = new DiscoveryService();
+            System.out.println("DISCOVERY");
+            boolean good = discoveryService.discover();
+            if(good) {
+                System.out.println(discoveryService.discover());
+                System.out.println(discoveryService.getServerAddress());
+                System.out.println(discoveryService.getServerPort());
+                System.out.println(discoveryService.getFingerprintPort());
+
+                if(isClient) {
+                    // Start fingerprint service
+                    startFingerprintService(discoveryService.getServerAddress().getHostAddress(),
+                            discoveryService.getMac(),
+                            discoveryService.getServerPort(),
+                            discoveryService.getFingerprintPort());
+                } else {
+                    String url = "http://" + discoveryService.getServerAddress().getHostAddress() + ":"
+                                            + discoveryService.getServerPort() + "?type=speaker";
+                    updateWebView(url);
+                }
+            } else {
+                Toast.makeText(this, "Unable to contact server", Toast.LENGTH_SHORT).show();
+            }
+        }).start();
+    }
+
+    public void startFingerprintService(String serverAddress, String mac, int webPort, int socketPort) {
         Intent intent = new Intent(this, FingerprintService.class);
         intent.setAction(FingerprintService.ACTION_START);
+        intent.putExtra(SERVER_ADDRESS, serverAddress);
+        intent.putExtra(MAC_HOST, mac);
+        intent.putExtra(WEB_PORT, webPort);
+        intent.putExtra(SOCKET_PORT, socketPort);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         } else {
@@ -132,4 +225,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, FingerprintService.class);
         stopService(intent);
     }
+
 }

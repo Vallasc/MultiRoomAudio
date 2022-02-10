@@ -13,17 +13,20 @@ public class SpeakerMain {
         
         DiscoveryService discovered = new DiscoveryService();
 
-        if (Desktop.isDesktopSupported()){
-            try {
-                Desktop.getDesktop().browse(
-                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?type=speaker"));
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
+        String uriString = "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?type=speaker";
+        URI uri;
+        try {
+            uri = new URI(uriString);
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().browse(uri);
+                } catch (Exception e) {
+                    it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
+                }
             }
-        } else {
-            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?type=speaker");
-        }
-        
+        } catch (URISyntaxException e1) {}
+
+        System.out.println("If you are not redirected visit: " + uriString);
     }
 
 }

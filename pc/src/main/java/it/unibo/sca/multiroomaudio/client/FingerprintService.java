@@ -4,18 +4,17 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import io.github.vallasc.APInfo;
 import io.github.vallasc.WlanScanner;
 import io.github.vallasc.WlanScanner.OperatingSystemNotDefinedException;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
+import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
 public class FingerprintService extends Thread {
-    static final int SECONDS_BETWEEN_SCANS = 2;
+    static final int MILLISECONDS_BETWEEN_SCANS = 100;
 
     final WlanScanner scanner;
     boolean isRunning = false;
@@ -41,65 +40,80 @@ public class FingerprintService extends Thread {
 
     @Override
     public void run() {
-        //client info always through websocket tho
-        isRunning = true;
+        System.out.println("Fingerprint service: RUNNING");
         
         DataOutputStream dOut = null;
         DataInputStream dIn = null;
         if(socket == null)
-            isRunning=false;
-        else{
-            try{
-                dOut = new DataOutputStream(socket.getOutputStream());
-                dIn = new DataInputStream(socket.getInputStream());
-            }catch(IOException e){
-                System.err.println("Cannot create a dataoutput stream");
-                e.printStackTrace();
-                isRunning = false;
-            }
+            return;
+
+        try {
+            dOut = new DataOutputStream(socket.getOutputStream());
+            dIn = new DataInputStream(socket.getInputStream());
+        } catch(IOException e) {
+            System.err.println("Cannot create a dataoutput stream");
+            e.printStackTrace();
+            return;
         }
+
         //send this through the socket
         Gson gson = new Gson();
-        while (isRunning) {
+        while (true) {
             try {
                 String json = dIn.readUTF();
-                String type = gson.fromJson(json, JsonObject.class).get("type").getAsString();
-                if(type.equals("CLOSED_WS")){
-                    isRunning = false;
-                    socket.close();
-                }else{
-                    MsgOfflineServer msgO = gson.fromJson(json, MsgOfflineServer.class);
-                    //if stop read again
-                    if(msgO.getStart()){
-                        //if start send
-                        APInfo[] APs = scanner.scanNetworks();
-                        dOut.writeUTF(gson.toJson(APs));
-                        dOut.flush();
-                        //then wait for ack, a dIn is enough tbh
-                        MsgAck msgA = gson.fromJson(dIn.readUTF(), MsgAck.class);
-                        if(msgA.getType().equals("ACK")){
-                            System.out.println("ACK: " + msgA.getN());
-                        }
-                        try {
-                            Thread.sleep(SECONDS_BETWEEN_SCANS * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                MsgStartScan msg = gson.fromJson(json, MsgStartScan.class);
+                //if stop read again
+                if(msg.getStart()) {
+                    //if start send
+                    try{
+                        ScanResult[] result = apInfoToScanResult(scanner.scanNetworks());
+                        MsgScanResult msgResult = new MsgScanResult(result);
+                        dOut.writeUTF( gson.toJson(msgResult) );
+                    } catch(com.google.gson.JsonSyntaxException e) {
+                        System.out.println("Message parsing error");
+                        continue;
                     }
-                }               
-            } catch(SocketException e) {
-                System.out.println("Closed connection");
-                isRunning = false;
+                    dOut.flush();
+                    sleep(MILLISECONDS_BETWEEN_SCANS);
+                } else {
+                    sleep(500);
+                }          
             } catch (OperatingSystemNotDefinedException | IOException e) {
+                System.out.println("Disconnected");
                 e.printStackTrace();
-                isRunning = false;
+                break;
             }                  
         }
 
+        try {
+            socket.close();
+        } catch (IOException e) {}
+
     }
 
-    public void stopScanner(){
+    public void stopScanner()  {
         isRunning = false;
+    }
+
+    public void sleep(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ScanResult[] apInfoToScanResult(APInfo[] aps) {
+        if(aps == null)
+            return new ScanResult[0];
+        ScanResult[] result = new ScanResult[aps.length];
+        for(int i = 0; i < aps.length; i++)
+            result[i] = new ScanResult(aps[i].getBSSID(), 
+                                        aps[i].getSSID(), 
+                                        aps[i].getSignal(), 
+                                        aps[i].getFrequency(), 
+                                        System.currentTimeMillis());
+        return result;
     }
     
 }

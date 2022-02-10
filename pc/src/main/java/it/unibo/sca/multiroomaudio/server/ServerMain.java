@@ -15,7 +15,7 @@ public class ServerMain {
         DatabaseManager dbm = new DatabaseManager();
         Thread udpHandler = new DatagramThread();
         udpHandler.start();
-
+        
         SpeakerManager speakerManger = new SpeakerManager(dbm);
         MusicOrchestrationManager musicManager = new MusicOrchestrationManager(dbm);
         musicManager.start();
@@ -25,7 +25,9 @@ public class ServerMain {
             if(args.length >= 1) {
                 new MusicHttpServer(8080, args[0], musicManager).listMusic().start();
             } else {
+                //new MusicHttpServer(8080, "/home/francesco/Music", musicManager).listMusic().start();
                 new MusicHttpServer(8080, "C:\\Users\\giaco\\Music", musicManager).listMusic().start();
+                //new MusicHttpServer(8080, "/home/vallasc/Musica", musicManager).listMusic().start();
             }
         } catch (IOException e) {
             e.printStackTrace();

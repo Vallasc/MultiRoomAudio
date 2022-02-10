@@ -15,49 +15,52 @@ import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class ClientMain {
     
-// read script file
-
-// call function from script file
     public static void main(String[] args) {
         
         // Find ip and port with broadcast
         Gson gson = new Gson();
         MsgHelloBack msg = null;
-        DiscoveryService discovered = new DiscoveryService();
+        DiscoveryService discoverService = new DiscoveryService();
+        discoverService.discover();
         //create socket for the fingerprints     
         Socket socket = null;
-        
-        try{
-            socket = new Socket(discovered.getServerAddress(), discovered.getFingerprintPort());
+
+        try {
+            socket = new Socket(discoverService.getServerAddress(), discoverService.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac(), "Francesco"))); // TODO cambiare nome
+            dOut.writeUTF(gson.toJson(new MsgHello(0, discoverService.getMac(), "Francesco"))); // TODO cambiare nome
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
             
-            
-        }catch(IOException e){
+        } catch(IOException e) {
             e.printStackTrace();
         }
-        
-        if (Desktop.isDesktopSupported()){
+
+        if(!msg.isRejected()) {
+            String uriString = "http://"+discoverService.getServerAddress().getHostAddress()+":"+discoverService.getServerPort()+"?"+msg.getCompletePath();
+            URI uri;
             try {
-                Desktop.getDesktop().browse(
-                    new URI("http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath()));
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Open " + "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath());
-        }
-        if(!msg.getPath().equals("type=rejected")){
+                uri = new URI(uriString);
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().browse(uri);
+                    } catch (Exception e) {
+                        //it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
+                    }
+                }
+            } catch (URISyntaxException e1) {}
+    
+            System.out.println("If you are not redirected visit: " + uriString);
+
             (new FingerprintService(socket)).start();
-        } else
+        } else {
             try {
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
     }
 
 }

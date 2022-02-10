@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
 
-import it.unibo.sca.multiroomaudio.shared.dto.Device;
-import it.unibo.sca.multiroomaudio.shared.dto.Speaker;
-import it.unibo.sca.multiroomaudio.shared.messages.MsgSpeakerList;
+import it.unibo.sca.multiroomaudio.shared.messages.player.MsgMute;
+import it.unibo.sca.multiroomaudio.shared.messages.player.MsgSpeakerList;
+import it.unibo.sca.multiroomaudio.shared.model.Device;
+import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
 public class SpeakerManager {
     private final static Logger LOGGER = Logger.getLogger(SpeakerManager.class.getSimpleName());
@@ -32,6 +33,7 @@ public class SpeakerManager {
         });
     }
 
+    //String speakerId?
     public void muteSpeaker(Speaker speaker){
         speaker.setMuted(true);
     }
@@ -47,6 +49,18 @@ public class SpeakerManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateAudioState(){
+            dbm.getConnectedWebDevices().stream()
+            .filter(pair -> pair.getRight() instanceof Speaker)
+            .forEach(pair -> {
+                try{
+                    WebSocketHandler.sendMessage(pair.getLeft(), new MsgMute(((Speaker)pair.getRight()).isMuted()));
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
+            });
     }
     
 }

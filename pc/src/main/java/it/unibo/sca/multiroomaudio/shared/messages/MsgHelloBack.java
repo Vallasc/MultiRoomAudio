@@ -2,20 +2,14 @@ package it.unibo.sca.multiroomaudio.shared.messages;
 
 public class MsgHelloBack extends Msg {
     private String path;
-    String id;
+    private String id;
+    private boolean rejected;
 
-    public MsgHelloBack() {
-        super("HELLO_BACK");
-    }
-
-    public MsgHelloBack(String type){
-        super(type);
-    }
-
-    public MsgHelloBack(String path, String id) {
+    public MsgHelloBack(String path, String id, boolean rejected) {
         super("HELLO_BACK");
         this.path = path;
         this.id = id;
+        this.rejected = rejected;
     }
 
     public String getPath(){
@@ -23,6 +17,10 @@ public class MsgHelloBack extends Msg {
     }
 
     public String getCompletePath(){
-        return this.path+"&clientId="+this.id;
+        return getPath() + "&clientId=" + this.id;
+    }
+
+    public boolean isRejected(){
+        return this.rejected;
     }
 }
