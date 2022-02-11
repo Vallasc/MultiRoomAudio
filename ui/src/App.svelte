@@ -4,7 +4,7 @@
     import RoomsPage from "./pages/RoomsPage.svelte"
     import SpeakerPage from "./pages/SpeakerPage.svelte"
     import AboutPage from "./pages/AboutPage.svelte"
-    import { deviceId } from "./stores"
+    import { deviceId, hostname, webPort, musicPort } from "./stores"
 
     const f7Params = {
         theme : "md",
@@ -32,16 +32,15 @@
     let isClient = false
     let isSpeaker = false
     let clientConnection = false
+    
+    $hostname = location.hostname
+    $deviceId = urlParams.get("id")
+    $webPort = urlParams.get("wPort")
+    $musicPort = urlParams.get("mPort")
 
-    deviceId.set(urlParams.get("clientId"))
-
-    if (
-        urlParams.get("type") &&
-        (urlParams.get("type") === "client" ||
-            urlParams.get("type") === "rejected")
-    ) {
+    if ( urlParams.get("type") && urlParams.get("type") === "client" ) {
         isClient = true
-    } else if (urlParams.get("type") && urlParams.get("type") === "speaker") {
+    } else if ( urlParams.get("type") && urlParams.get("type") === "speaker") {
         isSpeaker = true
     }
 
