@@ -10,12 +10,15 @@ import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
 public class DiscoveryService {
     private static final int bufferSize = 1024;
+    public static final int DATAGRAM_PORT_SEND = 6262;
+    public static final int DATAGRAM_PORT_RECEIVE = 6263;
 
     private List<InterfaceData> validInterfaces;
     private int interfaceIndex;
 
     private InetAddress serverAddress;
-    private int serverPort;
+    private int webServerPort;
+    private int musicServerPort;
     private int fingerprintPort;
 
     public DiscoveryService() {
@@ -74,7 +77,7 @@ public class DiscoveryService {
 
             DatagramSocket socket = null;
             try {
-                socket = new DatagramSocket(6263);
+                socket = new DatagramSocket(DATAGRAM_PORT_RECEIVE);
                 socket.setSoTimeout(2000);
             } catch (SocketException e) {
                 System.err.println("Error while creating Datagram socket");
@@ -82,7 +85,7 @@ public class DiscoveryService {
             }
 
             try {
-                socket.send(new DatagramPacket(data, data.length, broadcast, 6262));
+                socket.send(new DatagramPacket(data, data.length, broadcast, DATAGRAM_PORT_SEND));
                 System.out.println("The discovery packet is sent successfully");
             } catch (IOException e) {
                 socket.close();
@@ -109,10 +112,13 @@ public class DiscoveryService {
                 MsgDiscoveredServer discovered = (MsgDiscoveredServer) Msg.fromByteArray(packetReceive.getData());
                 serverAddress = packetReceive.getAddress();
                 fingerprintPort = discovered.getFingerprintPort();
-                serverPort = discovered.getServerPort();
+                webServerPort = discovered.getServerPort();
+                musicServerPort = discovered.getMusicPort();
             }catch (ClassNotFoundException | IOException e){
                 found = false;
             }
+        } else {
+            System.err.println("No server found");
         }
 
         return found;
@@ -147,8 +153,12 @@ public class DiscoveryService {
         return fingerprintPort;
     }
 
-    public int getServerPort(){
-        return serverPort;
+    public int getWebServerPort(){
+        return webServerPort;
+    }
+
+    public int getMusicServerPort(){
+        return musicServerPort;
     }
 
 

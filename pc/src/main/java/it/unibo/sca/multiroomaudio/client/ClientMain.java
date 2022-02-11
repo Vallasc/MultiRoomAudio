@@ -21,10 +21,10 @@ public class ClientMain {
         Gson gson = new Gson();
         MsgHelloBack msg = null;
         DiscoveryService discoverService = new DiscoveryService();
-        discoverService.discover();
+        if(!discoverService.discover()) return;
+        
         //create socket for the fingerprints     
         Socket socket = null;
-
         try {
             socket = new Socket(discoverService.getServerAddress(), discoverService.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
@@ -38,27 +38,30 @@ public class ClientMain {
         }
 
         if(!msg.isRejected()) {
-            String uriString = "http://"+discoverService.getServerAddress().getHostAddress()+":"+discoverService.getServerPort()+"?"+msg.getCompletePath();
+            (new FingerprintService(socket)).start();
+
+            int wPort = discoverService.getWebServerPort();
+            int mPort = discoverService.getMusicServerPort();
+            String uriString = "http://" + discoverService.getServerAddress().getHostAddress() + ":" + wPort
+                                        + "?type=client&id=" + msg.getClientId() + "&wPort=" + wPort + "&mPort=" + mPort;
             URI uri;
             try {
                 uri = new URI(uriString);
                 if (Desktop.isDesktopSupported()) {
                     try {
+                        Thread.sleep(2000);
                         Desktop.getDesktop().browse(uri);
-                    } catch (Exception e) {
-                        //it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
-                    }
+                    } catch (IOException | InterruptedException e) {}
                 }
-            } catch (URISyntaxException e1) {}
+            } catch (URISyntaxException e) {}
     
             System.out.println("If you are not redirected visit: " + uriString);
 
-            (new FingerprintService(socket)).start();
         } else {
             try {
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Connection rejected");
             }
         }
     }
