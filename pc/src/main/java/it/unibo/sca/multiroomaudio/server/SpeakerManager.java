@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
 
+import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgMute;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgSpeakerList;
 import it.unibo.sca.multiroomaudio.shared.model.Device;
@@ -34,13 +35,13 @@ public class SpeakerManager {
     }
 
     //String speakerId?
-    public void muteSpeaker(Speaker speaker){
+    /*public void muteSpeaker(Speaker speaker){
         speaker.setMuted(true);
     }
 
     public void unMuteSpeaker(Speaker speaker){
         speaker.setMuted(false);
-    }
+    }*/
 
     public void sendSpeakersList(Session session, List<Speaker> speakers){
         MsgSpeakerList message = new MsgSpeakerList(speakers);
