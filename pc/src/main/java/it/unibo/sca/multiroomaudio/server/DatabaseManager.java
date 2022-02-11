@@ -10,29 +10,19 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
-import io.github.vallasc.APInfo;
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
-/*HashMap<id, Device> (tutti i device)
-list<device> (device connessi)
-Map<clientID, stanza> -> Stanza(Nome, Map<idClient, List<Fingerprint>>)  -> 
-Device -> se il device è un client il fingerprint va salvato dentro device e il thread che si occupa del calcolo gira sui device connessi
-        che sono client
-        alcune robe che vengono accedute da device devono essere accedute con metodi synchronized
-MusicOrchestrationManager -> (list<speaker>, minutaggio, canzone)*/
+import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanRoomDone;
 import it.unibo.sca.multiroomaudio.shared.model.*;
 
 public class DatabaseManager {
     private final List<Song> songs = new ArrayList<Song>();
-
     private final ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
-
-    //private final ConcurrentHashMap<String, Pair<Session, Device>> connectedWebDevices = new ConcurrentHashMap<>(); //all the connected web devices
     private final ConcurrentHashMap<Session, Device> connectedWebDevices = new ConcurrentHashMap<>(); //should be to save the sessions 
-
     private final ConcurrentHashMap<String, Client> connectedSocketDevices = new ConcurrentHashMap<>(); //all the connected socket devices
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Room>> clientScans = new ConcurrentHashMap<>(); //the rooms for each client
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Room>> clientRooms = new ConcurrentHashMap<>(); //the rooms for each client
 
     //-------------------------------DEVICES-----------------------------------------------------------
 
@@ -52,27 +42,6 @@ public class DatabaseManager {
     public Device getDevice(String key){
         return devices.get(key);
     }
-
-    /*public boolean setDeviceStart(String clientId, String roomId, int nScan){
-        setDeviceStop(clientId, nScan);
-        try{
-            ((Client) devices.get(clientId)).setStart(true, roomId, nScan);
-            return true;
-        }catch(ClassCastException e){
-            System.err.println("you casted a speaker to a client, what's going on?");
-            return false;
-        }
-    }
-
-    public boolean setDeviceStop(String clientId, int nscan){
-        try{
-            ((Client) devices.get(clientId)).setStart(false, null, nscan);
-            return true;
-        }catch(ClassCastException e){
-            System.err.println("you casted a speaker to a client, what's going on?");
-            return false;
-        }
-    }*/
 
     //--------------------------------CONNECTEDWEBDEVICES----------------------------------------------------
     public List<Pair<Session, Device>> getConnectedWebSpeakers(){
@@ -101,8 +70,13 @@ public class DatabaseManager {
                     .findAny().get().getRight();
     }
 
-    public List<Speaker> getConnectedSpeakerRoom(String roomId){
-        return connectedWebDevices.values().stream().filter(d -> d instanceof Speaker).filter(d -> ((Speaker)d).getRoom().equals(roomId)).map(d -> (Speaker)d).collect(Collectors.toList());
+    public List<Speaker> getConnectedSpeakerRoom(String clientId, String roomId){
+        try {
+            return clientRooms.get(clientId).get(roomId)
+                                .getSpeakerList();
+        } catch (NullPointerException e) {
+            return new ArrayList<>();
+        }
     }
 
     public List<Pair<Session, Device>> getConnectedWebDevices(){
@@ -110,7 +84,6 @@ public class DatabaseManager {
                                     .map( (entry) -> new ImmutablePair<Session, Device>(entry.getKey(), entry.getValue()))
                                     .collect(Collectors.toList()); // Streams are immutable
     }
-
 
     public void addConnectedWebDevice(Session session, MsgHello initMessage){
         Device newDevice;
@@ -132,7 +105,6 @@ public class DatabaseManager {
             }
         }
     }
-
 
     public Device removeConnectedWebDevice(Session session){
         return connectedWebDevices.remove(session);
@@ -174,11 +146,11 @@ public class DatabaseManager {
     //-------------------------------ROOMS-----------------------------------------
     public void setClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> rooms;
-        rooms = clientScans.get(clientId);
+        rooms = clientRooms.get(clientId);
         if(rooms == null){
             rooms = new ConcurrentHashMap<String, Room>();
             rooms.put(roomId.toLowerCase(), new Room(roomId));
-            clientScans.putIfAbsent(clientId, rooms);
+            clientRooms.putIfAbsent(clientId, rooms);
         }
         else
             rooms.put(roomId.toLowerCase(), new Room(roomId));
@@ -189,7 +161,7 @@ public class DatabaseManager {
     public void deleteClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> rooms;
         try{
-            rooms = clientScans.get(clientId);
+            rooms = clientRooms.get(clientId);
         }catch(NullPointerException e){
             System.out.println("Delete unexisting client (can happen don't worry)");
             return;
@@ -200,8 +172,8 @@ public class DatabaseManager {
     }
 
     public List<Room> getClientRooms(String clientId){
-        ConcurrentHashMap<String, Room> rooms = clientScans.get(clientId);
-        if( rooms == null ) return null;
+        ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
+        if( rooms == null ) return new ArrayList<>();
         return new ArrayList<>(rooms.values());
     }
 
@@ -216,7 +188,7 @@ public class DatabaseManager {
         }
 
         String roomId = client.getActiveRoom().toLowerCase();
-        Room room = clientScans.get(client.getId()).get(roomId);
+        Room room = clientRooms.get(client.getId()).get(roomId);
         int currentPositionScans = client.getCurrentPositionScans();
         boolean doneScan = false;
         // If room is not full
@@ -283,22 +255,38 @@ public class DatabaseManager {
             ScanResult finalResult;
             double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
             finalResult = new ScanResult(key, results.get(key).getSSID(), mean, results.get(key).getFrequency(), results.get(key).getTimestamp());
-            clientScans.get(clientId).get(roomId).putClientFingerprints(finalResult);
+            clientRooms.get(clientId).get(roomId).putClientFingerprints(finalResult);
         }
     }
 
     public void printFingerprintDb(String clientId){
-        for(String clientKey : clientScans.keySet()){
-            for(String roomKey : clientScans.get(clientKey).keySet()){
+        for(String clientKey : clientRooms.keySet()){
+            for(String roomKey : clientRooms.get(clientKey).keySet()){
                 System.out.println("room: " + roomKey);
-                clientScans.get(clientKey).get(roomKey).printFingerprints();
+                clientRooms.get(clientKey).get(roomKey).printFingerprints();
             }
         }
     }
 
     //-------------------------------SONGS-----------------------------------------
-    public List<Song> getSongs(){
+    public List<Song> getSongs() {
         return this.songs;
+    }
+
+    public void bindSpeaker(String clientId, String speakerId, String roomId) {
+        Speaker speaker = this.getConnectedSpeaker(speakerId);
+        ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
+        if(rooms == null || speaker == null) return;
+
+        for(Room room : rooms.values()) {
+            List<Speaker> speakers = room.getSpeakerList();
+            speakers.remove(speaker);
+            if(room.getId().equals(roomId)){
+                speakers.add(speaker);
+            }
+        }
+
+        System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + "<->"+ roomId + ", is muted: " + speaker.isMuted());
     }
 
 }
