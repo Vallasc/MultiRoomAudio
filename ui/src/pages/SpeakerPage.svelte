@@ -3,7 +3,7 @@
     import { Page, f7 } from "framework7-svelte"
     import { onMount } from 'svelte'
     import { f7ready } from 'framework7-svelte'
-
+    import { deviceId, hostname, webPort, musicPort } from "../stores"
 
     let socket = null
     const audio = new Audio()
@@ -12,12 +12,11 @@
     let currentTimeSec = 0
     let songDurationSec = 0
 
-    const blankSong = "http://" + location.hostname + ":80/imgs/blank_album.png"
+    const blankSong = "http://" + $hostname + ":" + $webPort + "/imgs/blank_album.png"
     let imageUrl = blankSong
     let title = "Waiting for music..."
     let artist = ""
 
-    let speakerId
     let speakerName
 
     onMount(() => {
@@ -29,15 +28,15 @@
     })
 
     function loadId(){
-        speakerId = localStorage.getItem("id")
-        if(speakerId == null){
-            speakerId = Math.random().toString(36).substring(2, 15) + 
+        $deviceId = localStorage.getItem("id")
+        if($deviceId == null){
+            $deviceId = Math.random().toString(36).substring(2, 15) + 
                         Math.random().toString(36).substring(2, 15) + 
                         Math.random().toString(36).substring(2, 15) + 
                         Math.random().toString(36).substring(2, 15)
-            localStorage.setItem("id", speakerId)
+            localStorage.setItem("id", $deviceId)
         }
-        console.log("Id : " + speakerId)
+        console.log("Id : " + $deviceId)
     }
 
     function loadName(){
@@ -48,15 +47,8 @@
         }
     }
 
-    function saveName(value){
-        if(value == speakerName)
-            return
-        speakerName = value
-        localStorage.setItem("name", value)
-    }
-
     function socketSetup(){
-        socket = new WebSocket("ws://" + location.hostname + "/websocket")
+        socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
 
         socket.onopen = () => {
             sendInitMessage()
@@ -75,10 +67,15 @@
     let alertShowed = false
     function dialogInsertName(){
         f7.dialog.prompt('Insert speaker name', 'Multiroom Audio', (value) => {
-                alertShowed = true
-                saveName(value)
-                console.log("Name : " + speakerId)
-                socketSetup()
+                if(value.trim() === "")
+                    dialogInsertName()
+                else {
+                    alertShowed = true
+                    speakerName = value
+                    localStorage.setItem("name", speakerName)
+                    console.log("Name : " + speakerName)
+                    socketSetup()
+                }
         }, () => {
             dialogInsertName()
         }, speakerName)
@@ -88,7 +85,7 @@
         socket.send(JSON.stringify({
             type : "HELLO",
             deviceType : 1, // speaker type
-            id: speakerId,
+            id: $deviceId,
             name: speakerName
         }))
     }
@@ -122,11 +119,11 @@
             if(song.albumImageUrl == null)
                 imageUrl = blankSong
             else 
-                imageUrl = "http://" + location.hostname + ":8080/" + song.albumImageUrl.replace("./", "")
+                imageUrl = "http://" + $hostname + ":" + $musicPort + "/" + song.albumImageUrl.replace("./", "")
             title = song.title
             artist = song.artist
 
-            let res = await fetch("http://" + location.hostname + ":8080/" + song.songUrl.replace("./", ""))
+            let res = await fetch("http://" + $hostname + ":" + $musicPort + "/" + song.songUrl.replace("./", ""))
             let blob = await res.blob()
             audio.src = URL.createObjectURL(blob)
             audio.onloadeddata = () => {
