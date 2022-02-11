@@ -1,7 +1,6 @@
 package it.unibo.sca.multiroomaudio.speaker;
 
 import java.awt.Desktop;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -11,9 +10,13 @@ public class SpeakerMain {
     
     public static void main(String[] args) {
         
-        DiscoveryService discovered = new DiscoveryService();
+        DiscoveryService discoverService = new DiscoveryService();
+        if(!discoverService.discover()) return;
 
-        String uriString = "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?type=speaker";
+        int wPort = discoverService.getWebServerPort();
+        int mPort = discoverService.getMusicServerPort();
+        String uriString = "http://" + discoverService.getServerAddress().getHostAddress() + ":" + wPort
+                                    + "?type=speaker" + "&wPort=" + wPort + "&mPort=" + mPort;
         URI uri;
         try {
             uri = new URI(uriString);
