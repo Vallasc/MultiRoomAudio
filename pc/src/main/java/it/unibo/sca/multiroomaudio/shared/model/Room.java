@@ -11,17 +11,20 @@ public class Room {
     private final String id;
     private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
     private int nscan; // index scan position
+    private final ArrayList<Speaker> speakerList;
 
     public Room(String id){
         this.id = id;
         this.nscan = 0;
         this.fingerprints = new HashMap<>();
+        this.speakerList = new ArrayList<>();
     }
 
     public Room(String id, HashMap<String, List<ScanResult>> fingerprints) {
         this.nscan = 0;
         this.id = id;
         this.fingerprints = fingerprints;
+        this.speakerList = new ArrayList<>();
     }
     
     public String getId(){
@@ -34,21 +37,8 @@ public class Room {
                         .map((scan) -> scan.size())
                         .reduce(0, (tot, element) -> tot + element);
     }
-    /*public synchronized void putClientFingerprints(ScanResult scans){
-        List<ScanResult> list;
-        for(APInfo ap : scans){
-            list = fingerprints.get(ap.getBSSID());
-            if(list == null){
-                List<ScanResult> results = new ArrayList<>();
-                results.add(new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
-                fingerprints.put(ap.getBSSID(), results);
-            }else{
-                list.add(new ScanResult(ap.getBSSID(), ap.getSSID(), ap.getSignal(), ap.getFrequency(), System.currentTimeMillis()));
-            }
-        }
-    }*/
 
-    public synchronized void putClientFingerprints(ScanResult result){
+    public void putClientFingerprints(ScanResult result){
         //nscan = [1, maxscan]
         List<ScanResult> list;
         list = fingerprints.get(result.getBSSID());
@@ -78,11 +68,11 @@ public class Room {
         }
     }
 
-    public synchronized ArrayList<ScanResult> getFingerprints(String bssid){
+    public ArrayList<ScanResult> getFingerprints(String bssid){
         return (ArrayList<ScanResult>) fingerprints.get(bssid);
     }
 
-    public synchronized void setNScan(int nscan){
+    public void setNScan(int nscan){
         this.nscan = nscan;
     }
 
@@ -107,5 +97,16 @@ public class Room {
 
     public HashMap<String, List<ScanResult>> getFingerprints() {
         return fingerprints;
+    }
+
+    public ArrayList<Speaker> getSpeakerList() {
+        return speakerList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof Room)
+            return this.id.equals(((Room) o).id);
+        return false;
     }
 }
