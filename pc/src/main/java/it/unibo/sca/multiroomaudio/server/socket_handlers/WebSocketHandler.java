@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.server;
+package it.unibo.sca.multiroomaudio.server.socket_handlers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,9 +12,14 @@ import com.google.gson.JsonSyntaxException;
 
 import org.eclipse.jetty.websocket.api.Session;
 
+import it.unibo.sca.multiroomaudio.server.DatabaseManager;
+import it.unibo.sca.multiroomaudio.server.MusicOrchestrationManager;
+import it.unibo.sca.multiroomaudio.server.SpeakerManager;
+import it.unibo.sca.multiroomaudio.server.localization_algorithms.Bayes;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
+import it.unibo.sca.multiroomaudio.shared.messages.player.MsgSpeakerList;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgCreateRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
@@ -56,7 +61,7 @@ public class WebSocketHandler {
             MsgHello msg = gson.fromJson(message, MsgHello.class);
 
             if(!dbm.isConnectedSocket(msg.getId()) && msg.getDeviceType() == 0){ // Client doesnt have fingerprint service running
-                session.close();
+                session.close(1013, "No socket connection");
                 return;
             }
 
@@ -64,6 +69,9 @@ public class WebSocketHandler {
             dbm.addConnectedWebDevice(session, msg);
             System.out.println("DEVICE [" + msg.getId() + "]: connected");
             speakerManager.updateSpeakerList();
+            if(msg.getDeviceType() == 0){
+                sendMessage(session, new MsgRooms(dbm.getClientRooms(msg.getId())));
+            }
         } else{ 
             Device connected = dbm.getConnectedWebDevice(session);
             if(connected != null && connected instanceof Client) {
@@ -95,11 +103,13 @@ public class WebSocketHandler {
                     MsgCreateRoom msg = gson.fromJson(message, MsgCreateRoom.class);
                     dbm.deleteClientRoom(connected.getId(), msg.getRoomId());
                     dbm.setClientRoom(connected.getId(), msg.getRoomId());
+                    // Update client rooms
                     sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 } else if( msgType.equals("DELETE_ROOM")){
                     MsgDeleteRoom msg = gson.fromJson(message, MsgDeleteRoom.class);
                     System.out.println("DEBUG: Delete room");
                     dbm.deleteClientRoom(connected.getId(), msg.getRoomId());
+                    // Update client rooms
                     sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 } else if( msgType.equals("SCAN_ROOM")){
                     MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
@@ -110,12 +120,13 @@ public class WebSocketHandler {
                         System.out.println("DEBUG: STOP scan");
                         client.setStart(false, null);
                     }
+                    // Update client rooms
+                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 } else if( msgType.equals("BIND_SPEAKER")){
                     MsgBindSpeaker msg = gson.fromJson(message, MsgBindSpeaker.class);
-                    Speaker speaker = dbm.getConnectedSpeaker(msg.getSpeakerId());
-                    speaker.setRoom(msg.getRoomId());
-                    System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + "<->"+ speaker.getRoom() + " is muted: " + speaker.isMuted());
-                    //check if the speaker is already bound to another room 
+                    dbm.bindSpeaker(connected.getId(), msg.getSpeakerId(), msg.getRoomId());
+                    // Update rooms
+                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                 }
             }
         }

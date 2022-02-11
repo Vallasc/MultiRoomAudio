@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.server;
+package it.unibo.sca.multiroomaudio.server.socket_handlers;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,6 +9,7 @@ import java.net.SocketException;
 
 import com.google.gson.Gson;
 
+import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 
@@ -38,13 +39,13 @@ public class SocketHandler extends Thread{
             clientId = hello.getId();
             if( clientId== null || (clientId!= null&& dbm.isConnectedSocket(clientId))){ //already connected
                 System.out.println("Client already connected");
-                dOut.writeUTF(gson.toJson(new MsgHelloBack("?type=rejected", clientId, true)));
+                dOut.writeUTF(gson.toJson(new MsgHelloBack(clientId, true)));
                 dOut.close();
                 return;
             }
 
             dbm.addConnectedSocketClient(clientId, hello);
-            dOut.writeUTF(gson.toJson(new MsgHelloBack("?type=client", clientId, false)));
+            dOut.writeUTF(gson.toJson(new MsgHelloBack(clientId, false)));
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -53,6 +54,7 @@ public class SocketHandler extends Thread{
 
         Client myDevice = (Client) dbm.getDevice(clientId); 
         myDevice.setStart(true, null);
+        System.out.println("START SERVING: " + clientId);
         while(isRunning){
             try {
                 // Find a change in the start/stop state
@@ -94,12 +96,12 @@ public class SocketHandler extends Thread{
                 }
             }
 
-            if(dbm.getClientWebSession(clientId) == null){
+            /*if(dbm.getClientWebSession(clientId) == null){
                 isRunning = false;
                 try {
                     clientSocket.close();
                 } catch (IOException e) {}
-            }
+            }*/
         }
         dbm.removeConnectedSocketClient(clientId);
         // Close websocket session

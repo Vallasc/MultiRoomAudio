@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.server;
+package it.unibo.sca.multiroomaudio.server.socket_handlers;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.discovery.MsgDiscoveredServer;
 import it.unibo.sca.multiroomaudio.discovery.MsgDiscovery;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
@@ -17,11 +18,11 @@ public class DatagramExecutor extends Thread {
 	private BlockingQueue<Pair<byte[], InetAddress>> requestQ;
 	private static byte[] data;
 	
-	public DatagramExecutor() {
+	public DatagramExecutor(int fingerprintPort, int webServerPort, int musicServerPort) {
 		//should pass the data structure in which client parameters should be saved
 		requestQ  = new LinkedBlockingQueue<>();
         try {
-			data = (new MsgDiscoveredServer(8497, 80)).toByteArray();
+			data = (new MsgDiscoveredServer(fingerprintPort, webServerPort, musicServerPort)).toByteArray();
 		} catch (IOException e) {
 			System.err.println("error while creating the message");
 			e.printStackTrace();
@@ -33,7 +34,7 @@ public class DatagramExecutor extends Thread {
         DatagramSocket socket;
         try {
             socket = new DatagramSocket();
-            socket.send(new DatagramPacket(data, data.length, receiver, 6263));
+            socket.send(new DatagramPacket(data, data.length, receiver, DiscoveryService.DATAGRAM_PORT_RECEIVE));
             socket.close();
         } catch (SocketException e) {
             e.printStackTrace();

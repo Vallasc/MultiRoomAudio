@@ -1,8 +1,11 @@
-package it.unibo.sca.multiroomaudio.server;
+package it.unibo.sca.multiroomaudio.server.localization_algorithms;
 
 import java.util.Arrays;
 import java.util.List;
 
+import it.unibo.sca.multiroomaudio.server.DatabaseManager;
+import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
+import it.unibo.sca.multiroomaudio.server.SpeakerManager;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;

@@ -1,4 +1,4 @@
-package it.unibo.sca.multiroomaudio.server;
+package it.unibo.sca.multiroomaudio.server.localization_algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import it.unibo.sca.multiroomaudio.server.DatabaseManager;
+import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
+import it.unibo.sca.multiroomaudio.server.SpeakerManager;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
@@ -90,7 +93,7 @@ public class Bayes extends FingerprintAnalyzer{
                 prob[i] *=  compute(online.getSignal(), means.get(i), variance.get(i));
             }
         }
-        System.out.println("Probabilities for " + r.getId() + ": ");
+        //System.out.println("Probabilities for " + r.getId() + ": ");
         for(int i = 0; i < prob.length; i++){
             System.out.println("\t" + prob[i]);
         }
@@ -104,11 +107,11 @@ public class Bayes extends FingerprintAnalyzer{
 
         List<Room> rooms = dbm.getClientRooms(client.getId());
         if(rooms == null){
-            System.out.println("rooms is null");
+            //System.out.println("rooms is null");
             return null;
         } 
         if(rooms.size()<=0) {
-            System.out.println("rooms is empty");
+            //System.out.println("rooms is empty");
             return null;
         }
         String roomId = null;
@@ -127,7 +130,7 @@ public class Bayes extends FingerprintAnalyzer{
                 roomId = room.getId();
             }
         }   
-        System.out.println("Room: " + roomId);
+        //System.out.println("Room: " + roomId);
         return roomId;
     }   
     
