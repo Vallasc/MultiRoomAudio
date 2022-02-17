@@ -57,7 +57,7 @@ public abstract class FingerprintAnalyzer implements Runnable{
                     speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
-            speakerManager.updateAudioState();
+            speakerManager.updateAudioState(); // TODO inserire un intervallo
         }
     }
     
