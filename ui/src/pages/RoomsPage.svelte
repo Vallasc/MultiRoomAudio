@@ -48,6 +48,7 @@
                 if(message.singlePositionDone)
                     walkAnimationComponent.nextCorner()
                 if(message.allRoomDone) {
+                    stopScan()
                     popup.instance().close()
                 }
                 disableScan = false

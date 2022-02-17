@@ -72,8 +72,7 @@ export default {
 		production && terser(),
 		copy({
 			targets: [
-			  { src: './public/', dest: '../pc/src/main/resources/' },
-			  { src: './public/', dest: '../android/app/src/main/assets/' }
+			  { src: './public/', dest: '../pc/src/main/resources/' }
 			],
 			hook: 'writeBundle'
 		  })

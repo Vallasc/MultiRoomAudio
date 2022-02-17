@@ -3,7 +3,7 @@ package it.unibo.sca.multiroomaudio.server.http_server;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
-import it.unibo.sca.multiroomaudio.server.WebSocketHandler;
+import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 
 import java.io.*;
 
@@ -27,7 +27,7 @@ public class ServerWebSocket {
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
-        webSocketHandler.handleClose(session);                
+        webSocketHandler.handleClose(session);    
     }
 
     @OnWebSocketError

@@ -3,8 +3,6 @@ package it.unibo.sca.multiroomaudio.shared.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.vallasc.APInfo;
-
 public class Client extends Device {
     public class SharedState{
         private boolean start = false;
@@ -12,12 +10,12 @@ public class Client extends Device {
 
         // Offline phase
         private String activeRoom = null;
-        private List<APInfo> currentTmpScans = new ArrayList<APInfo>();
+        private List<ScanResult> currentTmpScans = new ArrayList<>();
         private int currentPositionScans = 0;
     }
 
     private final String ip;
-    private String mac;
+    private final String mac;
     private ScanResult[] fingerprints;
     //is true if start is clicked, false otherwise
     private SharedState state = new SharedState();
@@ -28,29 +26,22 @@ public class Client extends Device {
         this.ip = ip;
     }
 
-    public Client( String ip) {
-        super(ip); //TODO I think ip is not id
-        this.ip = ip;
+    public Client(String id) {
+        super(id);
+        this.ip = null;
+        this.mac = null;
     }
     
     public String getIp() {
         return ip;
     }
 
-    public synchronized void setFingerprints(APInfo[] aps) {
-        fingerprints = new ScanResult[aps.length];
-        for(int i = 0; i < aps.length; i++) {
-            fingerprints[i] = new ScanResult(aps[i]);
-        }
-        //Arrays.sort(fingerprints);
+    public synchronized void setFingerprints(ScanResult[] scans) {
+        this.fingerprints = scans;
     }
 
     public synchronized ScanResult[] getFingerprints() {
         return fingerprints;
-    }
-
-    public void setMac(String mac){
-        this.mac = mac;
     }
 
     public String getMac() {
@@ -85,9 +76,8 @@ public class Client extends Device {
     public synchronized boolean changeStart(boolean start){
         if(state.start != start){ 
             state.start = start;
-            return true;
         }
-        return false;
+        return state.start;
     }
 
     public synchronized boolean getPlay(){
@@ -109,10 +99,10 @@ public class Client extends Device {
     }
 
 
-    public List<APInfo> getCurrentTmpScans() {
+    public List<ScanResult> getCurrentTmpScans() {
         return state.currentTmpScans;
     }
-    public void setCurrentTmpScans(List<APInfo> currentTmpScans) {
+    public void setCurrentTmpScans(List<ScanResult> currentTmpScans) {
         state.currentTmpScans = currentTmpScans;
     }
 

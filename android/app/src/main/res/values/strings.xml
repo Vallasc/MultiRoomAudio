@@ -2,5 +2,7 @@
     <string name="app_name">MultiRoomAudio</string>
     <string name="notification_title">Background localization service</string>
     <string name="notification_message">Tap to open the app</string>
+    <string name="button_speaker">Speaker Page</string>
+    <string name="button_client">Client Page</string>
 
 </resources>

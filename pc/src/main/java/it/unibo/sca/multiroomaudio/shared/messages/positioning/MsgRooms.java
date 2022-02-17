@@ -26,9 +26,14 @@ class RoomDTO {
     String roomId;
     int samples;
     int nscan;
+    String[] speakers;
+
     RoomDTO(Room room){
         this.roomId = room.getId();
         this.samples = room.getFingerprintsSize();
         this.nscan = room.getNScan();
+        this.speakers = room.getSpeakerList().stream()
+                                            .map((speaker) -> speaker.getId())
+                                            .toArray(String[]::new);
     }
 }

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
 
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
+import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPause;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;

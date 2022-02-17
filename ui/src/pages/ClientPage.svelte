@@ -11,13 +11,15 @@
         Popup,
         Block,
         Chip,
+        BlockTitle,
+        BlockHeader
     } from "framework7-svelte"
-    import { deviceId, webSocket } from "../stores"
+    import { deviceId, hostname, webPort, musicPort, webSocket } from "../stores"
     import NowPlaying from "./NowPlaying.svelte"
 
     let socket
     const blankSong =
-        "http://" + location.hostname + ":80/imgs/blank_album.png"
+        "http://" + $hostname + ":" + $webPort + "/imgs/blank_album.png"
 
     onMount(() => {
         fetchSongs()
@@ -29,7 +31,7 @@
     })
 
     function socketSetup() {
-        socket = new WebSocket("ws://" + location.hostname + "/websocket")
+        socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
         socket.addEventListener("open", onSocketOpen)
         socket.addEventListener("message", onSocketMessage)
         socket.addEventListener("close", onSocketClose)
@@ -70,26 +72,29 @@
     function makeImageurl(albumImageUrl) {
         if (albumImageUrl != null)
             albumImageUrl =
-                "http://" + location.hostname + ":8080/" + albumImageUrl.replace("./", "")
+                "http://" + $hostname + ":" + $musicPort + "/" + albumImageUrl.replace("./", "")
         else albumImageUrl = blankSong
         return albumImageUrl
     }
 
-    let songs = []
-    let speakerList = []
-    let popupOpened = false
+    let popupSong;
+    let popupRooms;
+
     let state = 0 // 0 stop, 1 play, 2 pause
     let playingSong = null
     let progress = 0
-    let popupRoomsOpened = false
+    let currentSpeaker = null
+
+    let songs = []
+    let speakerList = []
     let rooms = []
-    let roomsLenght = 0
+    $: roomsLenght = rooms.length
 
     function processMessage(message) {
         //console.log(message)
         switch (message.type) {
             case "PLAY":
-                console.log(message)
+                //console.log(message)
                 state = 1
                 playingSong = message
                 playingSong.song.albumImageUrl = makeImageurl(
@@ -115,17 +120,18 @@
                 break
             case "SPEAKER_LIST":
                 speakerList = message.speakerList
+                console.log("Speakers")
+                console.log(speakerList)
                 break
             case "ROOMS":
                 rooms = message.rooms
-                roomsLenght = rooms.length
+                console.log("Rooms")
+                console.log(rooms)
                 break
         }
     }
 
-    let currentSpeaker = null
-
-    function getRooms(curr) {
+    /*function getRooms(curr) {
         currentSpeaker  = curr
         $webSocket.send(
             JSON.stringify({
@@ -133,37 +139,29 @@
             })
         )
         popupRoomsOpened = true
-    }
+    }*/
 
-    function bindSpeaker(roomid){
+    function bindSpeaker(roomId, speakerId){
         $webSocket.send(
             JSON.stringify({
                 type: "BIND_SPEAKER",
-                speakerId: currentSpeaker,
-                roomId: roomid
+                speakerId: speakerId,
+                roomId: roomId
             })
         )
-        popupRoomsOpened = false
+        popupRooms.instance().close()
     }
 
     async function fetchSongs() {
-        let res = await fetch("http://" + location.hostname + ":8080/songs", {
+        let res = await fetch("http://" + $hostname + ":" + $musicPort + "/songs", {
             method: "GET",
         })
         songs = await res.json()
         songs.forEach((song) => {
             if (song.albumImageUrl != null)
-                song.albumImageUrl =
-                    "http://" +
-                    location.hostname +
-                    ":8080/" +
-                    song.albumImageUrl.replace("./", "")
+                song.albumImageUrl = "http://" + location.hostname + ":" + $musicPort + "/" + song.albumImageUrl.replace("./", "")
             else song.albumImageUrl = "./imgs/blank_album.png"
-            song.songUrl =
-                "http://" +
-                location.hostname +
-                ":8080/" +
-                song.songUrl.replace("./", "")
+            song.songUrl = "http://" + location.hostname + ":" + $musicPort + "/" + song.songUrl.replace("./", "")
             song.isPlaying = false
         })
         console.log("Song list")
@@ -250,20 +248,15 @@
         <div class="list-speakers">
             {#each speakerList as speaker}
                 <div class="speaker-chip">
-                    {#if speaker.isMuted}
-                        <Chip
-                            text={speaker.name}
-                            onClick={() => getRooms(speaker.id)}
-                            iconMd="material:volume_mute"
-                        />
-                    {:else}
-                        <Chip
-                            text={speaker.name}
-                            onClick={() => getRooms(speaker.id)}
-                            color="#6200ee"
-                            iconMd="material:volume_up"
-                        />
-                    {/if}
+                    <Chip
+                        text={speaker.name}
+                        onClick={() => {
+                            popupRooms.instance().open()
+                            currentSpeaker = speaker
+                        }}
+                        color = {rooms.find(room => room.speakers.find(s => s === speaker.id))}
+                        iconMd = {speaker.isMuted ? "material:volume_mute" : "material:volume_up"}
+                    />
                 </div>
             {/each}
         </div>
@@ -277,7 +270,7 @@
                 />
             </span>
             <div class="toolbar-inner">
-                <div class="toolbarBox" on:click={() => (popupOpened = true)}>
+                <div class="toolbarBox" on:click={() => popupSong.instance().open() }>
                     <img
                         id="album"
                         alt={playingSong.song.title}
@@ -296,7 +289,7 @@
                 </div>
                 <div
                     style="width: 100%;height: 100%;"
-                    on:click={() => (popupOpened = true)}
+                    on:click={() => popupSong.instance().open()}
                 />
                 <div style="margin-right:14px;">
                     {#if state != 1}
@@ -375,62 +368,75 @@
             {/if}
         {/each}
     </List>
-</Page>
 
-<Popup
-    opened={popupOpened}
-    onPopupClosed={() => (popupOpened = false)}
-    swipeToClose
->
-    {#if playingSong != null}
-        <NowPlaying
-            imageUrl={playingSong.song.albumImageUrl}
-            title={playingSong.song.title}
-            artist={playingSong.song.artist}
-            currentValue={playingSong.fromTimeSec}
-            songDuration={playingSong.song.durationMs / 1000}
-            onNext={next}
-            onPrev={prev}
-            onPlayPause={playPause}
-            playing={state == 1}
-            onValueChanged={(value) => play(playingSong.song, value)}
-        />
-    {:else}
-        <NowPlaying
-            imageUrl={blankSong}
-            title={"Waiting for music..."}
-            artist={""}
-            currentValue={0}
-            songDuration={0}
-        />
-    {/if}
-</Popup>
-
-<Popup id="popup" opened={popupRoomsOpened} onPopupClosed={() => (popupRoomsOpened = false)} backdrop closeByBackdropClick = {true}>
-    <Page>
-        {#if roomsLenght > 0}
-        <List mediaList>
-            {#each rooms as room}
-            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
-                    <span slot="after">
-                        <Link iconMd="material:done" onClick={() => bindSpeaker(room.roomId)} />
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <!-- svelte-ignore a11y-missing-content -->
-                    </span>
-                </ListItem>
-            {/each}
-        </List>
+    <Popup opened={false} backdrop closeByBackdropClick swipeToClose bind:this={popupSong}>
+        {#if playingSong != null}
+            <NowPlaying
+                imageUrl={playingSong.song.albumImageUrl}
+                title={playingSong.song.title}
+                artist={playingSong.song.artist}
+                currentValue={playingSong.fromTimeSec}
+                songDuration={playingSong.song.durationMs / 1000}
+                onNext={next}
+                onPrev={prev}
+                onPlayPause={playPause}
+                playing={state == 1}
+                onValueChanged={(value) => play(playingSong.song, value)}
+            />
         {:else}
-            <div class="center">
-                <div/>
-                <div class="no-rooms">
-                    Non ci sono stanze
-                </div>
-                <div/>
-            </div>
+            <NowPlaying
+                imageUrl={blankSong}
+                title={"Waiting for music..."}
+                artist={""}
+                currentValue={0}
+                songDuration={0}
+            />
         {/if}
-    </Page>
-</Popup>
+    </Popup>
+
+    <Popup opened={false} backdrop swipeToClose closeByBackdropClick bind:this={popupRooms}>
+        <Page>
+            <div class="navbar">
+                <div class="navbar-bg" />
+                <div class="navbar-inner">
+                    <div class="navbar-bg" />
+                    <div class="title">Select the room of the speaker</div>
+                    <div class="right" style="margin-right: 14px;">
+                        <!-- svelte-ignore a11y-invalid-attribute -->
+                        <a
+                            class="link icon-only popup-close"
+                            href="#"
+                            iconmd="material:close"
+                            ><i class="icon material-icons" style="">close</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-left: 18px;padding-right: 18px;">
+                {#if roomsLenght > 0}
+                    <BlockTitle>Rooms</BlockTitle>
+                    <List>
+                        {#each rooms as room}
+                            <ListItem
+                                radio
+                                radioIcon = "end"
+                                title = {room.roomId}
+                                value= {room.roomId}
+                                onClick={() => {
+                                    bindSpeaker(room.roomId, currentSpeaker.id)
+                                    popupRooms.instance().close()
+                                }}
+                                checked = {currentSpeaker && room.speakers.find(s => s === currentSpeaker.id)}
+                            ></ListItem>
+                        {/each}
+                    </List>
+                {:else}
+                    Non ci sono stanze
+                {/if}
+            </div>
+        </Page>
+    </Popup>
+</Page>
 
 <style>
     .list-speakers {
@@ -459,14 +465,6 @@
     :global(.toolbar-bottom) {
         height: 70px !important;
     }
-
-    /*:global(.list ul:before) {
-    background-color: transparent;
-  }
-
-  :global(.list ul:after) {
-    background-color: transparent;
-  }*/
 
     :global(.item-title-row:before) {
         display: none !important;
@@ -511,5 +509,17 @@
         margin-left: 7px;
         margin-right: 7px;
         display: inline-flex;
+    }
+
+    .navbar-bg {
+        background: transparent;
+    }
+
+    .navbar-bg:before {
+        background: transparent;
+    }
+
+    .navbar-inner {
+        padding-top: 20px;
     }
 </style>

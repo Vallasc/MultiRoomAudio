@@ -20,44 +20,48 @@ public class ClientMain {
         // Find ip and port with broadcast
         Gson gson = new Gson();
         MsgHelloBack msg = null;
-        DiscoveryService discovered = new DiscoveryService();
+        DiscoveryService discoverService = new DiscoveryService();
+        if(!discoverService.discover()) return;
+        
         //create socket for the fingerprints     
         Socket socket = null;
-
         try {
-            socket = new Socket(discovered.getServerAddress(), discovered.getFingerprintPort());
+            socket = new Socket(discoverService.getServerAddress(), discoverService.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, discovered.getMac(), "Francesco"))); // TODO cambiare nome
+            dOut.writeUTF(gson.toJson(new MsgHello(0, discoverService.getMac(), "Francesco"))); // TODO cambiare nome
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
             
         } catch(IOException e) {
             e.printStackTrace();
         }
-        
-        if(!msg.getPath().equals("type=rejected")) {
-            String uriString = "http://"+discovered.getServerAddress().getHostAddress()+":"+discovered.getServerPort()+"?"+msg.getCompletePath();
+
+        if(!msg.isRejected()) {
+            (new FingerprintService(socket)).start();
+
+            int wPort = discoverService.getWebServerPort();
+            int mPort = discoverService.getMusicServerPort();
+            String uriString = "http://" + discoverService.getServerAddress().getHostAddress() + ":" + wPort
+                                        + "?type=client&id=" + msg.getClientId() + "&wPort=" + wPort + "&mPort=" + mPort;
             URI uri;
             try {
                 uri = new URI(uriString);
                 if (Desktop.isDesktopSupported()) {
                     try {
+                        Thread.sleep(2000);
                         Desktop.getDesktop().browse(uri);
-                    } catch (Exception e) {
-                        //it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
-                    }
+                    } catch (IOException | InterruptedException e) {}
                 }
-            } catch (URISyntaxException e1) {}
+            } catch (URISyntaxException e) {}
     
             System.out.println("If you are not redirected visit: " + uriString);
 
-            (new FingerprintService(socket)).start();
         } else {
             try {
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Connection rejected");
             }
         }
     }
