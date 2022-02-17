@@ -1,7 +1,5 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
-import io.github.vallasc.APInfo;
-
 public class ScanResult implements Comparable<ScanResult> {
     private final String BSSID;
     private final String SSID;
@@ -23,14 +21,6 @@ public class ScanResult implements Comparable<ScanResult> {
         this.signal = signal;
         this.frequency = frequency;
         this.timestamp = timestamp;
-    }
-
-    public ScanResult(APInfo ap) {
-        this.BSSID = ap.getBSSID();
-        this.SSID = ap.getSSID();
-        this.signal = ap.getSignal();
-        this.frequency = ap.getFrequency();
-        this.timestamp = System.currentTimeMillis();
     }
 
     public long getTimestamp() {
