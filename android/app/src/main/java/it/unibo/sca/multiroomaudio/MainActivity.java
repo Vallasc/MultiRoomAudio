@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String SEND_WEB_SERVER_URL = "sendWebServerUrl";
     public static final String SERVER_ADDRESS = "serverAddress";
     public static final String MAC_HOST = "macHost";
-    public static final String WEB_PORT = "webPort";
+    public static final String WEB_SERVER_PORT = "webServerPort";
+    public static final String WEB_MUSIC_PORT = "webMusicPort";
     public static final String SOCKET_PORT = "socketPort";
     public static final String COMPLETE_WEB_PATH = "completeWebPath";
 
@@ -186,18 +187,22 @@ public class MainActivity extends AppCompatActivity {
             if(good) {
                 System.out.println(discoveryService.discover());
                 System.out.println(discoveryService.getServerAddress());
-                System.out.println(discoveryService.getServerPort());
+                System.out.println(discoveryService.getWebServerPort());
+                System.out.println(discoveryService.getMusicServerPort());
                 System.out.println(discoveryService.getFingerprintPort());
 
                 if(isClient) {
                     // Start fingerprint service
                     startFingerprintService(discoveryService.getServerAddress().getHostAddress(),
                             discoveryService.getMac(),
-                            discoveryService.getServerPort(),
+                            discoveryService.getWebServerPort(),
+                            discoveryService.getMusicServerPort(),
                             discoveryService.getFingerprintPort());
                 } else {
+                    int wPort = discoveryService.getWebServerPort();
+                    int mPort = discoveryService.getMusicServerPort();
                     String url = "http://" + discoveryService.getServerAddress().getHostAddress() + ":"
-                                            + discoveryService.getServerPort() + "?type=speaker";
+                                            + wPort + "?type=speaker" + "&wPort=" + wPort + "&mPort=" + mPort;
                     updateWebView(url);
                 }
             } else {
@@ -206,12 +211,13 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void startFingerprintService(String serverAddress, String mac, int webPort, int socketPort) {
+    public void startFingerprintService(String serverAddress, String mac, int webServerPort, int webMusicPort, int socketPort) {
         Intent intent = new Intent(this, FingerprintService.class);
         intent.setAction(FingerprintService.ACTION_START);
         intent.putExtra(SERVER_ADDRESS, serverAddress);
         intent.putExtra(MAC_HOST, mac);
-        intent.putExtra(WEB_PORT, webPort);
+        intent.putExtra(WEB_SERVER_PORT, webServerPort);
+        intent.putExtra(WEB_MUSIC_PORT, webMusicPort);
         intent.putExtra(SOCKET_PORT, socketPort);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

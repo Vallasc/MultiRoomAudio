@@ -15,6 +15,14 @@ public class ScanResult implements Comparable<ScanResult> {
         this.timestamp = timestamp;
     }
 
+    public ScanResult(String BSSID, String SSID, double signal, double variance, double frequency, long timestamp) {
+        this.BSSID = BSSID;
+        this.SSID = SSID;
+        this.signal = signal;
+        this.frequency = frequency;
+        this.timestamp = timestamp;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
@@ -49,5 +57,9 @@ public class ScanResult implements Comparable<ScanResult> {
                 ", frequency=" + frequency +
                 ", timestamp=" + timestamp +
                 '}';
+    }
+    
+    public static int compareByBSSID(ScanResult a, ScanResult b){
+        return a.getBSSID().compareTo(b.getBSSID());
     }
 }

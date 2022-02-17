@@ -4,10 +4,9 @@ public class Speaker extends Device {
     private String name;
     private boolean isMuted = true; //true by default
     private int numberNowPlaying = 0;
-    private String roomId;
+
     public Speaker(String id, String name) {
         super(id);
-        roomId = null;
         this.name = name;
     }
 
@@ -23,26 +22,19 @@ public class Speaker extends Device {
         return isMuted;
     }
 
-    public synchronized void decNumberNowPlaying() {
+    public synchronized void decNumberNowPlaying() { // TODO synchronized needed?
         this.numberNowPlaying -= 1;
         if(this.numberNowPlaying == 0)
             this.isMuted = true;
     }
 
-    public synchronized void incNumberNowPlaying() {
+    public synchronized void incNumberNowPlaying() { // TODO synchronized needed?
         this.numberNowPlaying += 1;
         this.isMuted = false;
     }
     
-    public synchronized int getNumberNowPlaying() {
+    public synchronized int getNumberNowPlaying() { // TODO synchronized needed?
         return numberNowPlaying;
     }
 
-    public String getRoom(){
-        return roomId==null ? "" : roomId;
-    }
-
-    public synchronized void setRoom(String roomId){
-        this.roomId = roomId;
-    }
 }
