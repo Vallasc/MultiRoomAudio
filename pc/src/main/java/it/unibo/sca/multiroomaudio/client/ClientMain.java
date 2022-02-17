@@ -29,7 +29,7 @@ public class ClientMain {
             socket = new Socket(discoverService.getServerAddress(), discoverService.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, discoverService.getMac(), "Francesco"))); // TODO cambiare nome
+            dOut.writeUTF(gson.toJson(new MsgHello(0, discoverService.getMac())));
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
             
@@ -51,12 +51,11 @@ public class ClientMain {
                     try {
                         Thread.sleep(2000);
                         Desktop.getDesktop().browse(uri);
-                    } catch (IOException | InterruptedException e) {}
+                    } catch (IOException | InterruptedException | UnsupportedOperationException e) {}
                 }
             } catch (URISyntaxException e) {}
     
             System.out.println("If you are not redirected visit: " + uriString);
-
         } else {
             try {
                 socket.close();

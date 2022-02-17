@@ -31,8 +31,8 @@ public class ServerMain {
                 new MusicHttpServer(MUSIC_SERVER_PORT, args[0], musicManager).listMusic().start();
             } else {
                 //new MusicHttpServer(MUSIC_SERVER_PORT, "/home/francesco/Music", musicManager).listMusic().start();
-                new MusicHttpServer(MUSIC_SERVER_PORT, "C:\\Users\\giaco\\Music", musicManager).listMusic().start();
-                //new MusicHttpServer(MUSIC_SERVER_PORT, "/home/vallasc/Musica", musicManager).listMusic().start();
+                //new MusicHttpServer(MUSIC_SERVER_PORT, "C:\\Users\\giaco\\Music", musicManager).listMusic().start();
+                new MusicHttpServer(MUSIC_SERVER_PORT, "/home/vallasc/Musica", musicManager).listMusic().start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,7 +51,7 @@ public class ServerMain {
                 Socket clientSocket = serverSocket.accept();
                 (new SocketHandler(clientSocket, dbm)).start();
             }
-		}catch(IOException e){
+		} catch(IOException e){
 			e.printStackTrace();
 			return;
 		}
