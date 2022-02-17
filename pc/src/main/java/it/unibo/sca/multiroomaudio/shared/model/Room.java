@@ -60,10 +60,10 @@ public class Room {
             list.add(nscan-1, result);
         }
         if(nscan == 1){
-            System.out.println(result.getBSSID());
+            //System.out.println(result.getBSSID());
             list = fingerprints.get(result.getBSSID());
             for(ScanResult r : list){
-                System.out.println("\t" + r.getSignal());
+                //System.out.println("\t" + r.getSignal());
             }
         }
     }
