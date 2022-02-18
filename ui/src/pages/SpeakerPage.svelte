@@ -7,7 +7,7 @@
 
     let socket = null
     const audio = new Audio()
-    audio.muted = true
+    //audio.muted = true TODO
     let songId = -1
     let currentTimeSec = 0
     let songDurationSec = 0
@@ -18,7 +18,6 @@
     let artist = ""
 
     let speakerName
-
     onMount(() => {
         f7ready(() => {
             loadId()
@@ -114,6 +113,7 @@
             songId = message.songId
             let song = message.song
             console.log("Playing song")
+            console.log("http://" + $hostname + ":" + $musicPort + "/" + song.songUrl.replace("./", ""))
             console.log(song)
 
             if(song.albumImageUrl == null)
@@ -131,8 +131,7 @@
             }
             audio.load()
             audio.currentTime = message.fromTimeSec
-            if(alertShowed)
-                audio.play()
+            audio.play()
         } else {
             // Allign time
             const syncWindow = 4

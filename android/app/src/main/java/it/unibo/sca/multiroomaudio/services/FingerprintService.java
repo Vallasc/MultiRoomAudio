@@ -105,7 +105,8 @@ public class FingerprintService extends Service {
             MsgHelloBack msgHelloBack = null;
             String serverAddress = intent.getStringExtra(MainActivity.SERVER_ADDRESS);
             int socketPort = intent.getIntExtra(MainActivity.SOCKET_PORT, -1);
-            int webport = intent.getIntExtra(MainActivity.WEB_PORT, -1);
+            int webServerPort = intent.getIntExtra(MainActivity.WEB_SERVER_PORT, -1);
+            int webMusicPort = intent.getIntExtra(MainActivity.WEB_MUSIC_PORT, -1);
 
             DataOutputStream dOut = null;
             DataInputStream dIn = null;
@@ -113,7 +114,7 @@ public class FingerprintService extends Service {
                 socket = new Socket(serverAddress, socketPort);
                 dOut = new DataOutputStream(socket.getOutputStream());
                 dIn = new DataInputStream(socket.getInputStream());
-                dOut.writeUTF(gson.toJson(new MsgHello(0, intent.getStringExtra(MainActivity.MAC_HOST), "Francesco"))); // TODO cambiare nome
+                dOut.writeUTF(gson.toJson(new MsgHello(0, intent.getStringExtra(MainActivity.MAC_HOST))));
                 String json = dIn.readUTF();
                 msgHelloBack = gson.fromJson(json, MsgHelloBack.class);
             } catch (IOException e) {
@@ -124,7 +125,8 @@ public class FingerprintService extends Service {
                 Log.e(TAG, "Server socket error");
             }
             if(msgHelloBack != null && !msgHelloBack.isRejected()) {
-                String url = "http://" + serverAddress + ":" + webport + msgHelloBack.getCompletePath();
+                String url = "http://" + serverAddress + ":" + webServerPort
+                        + "?type=client&id=" + msgHelloBack.getClientId() + "&wPort=" + webServerPort + "&mPort=" + webMusicPort;
                 sendUrlToMainActivity(url);
             }
 

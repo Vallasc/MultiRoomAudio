@@ -13,7 +13,7 @@ public abstract class Msg implements Serializable {
 	static final long serialVersionUID = 1L;
 
 	protected String type;
-
+	
 	public Msg(String type) {
 		this.type = type;
 	}
@@ -23,14 +23,14 @@ public abstract class Msg implements Serializable {
 	}
 
 	public String toJson(Gson serializer) {
-		return serializer.toJson(this);
-	}
+        return serializer.toJson(this);
+    }
 
 	public int getDeviceType() {
-		return -1;
-	}
+        return -1;
+    }
 
-	public byte[] toByteArray() throws IOException {
+    public byte[] toByteArray() throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		oos.writeObject(this);

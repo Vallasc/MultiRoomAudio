@@ -12,6 +12,13 @@ public class MsgHello extends Msg{
         this.name = name;
     }
 
+    public MsgHello(int deviceType, String id) {
+        super("HELLO");
+        this.deviceType = deviceType;
+        this.id = id;
+        this.name = null;
+    }
+    
     public String getId() {
         return id;
     }

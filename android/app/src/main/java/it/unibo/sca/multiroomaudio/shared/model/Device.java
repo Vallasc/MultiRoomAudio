@@ -13,6 +13,9 @@ public abstract class Device {
 
     @Override
     public boolean equals(Object o) {
-        return ((String) o).equals(this.id);
+        if(o instanceof Device) {
+            return ((Device) o).id.equals(this.id);
+        }
+        return false;
     }
 }

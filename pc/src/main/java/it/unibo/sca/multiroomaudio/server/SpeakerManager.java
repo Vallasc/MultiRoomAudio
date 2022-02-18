@@ -53,9 +53,11 @@ public class SpeakerManager {
     }
 
     public void updateAudioState(){
-            dbm.getConnectedWebDevices().stream()
+        dbm.getConnectedWebDevices().stream()
             .filter(pair -> pair.getRight() instanceof Speaker)
             .forEach(pair -> {
+                Speaker speaker = (Speaker) pair.getRight();
+                System.out.println("DDEBUG: updateAudioState -> " + speaker.getName() + " " + speaker.isMuted());
                 try{
                     WebSocketHandler.sendMessage(pair.getLeft(), new MsgMute(((Speaker)pair.getRight()).isMuted()));
                 } catch(IOException e) {
