@@ -20,6 +20,12 @@ public abstract class FingerprintAnalyzer implements Runnable{
         this.client = client;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
+        new Timer().scheduleAtFixedRate(new TimerTask(){
+            @Override
+            public void run(){
+                speakerManager.updateAudioState(); // TODO inserire un intervallo
+            }
+        },0,2000);
     }
 
     protected static double positiveRepresentation(double inputSignal){
@@ -36,12 +42,7 @@ public abstract class FingerprintAnalyzer implements Runnable{
     public void run(){
         client.setPlay(true);
         String prevRoomKey = null;
-        new Timer().scheduleAtFixedRate(new TimerTask(){
-            @Override
-            public void run(){
-                speakerManager.updateAudioState(); // TODO inserire un intervallo
-            }
-        },0,2000);
+        
         while(client.getPlay()){
             String roomkey = findRoomKey();
             if(roomkey == null){
@@ -65,7 +66,6 @@ public abstract class FingerprintAnalyzer implements Runnable{
                     speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
-            
         }
     }
     

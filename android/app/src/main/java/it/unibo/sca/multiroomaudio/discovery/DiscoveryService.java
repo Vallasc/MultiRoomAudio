@@ -1,5 +1,7 @@
 package it.unibo.sca.multiroomaudio.discovery;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
@@ -45,7 +47,8 @@ public class DiscoveryService {
                         InetAddress broadcast = addr.getBroadcast();
                         // If it has a broadcast Ip then is valid
                         if (!(inetAddr instanceof Inet6Address) && broadcast != null) {
-                            String mac = buildMac(nInterface.getHardwareAddress());
+                            //String mac = buildMac(nInterface.getHardwareAddress());
+                            String mac = "Finto-Mac";
                             String ip = addr.getAddress().getHostAddress();
                             this.validInterfaces.add(new InterfaceData(mac, broadcast, ip));
                         }

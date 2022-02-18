@@ -71,6 +71,7 @@ public class DatabaseManager {
     }
 
     public List<Speaker> getConnectedSpeakerRoom(String clientId, String roomId){
+        System.out.println("client: " + clientId + " room " + roomId);
         try {
             return clientRooms.get(clientId).get(roomId)
                                 .getSpeakerList();
