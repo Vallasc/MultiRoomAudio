@@ -19,7 +19,6 @@ import it.unibo.sca.multiroomaudio.server.localization_algorithms.Bayes;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
-import it.unibo.sca.multiroomaudio.shared.messages.player.MsgSpeakerList;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgCreateRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
