@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
+import java.util.prefs.Preferences;
 
 import com.google.gson.Gson;
 
@@ -23,13 +25,14 @@ public class ClientMain {
         DiscoveryService discoverService = new DiscoveryService();
         if(!discoverService.discover()) return;
         
+        
         //create socket for the fingerprints     
         Socket socket = null;
         try {
             socket = new Socket(discoverService.getServerAddress(), discoverService.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, "IdUnivoco"))); // TODO
+            dOut.writeUTF(gson.toJson(new MsgHello(0, getUniqueId())));
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
             
@@ -65,4 +68,13 @@ public class ClientMain {
         }
     }
 
+    private static String getUniqueId(){
+        Preferences prefs = Preferences.userNodeForPackage(ClientMain.class);
+        String id = prefs.get("ID", null);
+        if(id == null) {
+            id = UUID.randomUUID().toString();
+            prefs.put("ID", id);
+        }
+        return id;
+    }
 }
