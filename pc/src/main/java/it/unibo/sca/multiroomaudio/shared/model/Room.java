@@ -3,24 +3,25 @@ package it.unibo.sca.multiroomaudio.shared.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
     public static final int SCANS_FOR_EACH_POSITION = 4;
     public static final int MAX_POSITION = 4;
     private final String id;
-    private final HashMap<String, List<ScanResult>> fingerprints;//<bssid, 
+    private final ConcurrentHashMap<String, List<ScanResult>> fingerprints;//<bssid, 
     private int nscan; // index scan position
     private final ArrayList<Speaker> speakerList;
 
     public Room(String id){
         this.id = id;
         this.nscan = 0;
-        this.fingerprints = new HashMap<>();
+        this.fingerprints = new ConcurrentHashMap<>();
         this.speakerList = new ArrayList<>();
     }
 
-    public Room(String id, HashMap<String, List<ScanResult>> fingerprints) {
+    public Room(String id, ConcurrentHashMap<String, List<ScanResult>> fingerprints) {
         this.nscan = 0;
         this.id = id;
         this.fingerprints = fingerprints;
@@ -95,7 +96,7 @@ public class Room {
         return fingerprints.keySet().toArray(bssid);
     }
 
-    public HashMap<String, List<ScanResult>> getFingerprints() {
+    public ConcurrentHashMap<String, List<ScanResult>> getFingerprints() {
         return fingerprints;
     }
 

@@ -25,7 +25,7 @@ public abstract class FingerprintAnalyzer extends Thread {
         new Timer().scheduleAtFixedRate(new TimerTask(){
             @Override
             public void run(){
-                speakerManager.updateAudioState(); // TODO inserire un intervallo
+                speakerManager.updateAudioState();
             }
         },0,2000);
         this.stopped = false;
@@ -50,26 +50,23 @@ public abstract class FingerprintAnalyzer extends Thread {
             if(roomkey == null){
                 continue;
             }
-            //System.out.println("Roomkey: " + roomkey);
+            List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
+            if(speakers == null || speakers.size() == 0){
+                continue;
+            }
             if(prevRoomKey == null){
                 //System.out.println("PrevRoomKey is null, ROOMKEY: " + roomkey);
-                List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
-                if(speakers != null)
-                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
             if(!prevRoomKey.equals(roomkey)){
                // System.out.println("PrevRoomKey is not null, ROOMKEY: " + roomkey + " PREV: " + prevRoomKey);
                 List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(client.getId(), prevRoomKey);
-                List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
                 if(prevspeakers != null)
                     prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
-                if(speakers != null)
-                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
 
-                // TODO
-                //speakerManager.updateAudioState();
             }
         }
         System.out.println("STOP FINGERPRINT ANALYZER: " + client.getId());
@@ -79,4 +76,5 @@ public abstract class FingerprintAnalyzer extends Thread {
     public void stopService() {
         this.stopped = true;
     }
+    
 }

@@ -26,6 +26,9 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         if(onlines == null){
             return -1d;
         }
+
+        if(r.getNScan() == 0)
+            return -1d;
         double[] roomErr = new double[r.getNScan()];
         Arrays.fill(roomErr, 0);
 

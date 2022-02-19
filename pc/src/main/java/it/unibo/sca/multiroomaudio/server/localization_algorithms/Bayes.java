@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
@@ -29,7 +30,7 @@ public class Bayes extends FingerprintAnalyzer{
     }
 
     //maybe i should aggregate the different ap for each rp and these are the values of mean and variance
-    private List<Double> aggregateMean(Room r, HashMap<String, List<ScanResult>> fingerprints){
+    private List<Double> aggregateMean(Room r, ConcurrentHashMap<String, List<ScanResult>> fingerprints){
         List<Double> mean = new ArrayList<>(r.getNScan());
         for(int i = 0; i < r.getNScan(); i++){
             mean.add(i, 0d);
@@ -47,7 +48,7 @@ public class Bayes extends FingerprintAnalyzer{
         return mean;
     }
 
-    private List<Double> aggregateVariance(Room r, List<Double> mean, HashMap<String, List<ScanResult>> fingerprints){
+    private List<Double> aggregateVariance(Room r, List<Double> mean, ConcurrentHashMap<String, List<ScanResult>> fingerprints){
         List<Double> variance = new ArrayList<>(r.getNScan());
         for(int i = 0; i < r.getNScan(); i++){
             variance.add(i, 0d);
@@ -70,8 +71,12 @@ public class Bayes extends FingerprintAnalyzer{
         if(onlines == null){
             return -1d;
         }
+        int nScan = r.getNScan();
+        if(nScan == 0){
+            return -1d;
+        }
         
-        HashMap<String, List<ScanResult>> fingerprints = r.getFingerprints();
+        ConcurrentHashMap<String, List<ScanResult>> fingerprints = r.getFingerprints();
         List<Double> means = aggregateMean(r, fingerprints);
         List<Double> variance = aggregateVariance(r, means, fingerprints);
         
@@ -85,11 +90,11 @@ public class Bayes extends FingerprintAnalyzer{
             System.out.println("\t" + var);
         }*/
 
-        double[] prob = new double[r.getNScan()];
+        double[] prob = new double[nScan];
         Arrays.fill(prob, 1);
 
         for(ScanResult online : onlines){
-            for(int i = 0; i < r.getNScan(); i++){
+            for(int i = 0; i < nScan; i++){
                 prob[i] *=  compute(online.getSignal(), means.get(i), variance.get(i));
             }
         }
@@ -130,7 +135,6 @@ public class Bayes extends FingerprintAnalyzer{
                 roomId = room.getId();
             }
         }   
-        //System.out.println("Room: " + roomId);
         return roomId;
     }   
     
