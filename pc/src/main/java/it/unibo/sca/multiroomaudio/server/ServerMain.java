@@ -45,19 +45,14 @@ public class ServerMain {
                 ),
             dbm ).start();      
 
-        //(new FingerprintAnalyzer(dbm)).start();
         try(ServerSocket serverSocket = new ServerSocket(FINGERPRINT_SERVER_PORT)){
-            //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets
             while(true){
                 Socket clientSocket = serverSocket.accept();
-                (new SocketHandler(clientSocket, dbm)).start();
+                (new SocketHandler(clientSocket, dbm, speakerManger)).start();
             }
 		} catch(IOException e){
 			e.printStackTrace();
 			return;
 		}
-        
     }
-   
-
 }
