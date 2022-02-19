@@ -14,7 +14,7 @@ import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
 public class FingerprintService extends Thread {
-    static final int MILLISECONDS_BETWEEN_SCANS = 100;
+    static final int MILLISECONDS_BETWEEN_SCANS = 300;
 
     final WlanScanner scanner;
     boolean isRunning = false;
