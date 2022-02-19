@@ -7,25 +7,28 @@ import java.util.TimerTask;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
-public abstract class FingerprintAnalyzer implements Runnable{
+public abstract class FingerprintAnalyzer extends Thread {
     private static final double ALPHA = 24;
     protected static final int MIN_STRENGTH = -80;
     protected static final int MAX_VALUE = 15000;
 
     protected final Client client;
     protected final DatabaseManager dbm;
-    protected SpeakerManager speakerManager;
+    private SpeakerManager speakerManager;
+    private boolean stopped;
 
     public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
         this.client = client;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
+        // TODO non si potrebbbe mettere che manda il messaggio solo quando cambia la stanza?
         new Timer().scheduleAtFixedRate(new TimerTask(){
             @Override
             public void run(){
                 speakerManager.updateAudioState(); // TODO inserire un intervallo
             }
         },0,2000);
+        this.stopped = false;
     }
 
     protected static double positiveRepresentation(double inputSignal){
@@ -40,10 +43,9 @@ public abstract class FingerprintAnalyzer implements Runnable{
 
     @Override
     public void run(){
-        client.setPlay(true);
         String prevRoomKey = null;
-        
-        while(client.getPlay()){
+        System.out.println("START FINGERPRINT ANALYZER: " + client.getId());
+        while(!this.stopped){
             String roomkey = findRoomKey();
             if(roomkey == null){
                 continue;
@@ -65,8 +67,16 @@ public abstract class FingerprintAnalyzer implements Runnable{
                 if(speakers != null)
                     speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
+
+                // TODO
+                //speakerManager.updateAudioState();
             }
         }
+        System.out.println("STOP FINGERPRINT ANALYZER: " + client.getId());
     }
-    
+
+
+    public void stopService() {
+        this.stopped = true;
+    }
 }
