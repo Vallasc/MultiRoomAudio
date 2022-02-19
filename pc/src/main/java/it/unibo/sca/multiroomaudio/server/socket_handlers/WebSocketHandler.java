@@ -3,8 +3,6 @@ package it.unibo.sca.multiroomaudio.server.socket_handlers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -15,7 +13,6 @@ import org.eclipse.jetty.websocket.api.Session;
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.MusicOrchestrationManager;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
-import it.unibo.sca.multiroomaudio.server.localization_algorithms.Bayes;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
@@ -34,7 +31,6 @@ public class WebSocketHandler {
     private final DatabaseManager dbm;  
     private final MusicOrchestrationManager musicManager;
     private final SpeakerManager speakerManager;
-    ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public WebSocketHandler(DatabaseManager dbm, MusicOrchestrationManager musicManager, SpeakerManager speakerManager) {
         this.dbm = dbm;
@@ -68,7 +64,7 @@ public class WebSocketHandler {
             dbm.addConnectedWebDevice(session, msg);
             System.out.println("DEVICE [" + msg.getId() + "]: connected");
             speakerManager.updateSpeakerList();
-            if(msg.getDeviceType() == 0){
+            if(msg.getDeviceType() == 0){ // new Client
                 sendMessage(session, new MsgRooms(dbm.getClientRooms(msg.getId())));
             }
         } else{ 
@@ -79,15 +75,12 @@ public class WebSocketHandler {
                     //start sending fingerprints again
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
                     System.out.println("DEBUG: Start play");
-                    pool.execute(new Bayes(speakerManager, client, dbm));
                     musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
                 } else if( msgType.equals("PAUSE") ){ // Client want to pause
                     System.out.println("DEBUG: Stop play");
-                    client.setPlay(false);
                     musicManager.pauseCurrentSong();
                 } else if( msgType.equals("STOP") ){ // Client want to stop
                     System.out.println("DEBUG: pause play");
-                    client.setPlay(false);
                     musicManager.stopCurrentSong();
                 } else if( msgType.equals("NEXT") ){ // Client want next song
                     musicManager.nextSong();
@@ -115,10 +108,10 @@ public class WebSocketHandler {
                     MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
                     if(msg.getRoomId() != null){
                         System.out.println("DEBUG: START scan");
-                        client.setStart(true, msg.getRoomId());
+                        client.setActiveRoom(msg.getRoomId().toLowerCase());
                     } else {
                         System.out.println("DEBUG: STOP scan");
-                        client.setStart(false, null);
+                        client.setActiveRoom(null);
                     }
                     // Update client rooms
                     sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
