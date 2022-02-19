@@ -10,15 +10,21 @@ import java.net.SocketException;
 import com.google.gson.Gson;
 
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
+import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
+import it.unibo.sca.multiroomaudio.server.SpeakerManager;
+import it.unibo.sca.multiroomaudio.server.localization_algorithms.Bayes;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 
 public class SocketHandler extends Thread{
     private final Socket clientSocket;
     private final DatabaseManager dbm;
-    public SocketHandler(Socket clientSocket, DatabaseManager dbm){
+    private final SpeakerManager speakerManager;
+
+    public SocketHandler(Socket clientSocket, DatabaseManager dbm, SpeakerManager speakerManager){
         this.clientSocket = clientSocket;
         this.dbm = dbm;
+        this.speakerManager = speakerManager;
     }
 
     @Override
@@ -37,7 +43,7 @@ public class SocketHandler extends Thread{
             String json = dIn.readUTF();
             MsgHello hello = gson.fromJson(json, MsgHello.class);
             clientId = hello.getId();
-            if( clientId== null || (clientId!= null&& dbm.isConnectedSocket(clientId))){ //already connected
+            if( clientId== null || (clientId!= null && dbm.isConnectedSocket(clientId))){ //already connected
                 System.out.println("Client already connected");
                 dOut.writeUTF(gson.toJson(new MsgHelloBack(clientId, true)));
                 dOut.close();
@@ -53,24 +59,24 @@ public class SocketHandler extends Thread{
         }
 
         Client myDevice = (Client) dbm.getDevice(clientId); 
-        myDevice.setStart(true, null);
+        myDevice.setActiveRoom(null);
         System.out.println("START SERVING: " + clientId);
+        FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
+        fAnalyzernew.start();
         while(isRunning){
             try {
                 // Find a change in the start/stop state
-                if(myDevice.getStart()){
-                    //send start to the client
-                    dOut.writeUTF(gson.toJson(new MsgStartScan(true)));
-                    dOut.flush();
-
-                    MsgScanResult resultMessage = gson.fromJson(dIn.readUTF(), MsgScanResult.class);
-                    if(myDevice.getActiveRoom() == null) {
-                        //System.out.println("Current scan len:" + currentAPInfo.length);
-                        myDevice.setFingerprints(resultMessage.getApList());
-                    } else {
-                        //System.out.println("Current scan len:" + resultMessage.getApList().length);
-                        dbm.putScans(myDevice, resultMessage.getApList());
-                    }
+                //send start to the client
+                dOut.writeUTF(gson.toJson(new MsgStartScan(true)));
+                dOut.flush();
+                MsgScanResult resultMessage = gson.fromJson(dIn.readUTF(), MsgScanResult.class);
+                //System.out.println(resultMessage.toJson());
+                if(myDevice.getActiveRoom() == null) {
+                    //System.out.println("Current scan len:" + currentAPInfo.length);
+                    myDevice.setFingerprints(resultMessage.getApList());
+                } else {
+                    //System.out.println("Current scan len:" + resultMessage.getApList().length);
+                    dbm.putScans(myDevice, resultMessage.getApList());
                 }
             } catch (SocketException e) {
                 //e.printStackTrace();
@@ -85,14 +91,12 @@ public class SocketHandler extends Thread{
             }
 
             if(!dbm.isConnectedSocket(clientId) || !isRunning){
-                isRunning = false;
-                //dbm.setDeviceStop(clientId, nScan);
-                myDevice.setStart(false, null);
-                myDevice.setActiveRoom(null);
-                myDevice.setPlay(false);
                 try {
+                    isRunning = false;
+                    //dbm.setDeviceStop(clientId, nScan);
+                    myDevice.setActiveRoom(null);
                     dOut.close();
-                }catch(IOException e) {
+                }catch(Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -104,6 +108,7 @@ public class SocketHandler extends Thread{
                 } catch (IOException e) {}
             }*/
         }
+        fAnalyzernew.stopService();
         dbm.removeConnectedSocketClient(clientId);
         // Close websocket session
         dbm.removeConnectedWebDevicesAndDisconnect(clientId);
