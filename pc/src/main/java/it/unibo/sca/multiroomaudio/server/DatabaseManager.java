@@ -150,11 +150,11 @@ public class DatabaseManager {
         rooms = clientRooms.get(clientId);
         if(rooms == null){
             rooms = new ConcurrentHashMap<String, Room>();
-            rooms.put(roomId.toLowerCase(), new Room(roomId));
+            rooms.put(roomId.toLowerCase(), new Room(roomId.toLowerCase()));
             clientRooms.putIfAbsent(clientId, rooms);
         }
         else
-            rooms.put(roomId.toLowerCase(), new Room(roomId));
+            rooms.put(roomId.toLowerCase(), new Room(roomId.toLowerCase()));
 
         System.out.println("New room for client "+ clientId + ", roomID: " + roomId);
     }
@@ -168,7 +168,7 @@ public class DatabaseManager {
             return;
         }
         if( rooms == null ) return;
-            rooms.remove(roomId);
+            rooms.remove(roomId.toLowerCase());
         
     }
 
@@ -275,6 +275,7 @@ public class DatabaseManager {
     }
 
     public void bindSpeaker(String clientId, String speakerId, String roomId) {
+        roomId = roomId.toLowerCase();
         Speaker speaker = this.getConnectedSpeaker(speakerId);
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
         if(rooms == null || speaker == null) return;
