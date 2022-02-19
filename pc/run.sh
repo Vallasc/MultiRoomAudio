@@ -9,7 +9,7 @@ JAR="target/multi_room_audio_client-0.0.1-jar-with-dependencies.jar"
 
 case "$1" in
     "server")
-        sudo java -cp "$JAR" it.unibo.sca.multiroomaudio.server.ServerMain
+        java -cp "$JAR" it.unibo.sca.multiroomaudio.server.ServerMain
         ;;
     "client")
         sudo java -cp "$JAR" it.unibo.sca.multiroomaudio.client.ClientMain
