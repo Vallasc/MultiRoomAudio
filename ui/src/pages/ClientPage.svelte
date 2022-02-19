@@ -12,7 +12,7 @@
         Block,
         Chip,
         BlockTitle,
-        BlockHeader
+        f7
     } from "framework7-svelte"
     import { deviceId, hostname, webPort, musicPort, webSocket } from "../stores"
     import NowPlaying from "./NowPlaying.svelte"
@@ -20,63 +20,6 @@
     let socket
     const blankSong =
         "http://" + $hostname + ":" + $webPort + "/imgs/blank_album.png"
-
-    onMount(() => {
-        fetchSongs()
-        socketSetup()
-    })
-
-    onDestroy(() => {
-        socketDestroy()
-    })
-
-    function socketSetup() {
-        socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
-        socket.addEventListener("open", onSocketOpen)
-        socket.addEventListener("message", onSocketMessage)
-        socket.addEventListener("close", onSocketClose)
-        webSocket.set(socket)
-    }
-
-    // Socket functions
-    function onSocketOpen(){
-        sendInitMessage()
-    }
-    function onSocketMessage(event){
-        processMessage(JSON.parse(event.data))
-    }
-    function onSocketClose(event) {
-        // TODO print connection lost
-        console.log(event)
-    }
-
-    function socketDestroy() {
-        socket.removeEventListener("open", onSocketOpen)
-        socket.removeEventListener("message", onSocketMessage)
-        socket.removeEventListener("close", onSocketClose)
-        webSocket.set(null)
-    }
-
-    function sendInitMessage() {
-        console.log($deviceId)
-        socket.send(
-            JSON.stringify({
-                type: "HELLO",
-                deviceType: 0, // client type
-                id: $deviceId,
-                name: "vallascClient", // TODO change name
-            })
-        )
-    }
-
-    function makeImageurl(albumImageUrl) {
-        if (albumImageUrl != null)
-            albumImageUrl =
-                "http://" + $hostname + ":" + $musicPort + "/" + albumImageUrl.replace("./", "")
-        else albumImageUrl = blankSong
-        return albumImageUrl
-    }
-
     let popupSong;
     let popupRooms;
 
@@ -89,6 +32,56 @@
     let speakerList = []
     let rooms = []
     $: roomsLenght = rooms.length
+
+    onMount(() => {
+        fetchSongs()
+        socketSetup()
+    })
+
+    function alertConnectionClosed(){
+        f7.dialog.preloader('Connection closed...')
+        setTimeout( () => location.reload(), 5000)
+    }
+
+    function socketSetup() {
+        function onSocketOpen(){
+            sendInitMessage()
+        }
+        function onSocketMessage(event){
+            processMessage(JSON.parse(event.data))
+        }
+        function onSocketClose(event) {
+            // TODO print connection lost
+            console.log(event)
+            alertConnectionClosed()
+        }
+
+        socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
+        socket.addEventListener("open", onSocketOpen)
+        socket.addEventListener("message", onSocketMessage)
+        socket.addEventListener("close", onSocketClose)
+        webSocket.set(socket)
+    }
+
+    function sendInitMessage() {
+        console.log($deviceId)
+        socket.send(
+            JSON.stringify({
+                type: "HELLO",
+                deviceType: 0, // client type
+                id: $deviceId,
+                name: "client",
+            })
+        )
+    }
+
+    function makeImageurl(albumImageUrl) {
+        if (albumImageUrl != null)
+            albumImageUrl =
+                "http://" + $hostname + ":" + $musicPort + "/" + albumImageUrl.replace("./", "")
+        else albumImageUrl = blankSong
+        return albumImageUrl
+    }
 
     function processMessage(message) {
         //console.log(message)
@@ -130,16 +123,6 @@
                 break
         }
     }
-
-    /*function getRooms(curr) {
-        currentSpeaker  = curr
-        $webSocket.send(
-            JSON.stringify({
-                type: "ROOMS_REQUEST"
-            })
-        )
-        popupRoomsOpened = true
-    }*/
 
     function bindSpeaker(roomId, speakerId){
         $webSocket.send(

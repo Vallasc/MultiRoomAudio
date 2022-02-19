@@ -46,21 +46,28 @@
         }
     }
 
-    function socketSetup(){
-        socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
+    function alertConnectionClosed(){
+        f7.dialog.preloader('Connection closed...')
+        setTimeout( () => location.reload(), 5000)
+    }
 
-        socket.onopen = () => {
+    function socketSetup() {
+        function onSocketOpen(){
             sendInitMessage()
         }
-
-        socket.onmessage = (event) => {
+        function onSocketMessage(event){
             processMessage(JSON.parse(event.data))
         }
-
-        socket.onclose = (event) => {
+        function onSocketClose(event) {
+            // TODO print connection lost
             console.log(event)
-            window.clearTimeout(intervalResponse)
+            alertConnectionClosed()
         }
+
+        socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
+        socket.addEventListener("open", onSocketOpen)
+        socket.addEventListener("message", onSocketMessage)
+        socket.addEventListener("close", onSocketClose)
     }
 
     let alertShowed = false
