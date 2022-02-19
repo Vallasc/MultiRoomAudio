@@ -5,10 +5,6 @@ import java.util.List;
 
 public class Client extends Device {
     public class SharedState{
-        private boolean start = false;
-        private boolean play = false;
-
-        // Offline phase
         private String activeRoom = null;
         private List<ScanResult> currentTmpScans = new ArrayList<>();
         private int currentPositionScans = 0;
@@ -36,11 +32,11 @@ public class Client extends Device {
         return ip;
     }
 
-    public synchronized void setFingerprints(ScanResult[] scans) {
+    public void setFingerprints(ScanResult[] scans) {
         this.fingerprints = scans;
     }
 
-    public synchronized ScanResult[] getFingerprints() {
+    public ScanResult[] getFingerprints() {
         return fingerprints;
     }
 
@@ -53,55 +49,18 @@ public class Client extends Device {
         return ((String) o).equals(this.ip);
     }
 
-    
-    //---------------------STATE THINGS------------------------------------
-    /*public synchronized void setStart(boolean start, String activeRoom, int nScan){
-        state.start = start;
-        state.activeRoom = activeRoom;
-        state.nScan = nScan;
-    }*/
-
-    public synchronized void setStart(boolean start, String activeRoom){
-        state.start = start;
+    public void setActiveRoom(String activeRoom){
         state.activeRoom = activeRoom;
     }
 
-    public synchronized boolean getStart(){
-        return state.start;
-    }
-
-    /**
-     * @return: true if state changed, false otherwise
-     */
-    public synchronized boolean changeStart(boolean start){
-        if(state.start != start){ 
-            state.start = start;
-        }
-        return state.start;
-    }
-
-    public synchronized boolean getPlay(){
-        return state.play;
-    }
-
-    public synchronized void setPlay(boolean play){
-        if(state.start && !state.play) return;
-        state.start = play;
-        state.play = play;
-    }
-
-    public synchronized void setActiveRoom(String activeRoom){
-        state.activeRoom = activeRoom;
-    }
-
-    public synchronized String getActiveRoom(){
+    public String getActiveRoom(){
         return state.activeRoom;
     }
-
 
     public List<ScanResult> getCurrentTmpScans() {
         return state.currentTmpScans;
     }
+
     public void setCurrentTmpScans(List<ScanResult> currentTmpScans) {
         state.currentTmpScans = currentTmpScans;
     }

@@ -22,7 +22,7 @@ public class Speaker extends Device {
         return isMuted;
     }
 
-    public synchronized void decNumberNowPlaying() { // TODO synchronized needed?
+    public void decNumberNowPlaying() { // TODO synchronized needed?
         this.numberNowPlaying -= 1;
         if(this.numberNowPlaying == 0)
             this.isMuted = true;

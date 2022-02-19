@@ -16,7 +16,6 @@ import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
 public class SpeakerManager {
     private final static Logger LOGGER = Logger.getLogger(SpeakerManager.class.getSimpleName());
-
     private final DatabaseManager dbm;
 
     public SpeakerManager(DatabaseManager dbm){
@@ -34,15 +33,6 @@ public class SpeakerManager {
         });
     }
 
-    //String speakerId?
-    /*public void muteSpeaker(Speaker speaker){
-        speaker.setMuted(true);
-    }
-
-    public void unMuteSpeaker(Speaker speaker){
-        speaker.setMuted(false);
-    }*/
-
     public void sendSpeakersList(Session session, List<Speaker> speakers){
         MsgSpeakerList message = new MsgSpeakerList(speakers);
         try {
@@ -57,9 +47,9 @@ public class SpeakerManager {
             .filter(pair -> pair.getRight() instanceof Speaker)
             .forEach(pair -> {
                 Speaker speaker = (Speaker) pair.getRight();
-                //System.out.println("DEBUG: updateAudioState -> " + speaker.getName() + " " + speaker.isMuted());
+                //System.out.println("DEBUG: updateAudioState -> " + speaker.getName() + " muted ->" + speaker.isMuted());
                 try{
-                    WebSocketHandler.sendMessage(pair.getLeft(), new MsgMute(((Speaker)pair.getRight()).isMuted()));
+                    WebSocketHandler.sendMessage(pair.getLeft(), new MsgMute(speaker.isMuted()));
                 } catch(IOException e) {
                     e.printStackTrace();
                 }
