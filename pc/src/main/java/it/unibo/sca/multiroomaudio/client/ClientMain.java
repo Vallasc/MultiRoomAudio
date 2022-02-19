@@ -29,7 +29,7 @@ public class ClientMain {
             socket = new Socket(discoverService.getServerAddress(), discoverService.getFingerprintPort());
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             DataInputStream dIn = new DataInputStream(socket.getInputStream());
-            dOut.writeUTF(gson.toJson(new MsgHello(0, discoverService.getMac())));
+            dOut.writeUTF(gson.toJson(new MsgHello(0, "IdUnivoco"))); // TODO
             String json = dIn.readUTF();
             msg = gson.fromJson(json, MsgHelloBack.class);
             
