@@ -57,7 +57,7 @@ public class SpeakerManager {
             .filter(pair -> pair.getRight() instanceof Speaker)
             .forEach(pair -> {
                 Speaker speaker = (Speaker) pair.getRight();
-                System.out.println("DDEBUG: updateAudioState -> " + speaker.getName() + " " + speaker.isMuted());
+                //System.out.println("DEBUG: updateAudioState -> " + speaker.getName() + " " + speaker.isMuted());
                 try{
                     WebSocketHandler.sendMessage(pair.getLeft(), new MsgMute(((Speaker)pair.getRight()).isMuted()));
                 } catch(IOException e) {

@@ -1,6 +1,8 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
@@ -18,6 +20,12 @@ public abstract class FingerprintAnalyzer implements Runnable{
         this.client = client;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
+        new Timer().scheduleAtFixedRate(new TimerTask(){
+            @Override
+            public void run(){
+                speakerManager.updateAudioState(); // TODO inserire un intervallo
+            }
+        },0,2000);
     }
 
     protected static double positiveRepresentation(double inputSignal){
@@ -34,6 +42,7 @@ public abstract class FingerprintAnalyzer implements Runnable{
     public void run(){
         client.setPlay(true);
         String prevRoomKey = null;
+        
         while(client.getPlay()){
             String roomkey = findRoomKey();
             if(roomkey == null){
@@ -57,7 +66,6 @@ public abstract class FingerprintAnalyzer implements Runnable{
                     speakers.forEach(speaker -> speaker.incNumberNowPlaying());
                 prevRoomKey = roomkey;
             }
-            speakerManager.updateAudioState(); // TODO inserire un intervallo
         }
     }
     

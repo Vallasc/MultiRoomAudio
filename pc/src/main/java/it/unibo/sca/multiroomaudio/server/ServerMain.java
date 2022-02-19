@@ -44,6 +44,7 @@ public class ServerMain {
                 new WebSocketHandler(dbm, musicManager, speakerManger)
                 ),
             dbm ).start();      
+
         //(new FingerprintAnalyzer(dbm)).start();
         try(ServerSocket serverSocket = new ServerSocket(FINGERPRINT_SERVER_PORT)){
             //only one connection at a time is accepted through the socket, that's the client, speakers are handled through websockets

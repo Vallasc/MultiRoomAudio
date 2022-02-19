@@ -19,7 +19,6 @@ import it.unibo.sca.multiroomaudio.server.localization_algorithms.Bayes;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
-import it.unibo.sca.multiroomaudio.shared.messages.player.MsgSpeakerList;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgCreateRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
@@ -77,6 +76,7 @@ public class WebSocketHandler {
             if(connected != null && connected instanceof Client) {
                 Client client = (Client)dbm.getDevice(connected.getId());
                 if( msgType.equals("PLAY") ){ // Client want to play
+                    //start sending fingerprints again
                     MsgPlay msg = gson.fromJson(message, MsgPlay.class);
                     System.out.println("DEBUG: Start play");
                     pool.execute(new Bayes(speakerManager, client, dbm));

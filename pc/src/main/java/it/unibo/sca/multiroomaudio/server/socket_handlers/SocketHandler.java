@@ -68,6 +68,7 @@ public class SocketHandler extends Thread{
                         //System.out.println("Current scan len:" + currentAPInfo.length);
                         myDevice.setFingerprints(resultMessage.getApList());
                     } else {
+                        //System.out.println("Current scan len:" + resultMessage.getApList().length);
                         dbm.putScans(myDevice, resultMessage.getApList());
                     }
                 }
