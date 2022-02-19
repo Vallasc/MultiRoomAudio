@@ -26,14 +26,6 @@ public class DiscoveryService {
         interfaceIndex = 0;
     }
 
-    private static String buildMac(byte[] mac){
-        StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < mac.length; i++) {
-			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
-		}
-		return sb.toString();
-    }
-
     private void getSpecs(){
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
@@ -45,9 +37,8 @@ public class DiscoveryService {
                         InetAddress broadcast = addr.getBroadcast();
                         // If it has a broadcast Ip then is valid
                         if (!(inetAddr instanceof Inet6Address) && broadcast != null) {
-                            String mac = buildMac(nInterface.getHardwareAddress());
                             String ip = addr.getAddress().getHostAddress();
-                            this.validInterfaces.add(new InterfaceData(mac, broadcast, ip));
+                            this.validInterfaces.add(new InterfaceData(broadcast, ip));
                         }
                     }
                 }
@@ -124,13 +115,6 @@ public class DiscoveryService {
         return found;
     }
 
-    public String getMac(){
-        if(interfaceIndex < validInterfaces.size())
-            return validInterfaces.get(interfaceIndex).getMac();
-        else
-            return null;
-    }
-
     public InetAddress getBroadcast(){
         if(interfaceIndex < validInterfaces.size())
             return validInterfaces.get(interfaceIndex).getBroadcast();
@@ -163,18 +147,12 @@ public class DiscoveryService {
 
 
     private class InterfaceData {
-        private String mac;
         private InetAddress broadcast;
         private String ip;
 
-        private InterfaceData(String mac, InetAddress broadcast, String ip) {
-            this.mac = mac;
+        private InterfaceData(InetAddress broadcast, String ip) {
             this.broadcast = broadcast;
             this.ip = ip;
-        }
-
-        public String getMac() {
-            return mac;
         }
 
         public InetAddress getBroadcast() {
@@ -188,8 +166,7 @@ public class DiscoveryService {
         @Override
         public String toString() {
             return "InterfaceData{" +
-                    "mac='" + mac + '\'' +
-                    ", broadcast=" + broadcast +
+                    "broadcast=" + broadcast +
                     ", ip='" + ip + '\'' +
                     '}';
         }
