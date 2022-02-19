@@ -75,7 +75,6 @@ public class FingerprintService extends Service {
                 startForeground(ONGOING_NOTIFICATION_ID, notification);
             }
             startScanning(intent);
-
             return START_STICKY;
         }
         return START_NOT_STICKY;
@@ -94,6 +93,10 @@ public class FingerprintService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceiver(wifiReceiver);
+        Log.d(TAG,"Close socket");
+        try {
+            socket.close();
+        } catch (IOException e) {}
         super.onDestroy();
     }
 
@@ -114,7 +117,7 @@ public class FingerprintService extends Service {
                 socket = new Socket(serverAddress, socketPort);
                 dOut = new DataOutputStream(socket.getOutputStream());
                 dIn = new DataInputStream(socket.getInputStream());
-                dOut.writeUTF(gson.toJson(new MsgHello(0, intent.getStringExtra(MainActivity.MAC_HOST))));
+                dOut.writeUTF(gson.toJson(new MsgHello(0, intent.getStringExtra(MainActivity.ID_HOST))));
                 String json = dIn.readUTF();
                 msgHelloBack = gson.fromJson(json, MsgHelloBack.class);
             } catch (IOException e) {
@@ -130,8 +133,10 @@ public class FingerprintService extends Service {
                 sendUrlToMainActivity(url);
             }
 
-            if( socket == null)
+            if( socket == null) {
+                Log.e(TAG, "Socket NULL");
                 return;
+            }
 
             Log.d(TAG,"Fingerprint service: RUNNING");
             //send this through the socket
@@ -165,10 +170,12 @@ public class FingerprintService extends Service {
                         }
                         dOut.flush();
                     } else {
+                        Log.e(TAG, "NOT STARTED SCAN");
                         sleep(500);
                     }
                 } catch ( IOException e) {
                     Log.e(TAG,"Disconnected");
+                    e.printStackTrace();
                     break;
                 }
             }

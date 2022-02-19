@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.services.FingerprintService;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String SEND_WEB_SERVER_URL = "sendWebServerUrl";
     public static final String SERVER_ADDRESS = "serverAddress";
-    public static final String MAC_HOST = "macHost";
+    public static final String ID_HOST = "idHost";
     public static final String WEB_SERVER_PORT = "webServerPort";
     public static final String WEB_MUSIC_PORT = "webMusicPort";
     public static final String SOCKET_PORT = "socketPort";
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private View chooseView;
     private Button button_speakaer;
     private Button button_client;
+    private String id;
 
     private boolean permissionGranted;
 
@@ -82,6 +85,16 @@ public class MainActivity extends AppCompatActivity {
                 main(true);
             }
         });
+
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        this.id = sharedPref.getString("ID", null);
+        if(this.id == null) {
+            String uniqueID = UUID.randomUUID().toString();
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("ID", uniqueID);
+            editor.apply();
+        }
+
     }
 
     @Override
@@ -194,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
                 if(isClient) {
                     // Start fingerprint service
                     startFingerprintService(discoveryService.getServerAddress().getHostAddress(),
-                            discoveryService.getMac(),
                             discoveryService.getWebServerPort(),
                             discoveryService.getMusicServerPort(),
                             discoveryService.getFingerprintPort());
@@ -206,16 +218,17 @@ public class MainActivity extends AppCompatActivity {
                     updateWebView(url);
                 }
             } else {
-                Toast.makeText(this, "Unable to contact server", Toast.LENGTH_SHORT).show();
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Unable to contact server", Toast.LENGTH_SHORT).show());
             }
         }).start();
     }
 
-    public void startFingerprintService(String serverAddress, String mac, int webServerPort, int webMusicPort, int socketPort) {
+    public void startFingerprintService(String serverAddress, int webServerPort, int webMusicPort, int socketPort) {
         Intent intent = new Intent(this, FingerprintService.class);
         intent.setAction(FingerprintService.ACTION_START);
         intent.putExtra(SERVER_ADDRESS, serverAddress);
-        intent.putExtra(MAC_HOST, mac);
+        intent.putExtra(ID_HOST, this.id);
         intent.putExtra(WEB_SERVER_PORT, webServerPort);
         intent.putExtra(WEB_MUSIC_PORT, webMusicPort);
         intent.putExtra(SOCKET_PORT, socketPort);
@@ -228,8 +241,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void stopFingerprintService(){
-        Intent intent = new Intent(this, FingerprintService.class);
-        stopService(intent);
+        Intent intent2 = new Intent(this, FingerprintService.class);
+        stopService(intent2);
     }
 
 }
