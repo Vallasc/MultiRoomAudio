@@ -45,10 +45,7 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         for(int j = 0; j < roomErr.length; j++)
             roomErr[j] = Math.sqrt(roomErr[j]);
         Arrays.sort(roomErr);
-        /*System.out.println("ERRORS:");
-        for(int j = 0; j < roomErr.length; j++)
-            System.out.println("\t" + roomErr[j]);*/
-        //System.out.println(r.getId() + " Min: " + roomErr[0]);
+        printResults(r, roomErr);
         return roomErr[0];
     }
 
@@ -77,5 +74,12 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         }
         System.out.println("Room: " + roomId);
         return roomId;
-    }   
+    }  
+    
+    protected void printResults(Room r, double[] roomErr) {
+        System.out.println("ERRORS:");
+        for(int j = 0; j < roomErr.length; j++)
+            System.out.println("\t" + roomErr[j]);
+        System.out.println(r.getId() + " Min: " + roomErr[0]);
+    }
 }
