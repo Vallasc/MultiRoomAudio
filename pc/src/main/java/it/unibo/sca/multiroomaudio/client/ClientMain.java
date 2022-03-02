@@ -54,7 +54,9 @@ public class ClientMain {
                     try {
                         Thread.sleep(2000);
                         Desktop.getDesktop().browse(uri);
-                    } catch (IOException | InterruptedException | UnsupportedOperationException e) {}
+                    } catch (IOException | InterruptedException | UnsupportedOperationException e) {
+                        System.err.println("Unsupported desktop environment");
+                    }
                 }
             } catch (URISyntaxException e) {}
     
