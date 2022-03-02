@@ -4,6 +4,7 @@ public class ScanResult implements Comparable<ScanResult> {
     private final String BSSID;
     private final String SSID;
     private final double signal;//mean
+    private final double stddev;//standard deviation
     private final double frequency;
     private final long timestamp;
 
@@ -13,14 +14,16 @@ public class ScanResult implements Comparable<ScanResult> {
         this.signal = signal;
         this.frequency = frequency;
         this.timestamp = timestamp;
+        this.stddev = 0d;
     }
 
-    public ScanResult(String BSSID, String SSID, double signal, double variance, double frequency, long timestamp) {
+    public ScanResult(String BSSID, String SSID, double signal, double stddev, double frequency, long timestamp) {
         this.BSSID = BSSID;
         this.SSID = SSID;
         this.signal = signal;
         this.frequency = frequency;
         this.timestamp = timestamp;
+        this.stddev = stddev;
     }
 
     public long getTimestamp() {
@@ -33,6 +36,10 @@ public class ScanResult implements Comparable<ScanResult> {
 
     public double getSignal() {
         return signal;
+    }
+
+    public double getStddev(){
+        return stddev;
     }
 
     public String getBSSID() {

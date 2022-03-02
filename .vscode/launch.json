@@ -50,7 +50,7 @@
             "request": "launch",
             "mainClass": "it.unibo.sca.multiroomaudio.server.ServerMain",
             "projectName": "multi_room_audio_client",
-            "args": "/home/francesco/Musica"
+            "args": "E:\\francesco\\music"
         },
         {
             "type": "java",

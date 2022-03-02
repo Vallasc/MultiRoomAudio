@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
@@ -21,14 +23,14 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         return Math.pow(x - mu, 2);
     }
 
-    private double roomError(Room r, ScanResult[] onlines){
+    private double[] roomError(Room r, ScanResult[] onlines){
         
         if(onlines == null){
-            return -1d;
+            return null;
         }
 
         if(r.getNScan() == 0)
-            return -1d;
+            return null;
         double[] roomErr = new double[r.getNScan()];
         Arrays.fill(roomErr, 0);
 
@@ -45,15 +47,12 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         for(int j = 0; j < roomErr.length; j++)
             roomErr[j] = Math.sqrt(roomErr[j]);
         Arrays.sort(roomErr);
-        /*System.out.println("ERRORS:");
-        for(int j = 0; j < roomErr.length; j++)
-            System.out.println("\t" + roomErr[j]);*/
-        //System.out.println(r.getId() + " Min: " + roomErr[0]);
-        return roomErr[0];
+        
+        return roomErr;
     }
 
     @Override
-    public String findRoomKey() {
+    public ImmutablePair<String, double[]> findRoomKey() {
 
         List<Room> rooms = dbm.getClientRooms(client.getId());
         if(rooms == null){
@@ -66,16 +65,21 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         }
         String roomId = null;
         double min = MAX_VALUE;
+        double[] appArrRet = null;
         ScanResult[] onlines = client.getFingerprints();
         for(Room room : rooms) {
-                double app = roomError(room, onlines);
+            double[] appArr = roomError(room, onlines);
+            if(appArr != null){
+                double app = appArr[0];
                 if(app == -1d) return null;
                 if(min>app){
                     min = app;
-                    roomId = room.getId();   
+                    roomId = room.getId(); 
+                    appArrRet = appArr;  
                 }
+            }
         }
         System.out.println("Room: " + roomId);
-        return roomId;
+        return new ImmutablePair<String, double[]>(roomId, appArrRet);
     }   
 }

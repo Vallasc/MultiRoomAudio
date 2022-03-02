@@ -2,10 +2,10 @@ package it.unibo.sca.multiroomaudio.server.localization_algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
@@ -20,13 +20,9 @@ public class Bayes extends FingerprintAnalyzer{
         super(speakerManager, client, dbm);
     }
 
-    private double compute(double x, double mu, double variance){
-        double den = Math.sqrt(variance*2*Math.PI);
-        return (1/den) *  
-                    Math.pow(Math.E, 
-                        (-Math.pow(x - mu, 2) /
-                        (2*variance))
-                );
+    private double compute(double x, double mu, double stddev){
+        double exponent = Math.pow(Math.E, -Math.pow((x-mu), 2)/2*Math.pow(stddev, 2));
+        return (1/Math.sqrt(2*Math.PI*stddev))*exponent;
     }
 
     //maybe i should aggregate the different ap for each rp and these are the values of mean and variance
@@ -66,30 +62,20 @@ public class Bayes extends FingerprintAnalyzer{
         return variance;
     }
 
-    private double roomError(Room r, ScanResult[] onlines){
+    /*private double[] roomError(Room r, ScanResult[] onlines){
         
         if(onlines == null){
-            return -1d;
+            return null;
         }
         int nScan = r.getNScan();
         if(nScan == 0){
-            return -1d;
+            return null;
         }
         
         ConcurrentHashMap<String, List<ScanResult>> fingerprints = r.getFingerprints();
         List<Double> means = aggregateMean(r, fingerprints);
         List<Double> variance = aggregateVariance(r, means, fingerprints);
-        
-        /*System.out.println("means : ");
-        for(double mean: means){
-            System.out.println("\t" + mean);
-        }
-
-        System.out.println("variance : ");
-        for(double var: variance){
-            System.out.println("\t" + var);
-        }*/
-
+   
         double[] prob = new double[nScan];
         Arrays.fill(prob, 1);
 
@@ -98,17 +84,37 @@ public class Bayes extends FingerprintAnalyzer{
                 prob[i] *=  compute(online.getSignal(), means.get(i), variance.get(i));
             }
         }
-        //System.out.println("Probabilities for " + r.getId() + ": ");
-        /*for(int i = 0; i < prob.length; i++){
-            System.out.println("\t" + prob[i]);
-        }*/
         Arrays.sort(prob);
 
-        return prob[prob.length - 1];
+        //return prob[prob.length - 1];
+        return prob;
+    }*/
+    private double[] roomError(Room r, ScanResult[] onlines){
+        if(onlines == null){
+            return null;
+        }
+        int nScan = r.getNScan();
+        if(nScan == 0){
+            return null;
+        }
+        
+        double[] prob = new double[nScan];
+        Arrays.fill(prob, 0);
+
+        for(ScanResult online : onlines){
+            ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
+            if(offlines != null){
+                for(int i = 0; i < offlines.size(); i++){
+                    prob[i] += compute(online.getSignal(), offlines.get(i).getSignal(), offlines.get(i).getStddev());
+                }
+            }
+        }
+
+        return prob;
     }
 
     @Override
-    public String findRoomKey() {
+    public ImmutablePair<String, double[]> findRoomKey() {
 
         List<Room> rooms = dbm.getClientRooms(client.getId());
         if(rooms == null){
@@ -123,19 +129,26 @@ public class Bayes extends FingerprintAnalyzer{
         ScanResult[] onlines = client.getFingerprints();
 
         Room room = rooms.get(0);
-        double max = roomError(room, onlines);
-        if(max == -1d) return null;
+        double[] appArrRet = roomError(room, onlines);
+        if(appArrRet == null) return null;
+
+        double max = appArrRet[room.getNScan()-1];
         roomId = room.getId();
+        
         for(int i = 1; i<rooms.size(); i++){
             room = rooms.get(i);
-            double app = roomError(room, onlines);
-            if(app == -1d) return null;
-            if(app > max){
-                max = app;
-                roomId = room.getId();
+            double[] appArr = roomError(room, onlines);
+            if(appArr != null){
+                double app = roomError(room, onlines)[room.getNScan()-1];
+                if(app == -1d) return null;
+                if(app > max){
+                    max = app;
+                    roomId = room.getId();
+                    appArrRet = appArr;
+                }
             }
         }   
-        return roomId;
+        return new ImmutablePair<String, double[]>(roomId, appArrRet);
     }   
     
 }
