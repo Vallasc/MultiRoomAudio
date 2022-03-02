@@ -24,7 +24,7 @@ public class SpeakerMain {
                 try {
                     Desktop.getDesktop().browse(uri);
                 } catch (Exception e) {
-                    it.unibo.sca.multiroomaudio.utils.Desktop.browse(uri);
+                    System.err.println("Unsupported desktop environment");
                 }
             }
         } catch (URISyntaxException e1) {}

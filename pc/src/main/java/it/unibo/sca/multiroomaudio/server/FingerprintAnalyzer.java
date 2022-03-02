@@ -81,6 +81,8 @@ public abstract class FingerprintAnalyzer extends Thread {
                 prevErrArr = errArr;
                 prevRoomKey = roomkey;
             }
+            
+            sleep(2000);
         }
         System.out.println("STOP FINGERPRINT ANALYZER: " + client.getId());
     }
@@ -90,4 +92,11 @@ public abstract class FingerprintAnalyzer extends Thread {
         this.stopped = true;
     }
     
+    public void sleep(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

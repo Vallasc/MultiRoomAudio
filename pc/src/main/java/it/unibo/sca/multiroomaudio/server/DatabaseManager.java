@@ -13,7 +13,6 @@ import org.eclipse.jetty.websocket.api.Session;
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
-import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanRoomDone;
 import it.unibo.sca.multiroomaudio.shared.model.*;
 

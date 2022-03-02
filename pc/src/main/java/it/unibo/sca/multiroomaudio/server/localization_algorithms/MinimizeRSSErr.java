@@ -49,6 +49,7 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         Arrays.sort(roomErr);
         
         return roomErr;
+
     }
 
     @Override
@@ -82,4 +83,11 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         System.out.println("Room: " + roomId);
         return new ImmutablePair<String, double[]>(roomId, appArrRet);
     }   
+    
+    protected void printResults(Room r, double[] roomErr) {
+        System.out.println("ERRORS:");
+        for(int j = 0; j < roomErr.length; j++)
+            System.out.println("\t" + roomErr[j]);
+        System.out.println(r.getId() + " Min: " + roomErr[0]);
+    }
 }
