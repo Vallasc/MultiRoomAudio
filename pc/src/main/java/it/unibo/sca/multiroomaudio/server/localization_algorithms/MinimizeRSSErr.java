@@ -80,7 +80,6 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
                 }
             }
         }
-        System.out.println("Room: " + roomId);
         return new ImmutablePair<String, double[]>(roomId, appArrRet);
     }   
     
