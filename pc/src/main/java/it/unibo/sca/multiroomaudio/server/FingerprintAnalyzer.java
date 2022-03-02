@@ -1,10 +1,9 @@
 package it.unibo.sca.multiroomaudio.server;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
@@ -13,9 +12,9 @@ public abstract class FingerprintAnalyzer extends Thread {
     private static final double ALPHA = 24;
     protected static final int MIN_STRENGTH = -80;
     protected static final int MAX_VALUE = 15000;
-
     protected final Client client;
     protected final DatabaseManager dbm;
+    protected HashMap<String, double[]> result = new HashMap<String, double[]>();
     private SpeakerManager speakerManager;
     private boolean stopped;
 
@@ -34,55 +33,55 @@ public abstract class FingerprintAnalyzer extends Thread {
         return Math.exp(inputSignal/ALPHA) / Math.exp(-MIN_STRENGTH/ALPHA);
     }
 
-    abstract public ImmutablePair<String, double[]> findRoomKey();//in case of max n returns max, in case of euclidean returns the min error for each ap
-    public void printDebug(String room, double[] errors){
-        System.out.println("ERRORS:");
-        for(int j = 0; j < errors.length; j++)
-            System.out.println("\t" + errors[j]);
-        System.out.println(room + " Min: " + errors[0]);
+    protected void printResult(String s){
+        if(this.result.isEmpty()) return;
+        System.out.println("Printing from " + s + " code");
+        for(String key : result.keySet()){
+            System.out.println("room: " + key);
+            double[] arr = result.get(key);
+            for(int i = 0; i < arr.length; i++){
+                System.out.println("\t" + arr[i]);
+            }
+        }
     }
+
+    protected void setResult(String k, double[] arr){
+        result.put(k, arr);
+    }
+
+    abstract public String findRoomKey();//in case of max n returns max, in case of euclidean returns the min error for each ap
 
     @Override
     public void run(){
         String prevRoomKey = null;
-        double[] prevErrArr = null;
         System.out.println("START FINGERPRINT ANALYZER: " + client.getId());
         while(!this.stopped){
-            ImmutablePair<String, double[]> result = findRoomKey();
-            if(result == null){
-                continue;
-            }
-            String roomkey = result.getLeft();
-            double[] errArr = result.getRight();
+            String roomkey = findRoomKey();
             if(roomkey == null){
                 continue;
             }
             List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
-            if(speakers == null || speakers.size() == 0){
+            
+            if(prevRoomKey == null && roomkey != null){
+                if(speakers != null && speakers.size() != 0){ 
+                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                    speakerManager.updateAudioState();
+                }
+                prevRoomKey = roomkey;
+                this.printResult("prevRoomKey null");
                 continue;
             }
-            if(prevRoomKey == null){
-                //System.out.println("PrevRoomKey is null, ROOMKEY: " + roomkey);
-                speakers.forEach(speaker -> speaker.incNumberNowPlaying());
-                speakerManager.updateAudioState();
-                prevRoomKey = roomkey;
-                prevErrArr = errArr;
-                printDebug(roomkey, errArr);
-            }
             if(!prevRoomKey.equals(roomkey)){
-               // System.out.println("PrevRoomKey is not null, ROOMKEY: " + roomkey + " PREV: " + prevRoomKey);
                 List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(client.getId(), prevRoomKey);
                 if(prevspeakers != null)
                     prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
-                speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                if(speakers != null && speakers.size() != 0){ 
+                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                }
                 speakerManager.updateAudioState();
-                printDebug(prevRoomKey, prevErrArr);
-                printDebug(roomkey, errArr);
-                prevErrArr = errArr;
                 prevRoomKey = roomkey;
+                this.printResult("prevRoomKey exist");
             }
-            
-            sleep(2000);
         }
         System.out.println("STOP FINGERPRINT ANALYZER: " + client.getId());
     }

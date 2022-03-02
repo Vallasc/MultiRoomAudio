@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
-    public static final int SCANS_FOR_EACH_POSITION = 4;
+    public static final int SCANS_FOR_EACH_POSITION = 10;
     public static final int MAX_POSITION = 10;
     private final String id;
     private final ConcurrentHashMap<String, List<ScanResult>> fingerprints;//<bssid, 
