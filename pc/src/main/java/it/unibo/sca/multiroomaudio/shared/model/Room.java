@@ -9,21 +9,16 @@ public class Room {
     public static final int SCANS_FOR_EACH_POSITION = 10;
     public static final int MAX_POSITION = 10;
     private final String id;
-    private final ConcurrentHashMap<String, List<ScanResult>> fingerprints;//<bssid, 
+    private final ConcurrentHashMap<String, List<ScanResult>> fingerprints; //<bssid, 
     private int nscan; // index scan position
     private transient final ArrayList<Speaker> speakerList;
+    private String urlEnter = "";
+    private String urlLeave = "";
 
     public Room(String id){
         this.id = id;
         this.nscan = 0;
         this.fingerprints = new ConcurrentHashMap<>();
-        this.speakerList = new ArrayList<>();
-    }
-
-    public Room(String id, ConcurrentHashMap<String, List<ScanResult>> fingerprints) {
-        this.nscan = 0;
-        this.id = id;
-        this.fingerprints = fingerprints;
         this.speakerList = new ArrayList<>();
     }
 
@@ -38,11 +33,8 @@ public class Room {
         return id;
     }
 
-    public int getFingerprintsSize(){
-        return fingerprints.values()
-                        .stream()
-                        .map((scan) -> scan.size())
-                        .reduce(0, (tot, element) -> tot + element);
+    public int getFingerprintsAPSize(){
+        return fingerprints.size();
     }
 
     public void putClientFingerprints(ScanResult result){
@@ -101,6 +93,22 @@ public class Room {
 
     public ArrayList<Speaker> getSpeakerList() {
         return speakerList;
+    }
+
+    public String getUrlLeave() {
+        return urlLeave;
+    }
+
+    public void setUrlLeave(String urlLeave) {
+        this.urlLeave = urlLeave;
+    }
+
+    public String getUrlEnter() {
+        return urlEnter;
+    }
+
+    public void setUrlEnter(String urlEnter) {
+        this.urlEnter = urlEnter;
     }
 
     @Override
