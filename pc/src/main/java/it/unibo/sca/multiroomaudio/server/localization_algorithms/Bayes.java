@@ -84,13 +84,10 @@ public class Bayes extends FingerprintAnalyzer{
                 prob[i] *=  compute(online.getSignal(), means.get(i), variance.get(i));
             }
         }
-<<<<<<< HEAD
-=======
         System.out.println("Probabilities for " + r.getId() + ": ");
         for(int i = 0; i < prob.length; i++){
             System.out.println("\t" + prob[i]);
         }
->>>>>>> 4496e56b969e2970bad8b672fcb97220e02768c6
         Arrays.sort(prob);
 
         //return prob[prob.length - 1];
