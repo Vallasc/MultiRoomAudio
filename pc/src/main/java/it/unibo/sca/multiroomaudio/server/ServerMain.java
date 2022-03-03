@@ -68,7 +68,7 @@ public class ServerMain {
         String musicHttpLocation = "E:\\francesco\\music";
         //String musicHttpLocation = "C:\\Users\\giaco\\Music";
         //String musicHttpLocation = "/home/vallasc/Musica";
-        String filepath = "E:\\francesco\\UNI\\SCA\\MultiRoomAudio\\pc\\db";
+        String filepath = "./db";
         int i = 0;
         boolean flagResume = false;
         DatabaseManager dbm = new DatabaseManager();
