@@ -27,11 +27,11 @@ public class Room {
         this.speakerList = new ArrayList<>();
     }
 
-    public Room(String id, ConcurrentHashMap<String, List<ScanResult>> fingerprints, ArrayList<Speaker> speakerList, int nscan){
+    public Room(String id, ConcurrentHashMap<String, List<ScanResult>> fingerprints, int nscan){
         this.nscan = nscan;
         this.id = id;
         this.fingerprints = fingerprints;
-        this.speakerList = speakerList;
+        this.speakerList = new ArrayList<>();
     }
     
     public String getId(){

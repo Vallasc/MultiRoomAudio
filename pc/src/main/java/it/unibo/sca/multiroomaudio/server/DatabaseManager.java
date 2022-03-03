@@ -312,9 +312,8 @@ public class DatabaseManager {
                     List<ScanResult> result = gson.fromJson(fingerprintsArr, scanType);
                     fingerprints.put(bssid, result);
                 }
-                ArrayList<Speaker> speakerList = gson.fromJson(roomObj.get("speakerList").getAsJsonArray(), speakerType);
                 int nscan = roomObj.get("nscan").getAsInt();
-                Room room = new Room(roomId, fingerprints, speakerList, nscan);
+                Room room = new Room(roomId, fingerprints, nscan);
                 this.clientRooms.get(clientId).put(roomId, room);
             }
         }
