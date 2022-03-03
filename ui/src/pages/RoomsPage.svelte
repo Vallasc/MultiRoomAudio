@@ -102,6 +102,7 @@
             if(value.trim()){
                 value = value.substring(0, 15)
                 console.log("New room: " + value)
+                setRoom(value)
                 startMisuration(value)
             } else {
                 dialogInsertRoomName()
@@ -112,7 +113,6 @@
     let currentRoomId = ""
     let walkAnimationComponent;
     function startMisuration(roomId) {
-        setRoom(roomId)
         f7.dialog.confirm(
             "Do you want to start scanning "+ roomId + "?",
             "Multiroom Audio",
