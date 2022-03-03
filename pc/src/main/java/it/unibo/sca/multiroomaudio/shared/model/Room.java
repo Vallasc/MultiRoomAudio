@@ -11,7 +11,7 @@ public class Room {
     private final String id;
     private final ConcurrentHashMap<String, List<ScanResult>> fingerprints;//<bssid, 
     private int nscan; // index scan position
-    private final ArrayList<Speaker> speakerList;
+    private transient final ArrayList<Speaker> speakerList;
 
     public Room(String id){
         this.id = id;
