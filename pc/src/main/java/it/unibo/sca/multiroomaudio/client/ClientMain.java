@@ -3,12 +3,7 @@ package it.unibo.sca.multiroomaudio.client;
 import java.awt.Desktop;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,29 +11,12 @@ import java.util.UUID;
 import java.util.prefs.Preferences;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 
 public class ClientMain {
 
-    static class ShutDownHandler extends Thread {
-        private final String id;
-        public ShutDownHandler(String id){
-            this.id = id;
-        }
-        public void run() {
-            try (Writer writer = new FileWriter(".\\pc\\src\\main\\java\\it\\unibo\\sca\\multiroomaudio\\client\\id.json")) {
-                Gson gson = new GsonBuilder().create();
-                gson.toJson(this.id, writer);
-            }catch(IOException e){
-                System.err.println("error while serializing the devices file");
-                e.printStackTrace();
-            }
-        }
-    }
     public static void main(String[] args) {
         
         // Find ip and port with broadcast
@@ -65,16 +43,9 @@ public class ClientMain {
 
         if(!msg.isRejected()) {
             (new FingerprintService(socket)).start();
-            try {
-                JsonReader reader = new JsonReader(new FileReader(".\\pc\\src\\main\\java\\it\\unibo\\sca\\multiroomaudio\\client\\id.json"));
-                id = gson.fromJson(reader, String.class);
-            } catch (FileNotFoundException e1) {};
-
             if(id == null)
                 id =  msg.getClientId();
-            System.out.println(id);
-            Runtime.getRuntime().addShutdownHook(new ShutDownHandler(id));
-
+            System.out.println("ID: " + id);
             int wPort = discoverService.getWebServerPort();
             int mPort = discoverService.getMusicServerPort();
             String uriString = "http://" + discoverService.getServerAddress().getHostAddress() + ":" + wPort
