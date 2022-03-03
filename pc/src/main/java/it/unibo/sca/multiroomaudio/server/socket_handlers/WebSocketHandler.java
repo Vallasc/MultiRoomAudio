@@ -19,6 +19,7 @@ import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgCreateRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgRoomURL;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgRooms;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanRoom;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
@@ -63,62 +64,81 @@ public class WebSocketHandler {
             dbm.addConnectedWebDevice(session, msg);
             System.out.println("DEVICE [" + msg.getId() + "]: connected");
             speakerManager.updateSpeakerList();
-            if(msg.getDeviceType() == 0){ // new Client
+            speakerManager.updateAudioState();
+            if(msg.getDeviceType() == 0){ // Client
                 sendMessage(session, new MsgRooms(dbm.getClientRooms(msg.getId())));
             }
-        } else{ 
+        } else { 
             Device connected = dbm.getConnectedWebDevice(session);
             if(connected != null && connected instanceof Client) {
                 Client client = (Client)dbm.getDevice(connected.getId());
-                if( msgType.equals("PLAY") ){ // Client want to play
-                    //start sending fingerprints again
-                    MsgPlay msg = gson.fromJson(message, MsgPlay.class);
-                    System.out.println("DEBUG: Start play");
-                    musicManager.playSong(msg.getSongId(), msg.getFromTimeSec());
-                } else if( msgType.equals("PAUSE") ){ // Client want to pause
-                    System.out.println("DEBUG: Stop play");
-                    musicManager.pauseCurrentSong();
-                } else if( msgType.equals("STOP") ){ // Client want to stop
-                    System.out.println("DEBUG: pause play");
-                    musicManager.stopCurrentSong();
-                } else if( msgType.equals("NEXT") ){ // Client want next song
-                    musicManager.nextSong();
-                } else if( msgType.equals("PREV") ){ // Client want prev song
-                    musicManager.prevSong();
-                } else if( msgType.equals("ROOMS_REQUEST")){
-                    List<Room> rooms = dbm.getClientRooms(connected.getId());
-                    if(rooms != null)
-                        sendMessage(session, new MsgRooms(rooms));
-                    else
-                        sendMessage(session, new MsgRooms(new ArrayList<Room>()));
-                } else if( msgType.equals("CREATE_ROOM")){
-                    MsgCreateRoom msg = gson.fromJson(message, MsgCreateRoom.class);
-                    dbm.deleteClientRoom(connected.getId(), msg.getRoomId());
-                    dbm.setClientRoom(connected.getId(), msg.getRoomId());
-                    // Update client rooms
-                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
-                } else if( msgType.equals("DELETE_ROOM")){
-                    MsgDeleteRoom msg = gson.fromJson(message, MsgDeleteRoom.class);
-                    System.out.println("DEBUG: Delete room");
-                    dbm.deleteClientRoom(connected.getId(), msg.getRoomId());
-                    // Update client rooms
-                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
-                } else if( msgType.equals("SCAN_ROOM")){
-                    MsgScanRoom msg = gson.fromJson(message, MsgScanRoom.class);
-                    if(msg.getRoomId() != null){
-                        System.out.println("DEBUG: START scan");
-                        client.setActiveRoom(msg.getRoomId().toLowerCase());
-                    } else {
-                        System.out.println("DEBUG: STOP scan");
-                        client.setActiveRoom(null);
-                    }
-                    // Update client rooms
-                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
-                } else if( msgType.equals("BIND_SPEAKER")){
-                    MsgBindSpeaker msg = gson.fromJson(message, MsgBindSpeaker.class);
-                    dbm.bindSpeaker(connected.getId(), msg.getSpeakerId(), msg.getRoomId());
-                    // Update rooms
-                    sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                switch(msgType){
+                    case "PLAY": // Client want to play
+                        //start sending fingerprints again
+                        MsgPlay msgPlay = gson.fromJson(message, MsgPlay.class);
+                        System.out.println("DEBUG: Start play");
+                        musicManager.playSong(msgPlay.getSongId(), msgPlay.getFromTimeSec());
+                        break;
+                    case "PAUSE": // Client want to pause
+                        System.out.println("DEBUG: Stop play");
+                        musicManager.pauseCurrentSong();
+                        break;
+                    case "STOP": // Client want to stop
+                        System.out.println("DEBUG: pause play");
+                        musicManager.stopCurrentSong();
+                        break;
+                    case "NEXT": // Client want next song
+                        musicManager.nextSong();
+                        break;
+                    case "PREV": // Client want prev song
+                        musicManager.prevSong();
+                        break;
+                    case "ROOMS_REQUEST":
+                        List<Room> rooms = dbm.getClientRooms(connected.getId());
+                        if(rooms != null)
+                            sendMessage(session, new MsgRooms(rooms));
+                        else
+                            sendMessage(session, new MsgRooms(new ArrayList<Room>()));
+                        break;
+                    case "CREATE_ROOM":
+                        MsgCreateRoom msgCreateRoom = gson.fromJson(message, MsgCreateRoom.class);
+                        dbm.deleteClientRoom(connected.getId(), msgCreateRoom.getRoomId());
+                        dbm.setClientRoom(connected.getId(), msgCreateRoom.getRoomId());
+                        // Update client rooms
+                        sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                        break;
+                    case "DELETE_ROOM":
+                        MsgDeleteRoom msgDeleteRoom = gson.fromJson(message, MsgDeleteRoom.class);
+                        System.out.println("DEBUG: Delete room");
+                        dbm.deleteClientRoom(connected.getId(), msgDeleteRoom.getRoomId());
+                        // Update client rooms
+                        sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                        break;
+                    case "ROOM_URL":
+                        MsgRoomURL msgRoomURL = gson.fromJson(message, MsgRoomURL.class);
+                        dbm.setRoomUrls(connected.getId(), msgRoomURL.getRoomId(), 
+                                        msgRoomURL.getUrlEnter(), msgRoomURL.getUrlLeave());
+                        // Update client rooms
+                        sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                        break;
+                    case "SCAN_ROOM":
+                        MsgScanRoom msgScanRoom = gson.fromJson(message, MsgScanRoom.class);
+                        if(msgScanRoom.getRoomId() != null){
+                            System.out.println("DEBUG: START scan");
+                            client.setActiveRoom(msgScanRoom.getRoomId().toLowerCase());
+                        } else {
+                            System.out.println("DEBUG: STOP scan");
+                            client.setActiveRoom(null);
+                        }
+                        // Update client rooms
+                        sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                        break;
+                    case "BIND_SPEAKER":
+                        MsgBindSpeaker msgBindSpeaker = gson.fromJson(message, MsgBindSpeaker.class);
+                        dbm.bindSpeaker(connected.getId(), msgBindSpeaker.getSpeakerId(), msgBindSpeaker.getRoomId());
+                        // Update rooms
+                        sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                        break;
                 }
             }
         }
