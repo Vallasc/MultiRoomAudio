@@ -61,8 +61,9 @@ public class MainActivity extends AppCompatActivity {
         stopFingerprintService();
 
         webView = findViewById(R.id.webView);
-        webView.setWebViewClient(new WebViewClient());
+        //webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
         //webView.loadUrl("file:///android_asset/public/index.html");
 
         chooseView = findViewById(R.id.choose_layout);
