@@ -33,7 +33,11 @@
     })
 
     function socketSetup() {
-        $webSocket.addEventListener("message", onSocketMessage)
+        try {
+            $webSocket.addEventListener("message", onSocketMessage)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     // Socket functions
@@ -138,8 +142,37 @@
         )
         disableScan = false
         popup.instance().close()
+    }
+
+    function setRoomUrls(roomId, urlEnter, urlLeave) {
+        $webSocket.send(
+            JSON.stringify({
+                type: "ROOM_URL",
+                roomId: roomId,
+                urlEnter: urlEnter,
+                urlLeave: urlLeave
+            })
+        )
     }  
 
+    function openDialogUrls(room){
+        let dialog =  f7.dialog.create({
+            title: 'Custom webhooks',
+            text: 'Enter the URLs that will be called when you enter and leave the room.',
+            content: '<div class="dialog-input-field dialog-input-double input">' +
+                        '<input type="text" id ="enter" name="dialog-room-enter" placeholder="URL on room enter" class="dialog-input" value = "' + room.urlEnter + '">' +
+                    '</div>' +
+                    '<div class="dialog-input-field dialog-input-double input">' +
+                        '<input type="text" id="leave" name="dialog-room-leave" placeholder="URL on room leave" class="dialog-input" value = "' + room.urlLeave + '">' +
+                    '</div>',
+            buttons: [{text: 'Cancel'}, {text: 'OK'}],
+            onClick: function (dialog, index) {
+                if(index == 1){
+                    setRoomUrls(room.roomId, dialog.$el.find('#enter').val(), dialog.$el.find('#leave').val())
+                }
+            },
+        }).open();
+    }
 
 </script>
 
@@ -153,20 +186,18 @@
     {#if roomsLenght > 0}
         <List mediaList>
             {#each rooms as room}
-            <ListItem title="{room.roomId}" subtitle="{room.samples + " " +room.nscan} fingerpint{room.samples == 1 ? "" : "s"}">
+            <ListItem title="{room.roomId}" subtitle="{room.samples} AP{room.samples == 1 ? "" : "s"}, {room.nscan} fingerpint{room.nscan == 1 ? "" : "s"}">
                     <span slot="after">
+                        <Link iconMd="material:http" onClick={() => openDialogUrls(room) } />
+                        <div style="margin-left: 16px; display: inline-block;" />
                         <Link iconMd="material:radar" onClick={() => startMisuration(room.roomId)} />
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <!-- svelte-ignore a11y-missing-content -->
-                        <a style="margin-left: 16px;" />
+                        <div style="margin-left: 16px; display: inline-block;" />
                         <Link
                             iconMd="material:delete"
                             color="red"
                             onClick={() => deleteRoom(room.roomId)}
                         />
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <!-- svelte-ignore a11y-missing-content -->
-                        <a style="margin-left: 8px;" />
+                        <div style="margin-left: 16px; display: inline-block;" />
                     </span>
                 </ListItem>
             {/each}
