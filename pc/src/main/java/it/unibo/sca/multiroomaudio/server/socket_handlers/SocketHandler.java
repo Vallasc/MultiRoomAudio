@@ -45,7 +45,7 @@ public class SocketHandler extends Thread{
             MsgHello hello = gson.fromJson(json, MsgHello.class);
             clientId = hello.getId();
             if( clientId== null || (clientId!= null && dbm.isConnectedSocket(clientId))){ //already connected
-                System.out.println("Client already connected");
+                System.out.println("Client [" + clientId + "] is already connected");
                 dOut.writeUTF(gson.toJson(new MsgHelloBack(clientId, true)));
                 dOut.close();
                 return;

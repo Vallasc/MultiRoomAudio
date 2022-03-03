@@ -48,7 +48,6 @@ public class WebSocketHandler {
         }
     }
 
-    
     public void handleMessage(org.eclipse.jetty.websocket.api.Session session, String message) throws JsonSyntaxException, IOException{
 
         String msgType = gson.fromJson(message, JsonObject.class).get("type").getAsString();
