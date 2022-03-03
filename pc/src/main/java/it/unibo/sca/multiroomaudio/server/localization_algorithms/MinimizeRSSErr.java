@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
@@ -38,14 +36,16 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
             ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
             if(offlines != null){
                 for(int i = 0; i < offlines.size(); i++){
-                    roomErr[i] += compute(online.getSignal(), offlines.get(i).getSignal());
+                    if(offlines.get(i).getSignal() <= -120)
+                        roomErr[i] += compute(online.getSignal(), offlines.get(i).getSignal());
                 }
             }
         }
 
         //if mse
-        for(int j = 0; j < roomErr.length; j++)
+        for(int j = 0; j < roomErr.length; j++){
             roomErr[j] = Math.sqrt(roomErr[j]);
+        }
         Arrays.sort(roomErr);
         return roomErr[0];
 
@@ -72,6 +72,6 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
             }
         }
         return roomId;
-    }   
+    }
     
 }

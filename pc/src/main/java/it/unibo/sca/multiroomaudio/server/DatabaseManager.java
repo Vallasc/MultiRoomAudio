@@ -1,5 +1,6 @@
 package it.unibo.sca.multiroomaudio.server;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,6 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.websocket.api.Session;
@@ -40,6 +47,20 @@ public class DatabaseManager {
 
     public Device getDevice(String key){
         return devices.get(key);
+    }
+
+    public HashMap<String, Device> getDevices(){
+        HashMap<String, Device> toSave = new HashMap<>();
+        int i = 0;
+        for(String key : devices.keySet()){
+            toSave.put(i+"", devices.get(key));
+            i++;
+        }
+        return toSave;
+    }
+
+    public void setDevices(Device device){
+        this.devices.put(device.getId(), device);
     }
 
     //--------------------------------CONNECTEDWEBDEVICES----------------------------------------------------
@@ -225,8 +246,6 @@ public class DatabaseManager {
             } catch (Exception e) {}
         }
 
-        //System.out.println("CURRENT SCAN CORNER= " + room.getNScan());
-        //System.out.println("CURRENT CORNER SCAN INDEX= " + currentPositionScans);
     }
 
     // Set scans for a room
@@ -253,9 +272,9 @@ public class DatabaseManager {
         for(String key : signals.keySet()){
             //compute the mean for each set of scan
             ScanResult finalResult;
-            double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
             //save the result only if the mean for the set of scan is significative
-            if(signals.get(key).size() > 2 && mean > -70){
+            if(signals.get(key).size() > 2){
+                double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
                 double stddev = Math.sqrt(signals.get(key).stream().reduce(0d, (subtotal, element) -> subtotal + Math.pow((element - mean), 2))/(signals.get(key).size()-1));
                 finalResult = new ScanResult(key, results.get(key).getSSID(), mean, stddev, results.get(key).getFrequency(), results.get(key).getTimestamp());
                 clientRooms.get(clientId).get(roomId).putClientFingerprints(finalResult);
@@ -271,6 +290,36 @@ public class DatabaseManager {
                 clientRooms.get(clientKey).get(roomKey).printFingerprints();
             }
         }
+    }
+
+    public ConcurrentHashMap<String, ConcurrentHashMap<String, Room>> getClientRooms(){
+        return this.clientRooms;
+    }
+
+    public void putFingerprintsResume(JsonObject json){
+        Gson gson = new Gson();
+        Type scanType = new TypeToken<ArrayList<ScanResult>>(){}.getType();
+        Type speakerType = new TypeToken<ArrayList<Speaker>>(){}.getType();
+        ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
+        for(String clientId : json.keySet()){
+            JsonObject clientObj = json.get(clientId).getAsJsonObject();
+            this.clientRooms.put(clientId, new ConcurrentHashMap<>());
+            for(String roomId : clientObj.keySet()){
+                JsonObject roomObj = clientObj.get(roomId).getAsJsonObject();
+                JsonObject fingerprintsObj = roomObj.get("fingerprints").getAsJsonObject();
+                for(String bssid : fingerprintsObj.keySet()){
+                    JsonArray fingerprintsArr = fingerprintsObj.get(bssid).getAsJsonArray();
+                    List<ScanResult> result = gson.fromJson(fingerprintsArr, scanType);
+                    fingerprints.put(bssid, result);
+                }
+                ArrayList<Speaker> speakerList = gson.fromJson(roomObj.get("speakerList").getAsJsonArray(), speakerType);
+                int nscan = roomObj.get("nscan").getAsInt();
+                Room room = new Room(roomId, fingerprints, speakerList, nscan);
+                this.clientRooms.get(clientId).put(roomId, room);
+            }
+
+        }
+
     }
 
     //-------------------------------SONGS-----------------------------------------

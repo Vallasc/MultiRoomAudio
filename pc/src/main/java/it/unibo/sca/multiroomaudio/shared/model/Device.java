@@ -2,9 +2,11 @@ package it.unibo.sca.multiroomaudio.shared.model;
 
 public abstract class Device { 
     private final String id;
+    private final int type;
 
-    public Device(String id) {
+    public Device(String id, int type) {
         this.id = id;
+        this.type = type;
     }
 
     public String getId() {

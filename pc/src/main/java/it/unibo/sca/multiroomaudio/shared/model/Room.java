@@ -26,6 +26,13 @@ public class Room {
         this.fingerprints = fingerprints;
         this.speakerList = new ArrayList<>();
     }
+
+    public Room(String id, ConcurrentHashMap<String, List<ScanResult>> fingerprints, ArrayList<Speaker> speakerList, int nscan){
+        this.nscan = nscan;
+        this.id = id;
+        this.fingerprints = fingerprints;
+        this.speakerList = speakerList;
+    }
     
     public String getId(){
         return id;
@@ -59,13 +66,6 @@ public class Room {
                 }
             list.add(nscan-1, result);
         }
-        /*if(nscan == 1){
-            //System.out.println(result.getBSSID());
-            list = fingerprints.get(result.getBSSID());
-            for(ScanResult r : list){
-                System.out.println("\t" + r.getSignal());
-            }
-        }*/
     }
 
     public ArrayList<ScanResult> getFingerprints(String bssid){

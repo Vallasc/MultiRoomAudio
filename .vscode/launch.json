@@ -50,7 +50,7 @@
             "request": "launch",
             "mainClass": "it.unibo.sca.multiroomaudio.server.ServerMain",
             "projectName": "multi_room_audio_client",
-            "args": "E:\\francesco\\music"
+            "args": ["-m", "E:\\francesco\\music", "-f", "E:\\francesco\\UNI\\SCA\\MultiRoomAudio\\pc\\db", "-r"]
         },
         {
             "type": "java",
