@@ -12,18 +12,20 @@ public class Client extends Device {
 
     private final String ip;
     private final String mac;
-    private ScanResult[] fingerprints;
+    private transient ScanResult[] fingerprints;
     //is true if start is clicked, false otherwise
-    private SharedState state = new SharedState();
+    private transient SharedState state;
 
     public Client(int type, String mac, String ip) {
-        super(mac);
+        super(mac, 0);
         this.mac = mac;
         this.ip = ip;
+        this.state = new SharedState();
     }
 
     public Client(String id) {
-        super(id);
+        super(id, 0);
+        this.state = new SharedState();
         this.ip = null;
         this.mac = null;
     }

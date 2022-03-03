@@ -2,6 +2,7 @@ target
 bin
 lib
 out
+db
 .vscode
 .settings
 .project

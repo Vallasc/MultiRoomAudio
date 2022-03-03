@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
@@ -23,14 +21,14 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         return Math.pow(x - mu, 2);
     }
 
-    private double[] roomError(Room r, ScanResult[] onlines){
+    private double roomError(Room r, ScanResult[] onlines){
         
         if(onlines == null){
-            return null;
+            return -1d;
         }
 
         if(r.getNScan() == 0)
-            return null;
+            return -1d;
         double[] roomErr = new double[r.getNScan()];
         Arrays.fill(roomErr, 0);
 
@@ -38,55 +36,42 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
             ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
             if(offlines != null){
                 for(int i = 0; i < offlines.size(); i++){
-                    roomErr[i] += compute(online.getSignal(), offlines.get(i).getSignal());
+                    if(offlines.get(i).getSignal() <= -120)
+                        roomErr[i] += compute(online.getSignal(), offlines.get(i).getSignal());
                 }
             }
         }
 
         //if mse
-        for(int j = 0; j < roomErr.length; j++)
+        for(int j = 0; j < roomErr.length; j++){
             roomErr[j] = Math.sqrt(roomErr[j]);
+        }
         Arrays.sort(roomErr);
-        
-        return roomErr;
+        return roomErr[0];
 
     }
 
     @Override
-    public ImmutablePair<String, double[]> findRoomKey() {
-
+    public String findRoomKey() {
         List<Room> rooms = dbm.getClientRooms(client.getId());
         if(rooms == null){
-            System.out.println("rooms is null");
             return null;
         } 
-        if(rooms.size()<=0) {
-            System.out.println("rooms is empty");
+        if(rooms.size() <= 0) {
             return null;
         }
         String roomId = null;
         double min = MAX_VALUE;
-        double[] appArrRet = null;
         ScanResult[] onlines = client.getFingerprints();
         for(Room room : rooms) {
-            double[] appArr = roomError(room, onlines);
-            if(appArr != null){
-                double app = appArr[0];
-                if(app == -1d) return null;
-                if(min>app){
-                    min = app;
-                    roomId = room.getId(); 
-                    appArrRet = appArr;  
-                }
+            double app = roomError(room, onlines);
+            if(app == -1d) return null;
+            if(min>app){
+                min = app;
+                roomId = room.getId(); 
             }
         }
-        return new ImmutablePair<String, double[]>(roomId, appArrRet);
-    }   
-    
-    protected void printResults(Room r, double[] roomErr) {
-        System.out.println("ERRORS:");
-        for(int j = 0; j < roomErr.length; j++)
-            System.out.println("\t" + roomErr[j]);
-        System.out.println(r.getId() + " Min: " + roomErr[0]);
+        return roomId;
     }
+    
 }

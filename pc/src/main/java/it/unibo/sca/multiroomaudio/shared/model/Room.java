@@ -6,12 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
-    public static final int SCANS_FOR_EACH_POSITION = 4;
+    public static final int SCANS_FOR_EACH_POSITION = 10;
     public static final int MAX_POSITION = 10;
     private final String id;
     private final ConcurrentHashMap<String, List<ScanResult>> fingerprints;//<bssid, 
     private int nscan; // index scan position
-    private final ArrayList<Speaker> speakerList;
+    private transient final ArrayList<Speaker> speakerList;
 
     public Room(String id){
         this.id = id;
@@ -22,6 +22,13 @@ public class Room {
 
     public Room(String id, ConcurrentHashMap<String, List<ScanResult>> fingerprints) {
         this.nscan = 0;
+        this.id = id;
+        this.fingerprints = fingerprints;
+        this.speakerList = new ArrayList<>();
+    }
+
+    public Room(String id, ConcurrentHashMap<String, List<ScanResult>> fingerprints, int nscan){
+        this.nscan = nscan;
         this.id = id;
         this.fingerprints = fingerprints;
         this.speakerList = new ArrayList<>();
@@ -59,13 +66,6 @@ public class Room {
                 }
             list.add(nscan-1, result);
         }
-        /*if(nscan == 1){
-            //System.out.println(result.getBSSID());
-            list = fingerprints.get(result.getBSSID());
-            for(ScanResult r : list){
-                System.out.println("\t" + r.getSignal());
-            }
-        }*/
     }
 
     public ArrayList<ScanResult> getFingerprints(String bssid){
