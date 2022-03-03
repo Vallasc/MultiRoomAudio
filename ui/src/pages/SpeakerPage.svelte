@@ -22,7 +22,7 @@
         f7ready(() => {
             loadId()
             loadName()
-            dialogInsertName()
+            setTimeout( () => dialogInsertName(), 1000)
         })
     })
 

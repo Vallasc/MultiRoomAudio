@@ -35,7 +35,7 @@
 
     onMount(() => {
         fetchSongs()
-        socketSetup()
+        setTimeout( () => socketSetup(), 1000)
     })
 
     function alertConnectionClosed(){
@@ -56,11 +56,15 @@
             alertConnectionClosed()
         }
 
-        socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
-        socket.addEventListener("open", onSocketOpen)
-        socket.addEventListener("message", onSocketMessage)
-        socket.addEventListener("close", onSocketClose)
-        webSocket.set(socket)
+        try {
+            socket = new WebSocket("ws://" + $hostname + ":" + $webPort + "/websocket")
+            socket.addEventListener("open", onSocketOpen)
+            socket.addEventListener("message", onSocketMessage)
+            socket.addEventListener("close", onSocketClose)
+            webSocket.set(socket)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     function sendInitMessage() {
@@ -180,8 +184,6 @@
         )
     }
 
-    
-
     function stop() {
         console.log("Stop playing " + playingSong.song.title)
         socket.send(
@@ -298,8 +300,6 @@
             </div>
         </div>
     {/if}
-
-    <Block>Bella zio se ti piace il nostro lavoro mettici un bel 30 😆</Block>
     <List mediaList>
         {#each songs as song}
             {#if setLastTitleBlock(song.dirPath)}
@@ -395,8 +395,8 @@
                     </div>
                 </div>
             </div>
-            <div style="padding-left: 18px;padding-right: 18px;">
-                {#if roomsLenght > 0}
+            {#if roomsLenght > 0}
+                <div style="padding-left: 18px; padding-right: 18px;">
                     <BlockTitle>Rooms</BlockTitle>
                     <List>
                         {#each rooms as room}
@@ -413,10 +413,16 @@
                             ></ListItem>
                         {/each}
                     </List>
-                {:else}
-                    Non ci sono stanze
-                {/if}
-            </div>
+                </div>
+            {:else}
+                <div class="center" style="height:80%">
+                    <div/>
+                    <div class="no-rooms">
+                        Add a new room using <Link iconMd="material:other_houses" iconOnly />
+                    </div>
+                    <div/>
+                </div>
+            {/if}
         </Page>
     </Popup>
 </Page>
@@ -504,5 +510,19 @@
 
     .navbar-inner {
         padding-top: 20px;
+    }
+
+    .center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .no-rooms {
+        font-size: 34px !important;
+        font-weight: 600;
     }
 </style>
