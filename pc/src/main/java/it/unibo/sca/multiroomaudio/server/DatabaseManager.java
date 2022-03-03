@@ -178,6 +178,18 @@ public class DatabaseManager {
         System.out.println("New room for client "+ clientId + ", roomID: " + roomId);
     }
 
+    public void setRoomUrls(String clientId, String roomId, String urlEnter, String urlLeave){
+        ConcurrentHashMap<String, Room> rooms;
+        rooms = clientRooms.get(clientId);
+        if(rooms != null){
+            Room room = rooms.get(roomId);
+            if(rooms != null){
+                room.setUrlEnter(urlEnter);
+                room.setUrlLeave(urlLeave);
+            }
+        }
+    }
+
     public void deleteClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> rooms;
         try{
