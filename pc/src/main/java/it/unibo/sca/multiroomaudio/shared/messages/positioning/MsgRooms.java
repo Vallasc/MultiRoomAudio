@@ -27,13 +27,17 @@ class RoomDTO {
     int samples;
     int nscan;
     String[] speakers;
+    String urlEnter;
+    String urlLeave;
 
     RoomDTO(Room room){
         this.roomId = room.getId();
-        this.samples = room.getFingerprintsSize();
+        this.samples = room.getFingerprintsAPSize();
         this.nscan = room.getNScan();
         this.speakers = room.getSpeakerList().stream()
                                             .map((speaker) -> speaker.getId())
                                             .toArray(String[]::new);
+        this.urlEnter = room.getUrlEnter();
+        this.urlLeave = room.getUrlLeave();
     }
 }
