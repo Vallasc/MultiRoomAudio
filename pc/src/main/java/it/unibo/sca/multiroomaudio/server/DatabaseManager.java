@@ -317,9 +317,7 @@ public class DatabaseManager {
                 Room room = new Room(roomId, fingerprints, speakerList, nscan);
                 this.clientRooms.get(clientId).put(roomId, room);
             }
-
         }
-
     }
 
     //-------------------------------SONGS-----------------------------------------

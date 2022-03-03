@@ -1,6 +1,5 @@
 package it.unibo.sca.multiroomaudio.server;
 
-import java.util.HashMap;
 import java.util.List;
 
 import it.unibo.sca.multiroomaudio.shared.model.Client;

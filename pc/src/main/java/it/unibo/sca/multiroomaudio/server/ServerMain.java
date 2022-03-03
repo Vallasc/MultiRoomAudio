@@ -5,18 +5,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 import it.unibo.sca.multiroomaudio.server.http_server.MainHttpServer;
@@ -26,8 +20,6 @@ import it.unibo.sca.multiroomaudio.server.socket_handlers.DatagramThread;
 import it.unibo.sca.multiroomaudio.server.socket_handlers.SocketHandler;
 import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
-import it.unibo.sca.multiroomaudio.shared.model.Device;
-import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 public class ServerMain {
 
