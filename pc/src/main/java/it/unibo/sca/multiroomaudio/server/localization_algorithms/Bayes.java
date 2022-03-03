@@ -71,7 +71,6 @@ public class Bayes extends FingerprintAnalyzer{
         } catch (InterruptedException e) {
         }
 
-        this.setResult(r.getId(), prob);
         return prob[prob.length - 1];
     }
 

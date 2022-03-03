@@ -36,6 +36,7 @@ public abstract class FingerprintAnalyzer extends Thread {
     public void run(){
         String prevRoomKey = null;
         System.out.println("START FINGERPRINT ANALYZER: " + client.getId());
+        int sLen = 0;
         while(!this.stopped){
             String roomkey = findRoomKey();
 
@@ -43,21 +44,27 @@ public abstract class FingerprintAnalyzer extends Thread {
                 continue;
             }
             List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
-            
+            if(sLen != speakers.size()){
+                prevRoomKey = null;                
+                sLen = speakers.size();
+            }
             if(prevRoomKey == null){
-                if(speakers != null && speakers.size() != 0){ 
+                try{ 
                     speakers.forEach(speaker -> speaker.incNumberNowPlaying());
-                    speakerManager.updateAudioState();
+                }catch(NullPointerException e){
+                    System.err.println("null pointer when updating speakers");
                 }
+                speakerManager.updateAudioState();
                 prevRoomKey = roomkey;
                 continue;
             }
             if(!prevRoomKey.equals(roomkey)){
                 List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(client.getId(), prevRoomKey);
-                if(prevspeakers != null)
+                try{
                     prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
-                if(speakers != null && speakers.size() != 0){ 
                     speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                }catch(NullPointerException e){
+                    System.err.println("null pointer when updating speakers");
                 }
                 speakerManager.updateAudioState();
                 prevRoomKey = roomkey;

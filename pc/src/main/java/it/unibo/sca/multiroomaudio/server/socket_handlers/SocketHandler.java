@@ -101,13 +101,6 @@ public class SocketHandler extends Thread{
                     e.printStackTrace();
                 }
             }
-
-            /*if(dbm.getClientWebSession(clientId) == null){
-                isRunning = false;
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {}
-            }*/
         }
         fAnalyzernew.stopService();
         dbm.removeConnectedSocketClient(clientId);
