@@ -7,7 +7,7 @@
 
     let socket = null
     const audio = new Audio()
-    //audio.muted = true TODO
+    audio.muted = true
     let songId = -1
     let currentTimeSec = 0
     let songDurationSec = 0
@@ -97,7 +97,7 @@
     }
 
     function processMessage(message) {
-        console.log(message)
+        //console.log(message)
         switch(message.type){
             case "PLAY":
                 play(message)
@@ -109,6 +109,7 @@
                 stop()
                 break
             case "MUTE":
+                console.log(message)
                 audio.muted = message.isMuted
                 break
         }    
