@@ -1,11 +1,34 @@
 package it.unibo.sca.multiroomaudio.server;
 
+import java.util.HashMap;
 import java.util.List;
 
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
 public abstract class FingerprintAnalyzer extends Thread {
+    public static class Printer{
+        HashMap<String, double[]> res;
+
+        public Printer(){
+            this.res = new HashMap<>();
+        }
+
+        public void set(String s, double[] res){
+            this.res.put(s, res);
+        }
+
+        public void print(){
+            double[] arr;
+            for(String key : this.res.keySet()){
+                System.out.println("Results for room: " + key);
+                arr = this.res.get(key);
+                for(int i = 0; i < arr.length; i++)
+                    System.out.println(arr[i]);
+            }
+        }
+    }
+
     private static final double ALPHA = 24;
     protected static final int MIN_STRENGTH = -80;
     protected static final int MAX_VALUE = 15000;
@@ -14,12 +37,14 @@ public abstract class FingerprintAnalyzer extends Thread {
     protected double[] roomErr;
     private SpeakerManager speakerManager;
     private boolean stopped;
+    protected Printer printer;
 
     public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
         this.client = client;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
         this.stopped = false;
+        this.printer = new Printer();
     }
 
     protected static double positiveRepresentation(double inputSignal){
@@ -31,48 +56,60 @@ public abstract class FingerprintAnalyzer extends Thread {
     }
 
     abstract public String findRoomKey();//in case of max n returns max, in case of euclidean returns the min error for each ap
+    
+    
 
     @Override
     public void run(){
         String prevRoomKey = null;
+        
         System.out.println("START FINGERPRINT ANALYZER: " + client.getId());
         int sLen = 0;
         while(!this.stopped){
             String roomkey = findRoomKey();
-
-            if(roomkey == null){
-                continue;
-            }
-            List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
-            if(sLen != speakers.size()){
-                prevRoomKey = null;                
-                sLen = speakers.size();
-            }
-            if(prevRoomKey == null){
-                try{ 
-                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
-                }catch(NullPointerException e){
-                    System.err.println("null pointer when updating speakers");
+            if(roomkey != null){
+                List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
+                if(sLen != speakers.size()){
+                    if(prevRoomKey != null && prevRoomKey.equals(roomkey)){
+                        System.out.println("DEBUG room was: " + roomkey + ", resetting cause new speaker connected");
+                        this.printer.print();        
+                        try{ 
+                            speakers.forEach(speaker -> speaker.decNumberNowPlaying());
+                        }catch(NullPointerException e){
+                            System.err.println("null pointer when updating speakers");
+                        }               
+                        prevRoomKey = null;
+                    }        
+                    sLen = speakers.size();
                 }
-                speakerManager.updateAudioState();
-                prevRoomKey = roomkey;
-                continue;
-            }
-            if(!prevRoomKey.equals(roomkey)){
-                List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(client.getId(), prevRoomKey);
-                try{
-                    prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
-                    speakers.forEach(speaker -> speaker.incNumberNowPlaying());
-                }catch(NullPointerException e){
-                    System.err.println("null pointer when updating speakers");
+                if(prevRoomKey == null){
+                    System.out.println("DEBUG room is: " + roomkey);
+                    this.printer.print();        
+                    try{ 
+                        speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                    }catch(NullPointerException e){
+                        System.err.println("null pointer when updating speakers");
+                    }
+                    speakerManager.updateAudioState();
+                    prevRoomKey = roomkey;
                 }
-                speakerManager.updateAudioState();
-                prevRoomKey = roomkey;
+                else if(!prevRoomKey.equals(roomkey)){
+                    System.out.println("DEBUG room is: " + roomkey);
+                    this.printer.print();        
+                    List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(client.getId(), prevRoomKey);
+                    try{
+                        prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
+                        speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                    }catch(NullPointerException e){
+                        System.err.println("null pointer when updating speakers");
+                    }
+                    speakerManager.updateAudioState();
+                    prevRoomKey = roomkey;
+                }
             }
         }
         System.out.println("STOP FINGERPRINT ANALYZER: " + client.getId());
     }
-
 
     public void stopService() {
         this.stopped = true;

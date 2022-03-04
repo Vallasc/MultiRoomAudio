@@ -311,7 +311,7 @@ public class DatabaseManager {
     public void putFingerprintsResume(JsonObject json){
         Gson gson = new Gson();
         Type scanType = new TypeToken<ArrayList<ScanResult>>(){}.getType();
-        Type speakerType = new TypeToken<ArrayList<Speaker>>(){}.getType();
+        //Type speakerType = new TypeToken<ArrayList<Speaker>>(){}.getType();
         ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
         for(String clientId : json.keySet()){
             JsonObject clientObj = json.get(clientId).getAsJsonObject();

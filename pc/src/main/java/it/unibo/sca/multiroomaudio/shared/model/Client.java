@@ -48,7 +48,7 @@ public class Client extends Device {
 
     @Override
     public boolean equals(Object o) {
-        return ((String) o).equals(this.ip);
+        return ((Client) o).getId().equals(this.getId());
     }
 
     public void setActiveRoom(String activeRoom){

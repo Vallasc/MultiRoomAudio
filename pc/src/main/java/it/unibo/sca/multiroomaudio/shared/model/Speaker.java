@@ -23,19 +23,25 @@ public class Speaker extends Device {
         return isMuted;
     }
 
-    public void decNumberNowPlaying() { // TODO synchronized needed?
-        this.numberNowPlaying -= 1;
+    public synchronized void decNumberNowPlaying() { 
+        if(this.numberNowPlaying > 0)
+            this.numberNowPlaying -= 1;
         if(this.numberNowPlaying == 0)
             this.isMuted = true;
     }
 
-    public synchronized void incNumberNowPlaying() { // TODO synchronized needed?
+    public synchronized void incNumberNowPlaying() { 
         this.numberNowPlaying += 1;
         this.isMuted = false;
     }
     
-    public synchronized int getNumberNowPlaying() { // TODO synchronized needed?
+    public synchronized int getNumberNowPlaying() { 
         return numberNowPlaying;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return ((Speaker) o).getId().equals(this.getId());
     }
 
 }
