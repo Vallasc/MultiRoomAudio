@@ -55,6 +55,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                     System.err.println("null pointer when updating speakers");
                 }
                 speakerManager.updateAudioState();
+                speakerManager.updateSpeakerList();
                 prevRoomKey = roomkey;
                 continue;
             }
@@ -67,6 +68,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                     System.err.println("null pointer when updating speakers");
                 }
                 speakerManager.updateAudioState();
+                speakerManager.updateSpeakerList();
                 prevRoomKey = roomkey;
             }
         }
