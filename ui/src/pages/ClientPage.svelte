@@ -9,7 +9,6 @@
         ListItem,
         List,
         Popup,
-        Block,
         Chip,
         BlockTitle,
         f7
@@ -29,6 +28,7 @@
     let currentSpeaker = null
 
     let songs = []
+    $: songsLenght = songs.length
     let speakerList = []
     let rooms = []
     $: roomsLenght = rooms.length
@@ -219,6 +219,7 @@
         }
         return false
     }
+
 </script>
 
 <Page>
@@ -240,7 +241,7 @@
                             currentSpeaker = speaker
                         }}
                         color = {rooms.find(room => room.speakers.find(s => s === speaker.id))}
-                        iconMd = {speaker.isMuted ? "material:volume_mute" : "material:volume_up"}
+                        iconMd = { speaker.isMuted ? "material:volume_mute" : "material:volume_up"}
                     />
                 </div>
             {/each}
@@ -300,16 +301,45 @@
             </div>
         </div>
     {/if}
-    <List mediaList>
-        {#each songs as song}
-            {#if setLastTitleBlock(song.dirPath)}
-                <li class="list-group-title">
-                    <div class="block-path">{song.dirPath}</div>
-                </li>
-            {/if}
-            {#if playingSong != null && song.id == playingSong.songId && state == 1}
-                <div style="background-color:#5521f314;">
-                    <ListItem title={song.title} subtitle={song.artist}>
+    {#if songsLenght > 0}
+        <List mediaList>
+            {#each songs as song}
+                {#if setLastTitleBlock(song.dirPath)}
+                    <li class="list-group-title">
+                        <div class="block-path">{song.dirPath}</div>
+                    </li>
+                {/if}
+                {#if playingSong != null && song.id == playingSong.songId && state == 1}
+                    <div style="background-color:#5521f314;">
+                        <ListItem title={song.title} subtitle={song.artist}>
+                            <img
+                                slot="media"
+                                alt={song.title}
+                                src={song.albumImageUrl}
+                                width="44"
+                            />
+                            <span slot="after" style="margin-right: 10px;">
+                                <Link
+                                    iconMd="material:pause"
+                                    iconOnly
+                                    on:click={(event) => {
+                                        event.preventDefault()
+                                        pause()
+                                    }}
+                                />
+                            </span>
+                        </ListItem>
+                    </div>
+                {:else}
+                    <ListItem
+                        title={song.title}
+                        subtitle={song.artist}
+                        on:click={(event) => {
+                            event.preventDefault()
+                            play(song, 0)
+                        }}
+                        link={true}
+                    >
                         <img
                             slot="media"
                             alt={song.title}
@@ -317,41 +347,21 @@
                             width="44"
                         />
                         <span slot="after" style="margin-right: 10px;">
-                            <Link
-                                iconMd="material:pause"
-                                iconOnly
-                                on:click={(event) => {
-                                    event.preventDefault()
-                                    pause()
-                                }}
-                            />
+                            <Link iconMd="material:play_arrow" iconOnly />
                         </span>
                     </ListItem>
-                </div>
-            {:else}
-                <ListItem
-                    title={song.title}
-                    subtitle={song.artist}
-                    on:click={(event) => {
-                        event.preventDefault()
-                        play(song, 0)
-                    }}
-                    link={true}
-                >
-                    <img
-                        slot="media"
-                        alt={song.title}
-                        src={song.albumImageUrl}
-                        width="44"
-                    />
-                    <span slot="after" style="margin-right: 10px;">
-                        <Link iconMd="material:play_arrow" iconOnly />
-                    </span>
-                </ListItem>
-            {/if}
-        {/each}
-    </List>
-
+                {/if}
+            {/each}
+        </List>
+    {:else}
+        <div class="center">
+            <div/>
+            <div class="no-rooms">
+                🎵 Add mp3 files in your music path 🎵
+            </div>
+            <div/>
+        </div>
+    {/if}
     <Popup opened={false} backdrop closeByBackdropClick swipeToClose bind:this={popupSong}>
         {#if playingSong != null}
             <NowPlaying
@@ -524,5 +534,14 @@
     .no-rooms {
         font-size: 34px !important;
         font-weight: 600;
+    }
+
+    .center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        justify-content: space-between;
     }
 </style>

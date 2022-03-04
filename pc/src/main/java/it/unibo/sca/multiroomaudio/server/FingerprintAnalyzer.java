@@ -91,6 +91,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                         System.err.println("null pointer when updating speakers");
                     }
                     speakerManager.updateAudioState();
+                    speakerManager.updateSpeakerList();
                     prevRoomKey = roomkey;
                 }
                 else if(!prevRoomKey.equals(roomkey)){

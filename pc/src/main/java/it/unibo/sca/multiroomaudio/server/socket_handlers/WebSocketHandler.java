@@ -64,7 +64,6 @@ public class WebSocketHandler {
             dbm.addConnectedWebDevice(session, msg);
             System.out.println("DEVICE [" + msg.getId() + "]: connected");
             speakerManager.updateSpeakerList();
-            speakerManager.updateAudioState();
             if(msg.getDeviceType() == 0){ // Client
                 sendMessage(session, new MsgRooms(dbm.getClientRooms(msg.getId())));
             }
