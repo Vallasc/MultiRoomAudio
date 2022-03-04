@@ -312,13 +312,17 @@ public class DatabaseManager {
         Gson gson = new Gson();
         Type scanType = new TypeToken<ArrayList<ScanResult>>(){}.getType();
         //Type speakerType = new TypeToken<ArrayList<Speaker>>(){}.getType();
-        ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
         for(String clientId : json.keySet()){
             JsonObject clientObj = json.get(clientId).getAsJsonObject();
             this.clientRooms.put(clientId, new ConcurrentHashMap<>());
             for(String roomId : clientObj.keySet()){
                 JsonObject roomObj = clientObj.get(roomId).getAsJsonObject();
+                
                 JsonObject fingerprintsObj = roomObj.get("fingerprints").getAsJsonObject();
+                
+                System.out.println(fingerprintsObj);
+                System.out.println("---------------------------------------------------");
+                ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
                 for(String bssid : fingerprintsObj.keySet()){
                     JsonArray fingerprintsArr = fingerprintsObj.get(bssid).getAsJsonArray();
                     List<ScanResult> result = gson.fromJson(fingerprintsArr, scanType);
