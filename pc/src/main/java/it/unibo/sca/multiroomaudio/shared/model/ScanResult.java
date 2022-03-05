@@ -1,6 +1,6 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
-public class ScanResult implements Comparable<ScanResult> {
+public class ScanResult implements Comparable<Object> {
     private final String BSSID;
     private final String SSID;
     private final double signal;//mean
@@ -51,8 +51,8 @@ public class ScanResult implements Comparable<ScanResult> {
     }
 
     @Override
-    public int compareTo(ScanResult o) {
-        return ((ScanResult)o).getBSSID().compareTo(this.getBSSID());
+    public int compareTo(Object o) {
+        return -((ScanResult)o).getBSSID().compareTo(this.getBSSID());
     }
 
     @Override
