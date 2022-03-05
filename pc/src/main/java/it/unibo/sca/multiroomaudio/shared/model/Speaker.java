@@ -23,24 +23,30 @@ public class Speaker extends Device {
         return isMuted;
     }
 
-    public synchronized void decNumberNowPlaying() { 
-        if(this.numberNowPlaying > 0)
-            this.numberNowPlaying -= 1;
-        if(this.numberNowPlaying == 0)
+    public void decNumberNowPlaying() {
+        synchronized (this){
+            if(this.numberNowPlaying > 0)
+                this.numberNowPlaying -= 1;
+            if(this.numberNowPlaying == 0)
+                this.isMuted = true;
+        }
+    }
+
+    public void incNumberNowPlaying() {
+        synchronized (this){
+            this.numberNowPlaying += 1;
+            this.isMuted = false;
+        }
+    }
+
+    public void resetPlaying(){
+        synchronized (this){
+            this.numberNowPlaying = 0;
             this.isMuted = true;
-    }
-
-    public synchronized void incNumberNowPlaying() { 
-        this.numberNowPlaying += 1;
-        this.isMuted = false;
-    }
-
-    public synchronized void resetPlaying(){
-        this.numberNowPlaying = 0;
-        this.isMuted = true;
+        }
     }
     
-    public synchronized int getNumberNowPlaying() { 
+    public int getNumberNowPlaying() { 
         return numberNowPlaying;
     }
 

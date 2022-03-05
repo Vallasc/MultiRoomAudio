@@ -13,6 +13,10 @@ public abstract class Device {
         return id;
     }
 
+    public int getType() {
+        return type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if(o instanceof Device) {
