@@ -26,32 +26,12 @@ public class ServerMain {
     private final static int FINGERPRINT_SERVER_PORT = 8497;
     private final static int WEB_SERVER_PORT = 8082;
     private final static int MUSIC_SERVER_PORT = 8081;
-    static class ShutDownHandler extends Thread {
-        private final DatabaseManager dbm;
-        private final String filepath;
-        public ShutDownHandler(DatabaseManager dbm, String filepath){
-            this.dbm = dbm;
-            this.filepath = filepath;
-        }
-        public void run() {
-            try (Writer writer = new FileWriter(filepath + "\\devices.json")) {
-                Gson gson = new GsonBuilder().create();
-                gson.toJson(dbm.getDevices(), writer);
-            }catch(IOException e){
-                System.err.println("error while serializing the devices file");
-                e.printStackTrace();
-            }
 
-            try (Writer writer = new FileWriter(filepath + "\\fingerprints.json")) {
-                Gson gson = new GsonBuilder().create();
-                gson.toJson(dbm.getClientRooms(), writer);
-            }catch(IOException e){
-                System.err.println("error while serializing the fingerprints file");
-                e.printStackTrace();
-            }
-            System.out.println("Bye.");
-        }
-    }
+    private static DatagramThread udpHandler;
+    private static MusicOrchestrationManager musicManager;
+    private static SocketHandler socketHandler;
+    private static boolean stopped;
+
 
     private static String handleOption(String opt, String[] args, int i, int len){
         if(i < len && !args[i].startsWith("-")){
@@ -63,10 +43,11 @@ public class ServerMain {
             return null;
         }
     }
+
     public static void main(String[] args){
         //default values
-        String musicHttpLocation = "E:\\francesco\\music";
-        //String musicHttpLocation = "C:\\Users\\giaco\\Music";
+        //String musicHttpLocation = "E:\\francesco\\music";
+        String musicHttpLocation = "C:\\Users\\giaco\\Music";
         //String musicHttpLocation = "/home/vallasc/Musica";
         String filepath = "./db";
         int i = 0;
@@ -128,16 +109,16 @@ public class ServerMain {
                 e.printStackTrace();
             }
         }
-        Runtime.getRuntime().addShutdownHook(new ShutDownHandler(dbm, filepath));
-        Thread udpHandler = new DatagramThread(FINGERPRINT_SERVER_PORT, WEB_SERVER_PORT, MUSIC_SERVER_PORT);
+
+        udpHandler = new DatagramThread(FINGERPRINT_SERVER_PORT, WEB_SERVER_PORT, MUSIC_SERVER_PORT);
         udpHandler.start();
         SpeakerManager speakerManger = new SpeakerManager(dbm);
-        MusicOrchestrationManager musicManager = new MusicOrchestrationManager(dbm);
+        musicManager = new MusicOrchestrationManager(dbm);
         musicManager.start();
 
         // Music http server
         try {
-                new MusicHttpServer(MUSIC_SERVER_PORT, musicHttpLocation, musicManager).listMusic().start();
+            new MusicHttpServer(MUSIC_SERVER_PORT, musicHttpLocation, musicManager).listMusic().start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,14 +130,53 @@ public class ServerMain {
                 ),
             dbm ).start();      
 
+        Runtime.getRuntime().addShutdownHook(new ShutDownHandler(dbm, filepath));
+
         try(ServerSocket serverSocket = new ServerSocket(FINGERPRINT_SERVER_PORT)){
-            while(true){
+            while(!stopped){
                 Socket clientSocket = serverSocket.accept();
-                (new SocketHandler(clientSocket, dbm, speakerManger)).start();
+                socketHandler = new SocketHandler(clientSocket, dbm, speakerManger);
+                socketHandler.start();
             }
 		} catch(IOException e){
 			e.printStackTrace();
 			return;
 		}
+    }
+
+    static class ShutDownHandler extends Thread {
+
+        private final DatabaseManager dbm;
+        private final String filepath;
+        public ShutDownHandler(DatabaseManager dbm, String filepath){
+            this.dbm = dbm;
+            this.filepath = filepath;
+        }
+
+        public void run() {
+            try (Writer writer = new FileWriter(filepath + "\\devices.json")) {
+                Gson gson = new GsonBuilder().create();
+                gson.toJson(dbm.getDevices(), writer);
+            }catch(IOException e){
+                System.err.println("error while serializing the devices file");
+                e.printStackTrace();
+            }
+
+            try (Writer writer = new FileWriter(filepath + "\\fingerprints.json")) {
+                Gson gson = new GsonBuilder().create();
+                gson.toJson(dbm.getClientRooms(), writer);
+            }catch(IOException e){
+                System.err.println("error while serializing the fingerprints file");
+                e.printStackTrace();
+            }
+
+            stopped = true;
+            udpHandler.stopService();
+            musicManager.stopService();
+            if(socketHandler != null)
+                socketHandler.stopService();
+
+            System.out.println("Bye.");
+        }
     }
 }

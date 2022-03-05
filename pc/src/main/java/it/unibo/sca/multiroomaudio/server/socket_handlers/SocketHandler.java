@@ -21,6 +21,7 @@ public class SocketHandler extends Thread{
     private final Socket clientSocket;
     private final DatabaseManager dbm;
     private final SpeakerManager speakerManager;
+    private boolean isRunning;
 
     public SocketHandler(Socket clientSocket, DatabaseManager dbm, SpeakerManager speakerManager){
         this.clientSocket = clientSocket;
@@ -30,7 +31,7 @@ public class SocketHandler extends Thread{
 
     @Override
     public void run(){
-        boolean isRunning = true;
+        isRunning = true;
         DataInputStream dIn = null;
         DataOutputStream dOut = null;
         Gson gson = new Gson();
@@ -108,7 +109,10 @@ public class SocketHandler extends Thread{
         // Close websocket session
         dbm.removeConnectedWebDevicesAndDisconnect(clientId);
         System.out.println("STOP SERVING: " + clientId);
-        
     }
 
+    public void stopService(){
+		isRunning = false;
+		this.interrupt();
+	}
 }

@@ -17,6 +17,7 @@ import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 public class DatagramExecutor extends Thread {
 	private BlockingQueue<Pair<byte[], InetAddress>> requestQ;
 	private static byte[] data;
+	private boolean stopped = false;
 	
 	public DatagramExecutor(int fingerprintPort, int webServerPort, int musicServerPort) {
 		//should pass the data structure in which client parameters should be saved
@@ -45,7 +46,7 @@ public class DatagramExecutor extends Thread {
 
 	public void run() {
 		System.out.println("Datagram handler started");
-		while(true) {
+		while(!stopped) {
 			try {
 				Pair<byte[], InetAddress> pair = requestQ.take();
 				InetAddress sender = (InetAddress) pair.getRight();
@@ -56,7 +57,7 @@ public class DatagramExecutor extends Thread {
 					sendDatagram(sender);
                 } else continue;
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (IOException e) {
 				System.err.println("Problem using the buffer");
 				e.printStackTrace();
@@ -68,6 +69,11 @@ public class DatagramExecutor extends Thread {
 	
 	public BlockingQueue<Pair<byte[], InetAddress>> getRequestQ() {
 		return this.requestQ;
+	}
+
+	public void stopService(){
+		stopped = true;
+		this.interrupt();
 	}
 
 }
