@@ -248,7 +248,7 @@
     }
 
     .no-rooms {
-        font-size: 34px !important;
+        font-size: 28px !important;
         font-weight: 600;
     }
 
