@@ -260,6 +260,7 @@ public class DatabaseManager {
 
     }
 
+    private static final int CUT_POWER = -80;
     // Set scans for a room
     public void putScansUpdateRoom(String clientId, String roomId, List<ScanResult> scans){ 
         /*Room room = clientScans.get(clientId).get(roomId);
@@ -288,8 +289,11 @@ public class DatabaseManager {
             if(signals.get(key).size() > 2){
                 double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
                 double stddev = Math.sqrt(signals.get(key).stream().reduce(0d, (subtotal, element) -> subtotal + Math.pow((element - mean), 2))/(signals.get(key).size()-1));
-                finalResult = new ScanResult(key, results.get(key).getSSID(), mean, stddev, results.get(key).getFrequency(), results.get(key).getTimestamp());
-                clientRooms.get(clientId).get(roomId).putClientFingerprints(finalResult);
+                //System.out.println("mean: " + mean);
+                if(mean > CUT_POWER){
+                    finalResult = new ScanResult(key, results.get(key).getSSID(), mean, stddev, results.get(key).getFrequency(), results.get(key).getTimestamp());
+                    clientRooms.get(clientId).get(roomId).putClientFingerprints(finalResult);
+                }
             }
             
         }
