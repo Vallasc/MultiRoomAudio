@@ -348,7 +348,7 @@ public class DatabaseManager {
             System.out.println("DEBUG: no speaker binded");
             return;
         }
-
+        speaker.resetPlaying();
         System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + " <-> "+ roomId + ", is muted: " + speaker.isMuted());
         System.out.println("DEBUG: room -> [speakers]");
         for(Room room : rooms.values()) {
@@ -361,6 +361,20 @@ public class DatabaseManager {
             for(Speaker spk : speakers)
                 System.out.print(spk.getName() + ", ");
             System.out.println("]");
+        }
+    }
+
+    public void unbindSpeaker(String clientId, String speakerId) {
+        Speaker speaker = this.getConnectedSpeaker(speakerId);
+        ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
+        if(rooms == null || speaker == null){
+            System.out.println("DEBUG: no speaker binded");
+            return;
+        }
+        System.out.println("DEBUG: unbind speaker [" + speaker.getName() + "]");
+        speaker.resetPlaying();
+        for(Room room : rooms.values()) {
+            room.getSpeakerList().remove(speaker);
         }
     }
 

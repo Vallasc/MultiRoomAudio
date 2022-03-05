@@ -134,7 +134,10 @@ public class WebSocketHandler {
                         break;
                     case "BIND_SPEAKER":
                         MsgBindSpeaker msgBindSpeaker = gson.fromJson(message, MsgBindSpeaker.class);
-                        dbm.bindSpeaker(connected.getId(), msgBindSpeaker.getSpeakerId(), msgBindSpeaker.getRoomId());
+                        if(msgBindSpeaker.getRoomId() != null)
+                            dbm.bindSpeaker(connected.getId(), msgBindSpeaker.getSpeakerId(), msgBindSpeaker.getRoomId());
+                        else
+                            dbm.unbindSpeaker(connected.getId(), msgBindSpeaker.getSpeakerId());
                         // Update rooms
                         sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
                         break;
