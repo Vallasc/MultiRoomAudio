@@ -320,8 +320,6 @@ public class DatabaseManager {
                 
                 JsonObject fingerprintsObj = roomObj.get("fingerprints").getAsJsonObject();
                 
-                System.out.println(fingerprintsObj);
-                System.out.println("---------------------------------------------------");
                 ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
                 for(String bssid : fingerprintsObj.keySet()){
                     JsonArray fingerprintsArr = fingerprintsObj.get(bssid).getAsJsonArray();

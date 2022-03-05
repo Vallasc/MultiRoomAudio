@@ -9,22 +9,40 @@ import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 public abstract class FingerprintAnalyzer extends Thread {
     public static class Printer{
         HashMap<String, double[]> res;
+        HashMap<String, Integer> knnRes;
+        int type;
+        public Printer(int type){
+            this.type = type;
+            if(this.type == 0)
+                this.res = new HashMap<>();
+            if(this.type == 1)
+                this.knnRes = new HashMap<>();
 
-        public Printer(){
-            this.res = new HashMap<>();
         }
+
+        public void setKnn(HashMap<String, Integer> knnRes){
+            this.knnRes = knnRes;
+        }
+
 
         public void set(String s, double[] res){
             this.res.put(s, res);
         }
 
         public void print(){
-            double[] arr;
-            for(String key : this.res.keySet()){
-                System.out.println("Results for room: " + key);
-                arr = this.res.get(key);
-                for(int i = 0; i < arr.length; i++)
-                    System.out.println(arr[i]);
+            if(this.type == 0){
+                double[] arr;
+                for(String key : this.res.keySet()){
+                    System.out.println("Results for room: " + key);
+                    arr = this.res.get(key);
+                    for(int i = 0; i < arr.length; i++)
+                        System.out.println(arr[i]);
+                }
+            }
+            if(this.type == 1){
+                for(String s : this.knnRes.keySet()){
+                    System.out.println("Room: " + s + " corrispondences: " + knnRes.get(s));
+                }
             }
         }
     }
@@ -37,14 +55,17 @@ public abstract class FingerprintAnalyzer extends Thread {
     protected double[] roomErr;
     private SpeakerManager speakerManager;
     private boolean stopped;
+    protected int type;
     protected Printer printer;
+    
 
-    public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
+    public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int type) {
         this.client = client;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
         this.stopped = false;
-        this.printer = new Printer();
+        this.printer = new Printer(type);
+        this.type = type;
     }
 
     protected static double positiveRepresentation(double inputSignal){

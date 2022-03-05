@@ -14,7 +14,7 @@ import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 public class Bayes extends FingerprintAnalyzer{
 
     public Bayes(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
-        super(speakerManager, client, dbm);
+        super(speakerManager, client, dbm, 0);
     }
 
     private double compute(double x, double mu, double stddev){
@@ -32,7 +32,6 @@ public class Bayes extends FingerprintAnalyzer{
         }
         
         double[] prob = new double[nScan];
-
         int initIndex = 0; 
         ScanResult online;
         ArrayList<ScanResult> offlines = null;
@@ -62,14 +61,7 @@ public class Bayes extends FingerprintAnalyzer{
         }
 
         Arrays.sort(prob);
-        System.out.println(r.getId());
-        for(int i = 0; i<prob.length; i++){
-            System.out.println(prob[i]);
-        }
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-        }
+        super.printer.set(r.getId(), prob);
 
         return prob[prob.length - 1];
     }
