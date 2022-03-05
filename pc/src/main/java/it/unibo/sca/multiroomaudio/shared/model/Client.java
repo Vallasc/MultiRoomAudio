@@ -1,6 +1,7 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Client extends Device {
