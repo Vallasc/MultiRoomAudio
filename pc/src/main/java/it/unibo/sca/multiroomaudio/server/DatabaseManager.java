@@ -344,17 +344,24 @@ public class DatabaseManager {
         roomId = roomId.toLowerCase();
         Speaker speaker = this.getConnectedSpeaker(speakerId);
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
-        if(rooms == null || speaker == null) return;
+        if(rooms == null || speaker == null){
+            System.out.println("DEBUG: no speaker binded");
+            return;
+        }
 
+        System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + " <-> "+ roomId + ", is muted: " + speaker.isMuted());
+        System.out.println("DEBUG: room -> [speakers]");
         for(Room room : rooms.values()) {
             List<Speaker> speakers = room.getSpeakerList();
             speakers.remove(speaker);
             if(room.getId().equals(roomId)){
                 speakers.add(speaker);
             }
+            System.out.print("\t" + room.getId() + " -> [");
+            for(Speaker spk : speakers)
+                System.out.print(spk.getName() + ", ");
+            System.out.println("]");
         }
-
-        System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + "<->"+ roomId + ", is muted: " + speaker.isMuted());
     }
 
 }
