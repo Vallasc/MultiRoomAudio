@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
+    public static final int SCAN_NOT_FOUND = 100;
     public static final int SCANS_FOR_EACH_POSITION = 4;
     public static final int MAX_POSITION = 10;
     private final String id;
@@ -44,17 +45,17 @@ public class Room {
         if(list == null){
             List<ScanResult> results = new ArrayList<>();
             if(nscan > 1){
-                for(int i = 0; i<nscan-1; i++)
-                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), result.getSignal(), result.getStddev(), result.getFrequency(), result.getTimestamp()));
+                for(int i = 0; i< nscan - 1; i++)
+                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), SCAN_NOT_FOUND, result.getStddev(), result.getFrequency(), result.getTimestamp()));
             }
-            results.add(nscan-1, result);
+            results.add( nscan - 1, result);
             fingerprints.put(result.getBSSID(), results);
                 
         }else{
             int len = list.size();
             if(len < nscan)
-                for(int i = len; i<nscan-1; i++){
-                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), result.getSignal(), result.getStddev(), result.getFrequency(), result.getTimestamp()));
+                for(int i = len; i< nscan - 1; i++){
+                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), SCAN_NOT_FOUND, result.getStddev(), result.getFrequency(), result.getTimestamp()));
                 }
             list.add(nscan-1, result);
         }
