@@ -30,6 +30,7 @@
     let songs = []
     $: songsLenght = songs.length
     let speakerList = []
+    $: speakerLenght = speakerList.length
     let rooms = []
     $: roomsLenght = rooms.length
 
@@ -116,8 +117,11 @@
                 progress = 0
                 break
             case "SPEAKER_LIST":
+                message.speakerList.sort((a, b) =>{
+                    if(!a.isMuted) return -1
+                    return 1
+                })
                 speakerList = message.speakerList
-                speakerList = speakerList
                 console.log("Speakers")
                 console.log(speakerList)
                 break
@@ -235,19 +239,32 @@
         <div class="list-speakers">
             {#each speakerList as speaker}
                 <div class="speaker-chip">
-                    <Chip
-                        text={speaker.name}
-                        onClick={() => {
-                            popupRooms.instance().open()
-                            currentSpeaker = speaker
-                        }}
-                        color = {rooms.find(room => room.speakers.find(s => s === speaker.id))}
-                        iconMd = { speaker.isMuted ? "material:volume_mute" : "material:volume_up"}
-                    />
+                    {#if speaker.isMuted}
+                        <Chip
+                            text={speaker.name}
+                            onClick={() => {
+                                popupRooms.instance().open()
+                                currentSpeaker = speaker
+                            }}
+                            color = {rooms.find(room => room.speakers.find(s => s === speaker.id))}
+                            iconMd = "material:volume_mute"
+                        />
+                    {:else}
+                        <Chip
+                            text={speaker.name}
+                            onClick={() => {
+                                popupRooms.instance().open()
+                                currentSpeaker = speaker
+                            }}
+                            color = {rooms.find(room => room.speakers.find(s => s === speaker.id))}
+                            iconMd = "material:volume_up"
+                        />
+                    {/if}
                 </div>
             {/each}
         </div>
     </Toolbar>
+
     <!-- Toolbar -->
     {#if playingSong != null}
         <div class="toolbar toolbar-bottom" data-f7-slot="fixed">
@@ -358,7 +375,7 @@
         <div class="center">
             <div/>
             <div class="no-rooms">
-                🎵 Add mp3 files in your music path 🎵
+                🎵 Add mp3 files 🎵
             </div>
             <div/>
         </div>
@@ -423,6 +440,17 @@
                                 checked = {currentSpeaker && room.speakers.find(s => s === currentSpeaker.id)}
                             ></ListItem>
                         {/each}
+                            <ListItem
+                                radio
+                                radioIcon = "end"
+                                title = "none"
+                                value= "none"
+                                onClick={() => {
+                                    bindSpeaker(null, currentSpeaker.id)
+                                    popupRooms.instance().close()
+                                }}
+                                checked = {currentSpeaker && !rooms.find(room => room.speakers.find(s => s === currentSpeaker.id))}
+                            ></ListItem>
                     </List>
                 </div>
             {:else}
@@ -533,7 +561,7 @@
     }
 
     .no-rooms {
-        font-size: 34px !important;
+        font-size: 28px !important;
         font-weight: 600;
     }
 
