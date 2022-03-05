@@ -34,11 +34,10 @@ public class ServerMain {
 
 
     private static String handleOption(String opt, String[] args, int i, int len){
-        if(i < len && !args[i].startsWith("-")){
+        if (i < len && !args[i].startsWith("-")){
             System.out.println(opt + " value is: " + args[i]);
             return args[i];
-        }
-        else{
+        } else {
             System.err.println(opt + " option needs an argument");
             return null;
         }
@@ -50,22 +49,24 @@ public class ServerMain {
         String musicHttpLocation = "C:\\Users\\giaco\\Music";
         //String musicHttpLocation = "/home/vallasc/Musica";
         String filepath = "./db";
+        String algo = "knn";
         int i = 0;
         boolean flagResume = false;
         DatabaseManager dbm = new DatabaseManager();
-        while(i<args.length){
-            if(args[i].startsWith("-")){ 
-                if(args[i].equals("-m") || args[i].equals("-music")){
+        while (i < args.length){
+            if (args[i].startsWith("-")){ 
+                if (args[i].equals("-m") || args[i].equals("-music")){
                     i += 1;
                     musicHttpLocation = handleOption("-m", args, i, args.length);
-                }
-                else if(args[i].equals("-f") || args[i].equals("-filepath")){
+                } else if(args[i].equals("-f") || args[i].equals("-filepath")){
                     i += 1;
                     filepath = handleOption("-f", args, i, args.length);
-                }else if(args[i].equals("-r") || args[i].equals("-resume")){
+                } else if(args[i].equals("-a") || args[i].equals("-algo")){
+                    i += 1;
+                    algo = handleOption("-a", args, i, args.length);
+                } else if(args[i].equals("-r") || args[i].equals("-resume")){
                     flagResume = true;
-                }
-                else{
+                } else {
                     System.err.println("Error while parsing arguments, exiting");
                     return;
                 }
