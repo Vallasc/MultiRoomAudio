@@ -14,6 +14,7 @@ import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
 import it.unibo.sca.multiroomaudio.server.localization_algorithms.Knn;
+import it.unibo.sca.multiroomaudio.server.localization_algorithms.MinimizeRSSErr;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 
@@ -22,13 +23,13 @@ public class SocketHandler extends Thread{
     private final DatabaseManager dbm;
     private final SpeakerManager speakerManager;
     private boolean isRunning;
-    private final Class algo;
+    //private final Class algo;
 
-    public SocketHandler(Socket clientSocket, DatabaseManager dbm, SpeakerManager speakerManager, Class algo){
+    public SocketHandler(Socket clientSocket, DatabaseManager dbm, SpeakerManager speakerManager){
         this.clientSocket = clientSocket;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
-        this.algo = algo;
+        //this.algo = algo;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class SocketHandler extends Thread{
         myDevice.setActiveRoom(null);
         System.out.println("START SERVING: " + clientId);
         //FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
-        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm);
+        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm, 2, true);
         //Constructor<?> fAnalyzernew = this.algo.getConstructor(SpeakerManager.class, Client.class, DatabaseManager.class);
         //Constructor constructor = Class.forName("java.lang.String").getConstructor(String.class);
         //String object = (String) constructor.newInstance("Hello");
