@@ -14,12 +14,14 @@ import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPause;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgStop;
 import it.unibo.sca.multiroomaudio.shared.model.Device;
+import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class MusicOrchestrationManager extends Thread {
     private final static Logger LOGGER = Logger.getLogger(MusicOrchestrationManager.class.getSimpleName());
 
     private DatabaseManager databaseManager;
     private Player musicPlayer;
+    private boolean stopped = false;
 
     public MusicOrchestrationManager(DatabaseManager databaseManager) {
         this.databaseManager = databaseManager;
@@ -29,8 +31,7 @@ public class MusicOrchestrationManager extends Thread {
     @Override
     public void run() {
         super.run();
-        
-        while(true){
+        while(!stopped){
             
             List<Pair<Session, Device>> connectedDevices = databaseManager.getConnectedWebDevices();
             Msg currentPlayerState;
@@ -47,13 +48,14 @@ public class MusicOrchestrationManager extends Thread {
                 }
             }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                return;
-            }
+            Utils.sleep(500);
         }
     }
+
+    public void stopService(){
+		stopped = true;
+		this.interrupt();
+	}
 
     public void setMusicList(ArrayList<Song> songs){
         this.databaseManager.getSongs().addAll(songs);

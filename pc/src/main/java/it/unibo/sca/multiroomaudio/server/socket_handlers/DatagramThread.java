@@ -15,6 +15,8 @@ public class DatagramThread extends Thread{
     private final int fingerprintServerPort;
     private final int webServerPort;
     private final int musicServerPort;
+    private DatagramExecutor datagramAnalyser;
+    private boolean stopped = false;
 
     public DatagramThread(int fingerprintServerPort, int webServerPort, int musicServerPort){
         this.fingerprintServerPort = fingerprintServerPort;
@@ -24,12 +26,12 @@ public class DatagramThread extends Thread{
 
     public void run(){
         System.out.println("Broadcast receiver started");
-        Thread datagramAnalyser = new DatagramExecutor(fingerprintServerPort, webServerPort, musicServerPort);
+        datagramAnalyser = new DatagramExecutor(fingerprintServerPort, webServerPort, musicServerPort);
         datagramAnalyser.start();
         byte buf[] = new byte[bufferSize];
         DatagramPacket datagramPacket = new DatagramPacket(buf, bufferSize);  
         try(DatagramSocket datagramSocket = new DatagramSocket(DiscoveryService.DATAGRAM_PORT_SEND)){
-            while(true){
+            while(!stopped){
                 datagramSocket.receive(datagramPacket);
                 ((DatagramExecutor) datagramAnalyser).getRequestQ().put(
                     new ImmutablePair<byte[], InetAddress>(datagramPacket.getData(), datagramPacket.getAddress()));
@@ -43,4 +45,10 @@ public class DatagramThread extends Thread{
             e.printStackTrace();
         } 
     }
+
+    public void stopService(){
+        datagramAnalyser.stopService();
+		stopped = true;
+		this.interrupt();
+	}
 }

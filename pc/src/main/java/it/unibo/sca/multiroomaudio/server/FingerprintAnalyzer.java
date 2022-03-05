@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
+import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public abstract class FingerprintAnalyzer extends Thread {
     public static class Printer{
@@ -50,6 +51,7 @@ public abstract class FingerprintAnalyzer extends Thread {
     private static final double ALPHA = 24;
     protected static final int MIN_STRENGTH = -80;
     protected static final int MAX_VALUE = 15000;
+    private static final int SLEEP_TIME = 200;
     protected final Client client;
     protected final DatabaseManager dbm;
     protected double[] roomErr;
@@ -129,6 +131,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                     prevRoomKey = roomkey;
                 }
             }
+            Utils.sleep(SLEEP_TIME);
         }
         System.out.println("STOP FINGERPRINT ANALYZER: " + client.getId());
     }
@@ -137,11 +140,4 @@ public abstract class FingerprintAnalyzer extends Thread {
         this.stopped = true;
     }
     
-    public void sleep(int milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
