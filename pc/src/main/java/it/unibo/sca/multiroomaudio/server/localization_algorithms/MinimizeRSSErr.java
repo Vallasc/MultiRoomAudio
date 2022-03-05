@@ -17,7 +17,11 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         super(speakerManager, client, dbm, 0);
     }
 
-    private double compute(double x, double mu){
+    public MinimizeRSSErr(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int t) {
+        super(speakerManager, client, dbm, t);
+    }
+
+    protected double compute(double x, double mu){
         return Math.pow(x - mu, 2);
     }
 
