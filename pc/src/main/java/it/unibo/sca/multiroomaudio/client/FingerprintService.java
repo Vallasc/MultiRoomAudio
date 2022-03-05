@@ -12,6 +12,7 @@ import io.github.vallasc.WlanScanner;
 import io.github.vallasc.WlanScanner.OperatingSystemNotDefinedException;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
+import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class FingerprintService extends Thread {
     static final int MILLISECONDS_BETWEEN_SCANS = 300;
@@ -74,9 +75,9 @@ public class FingerprintService extends Thread {
                         continue;
                     }
                     dOut.flush();
-                    sleep(MILLISECONDS_BETWEEN_SCANS);
+                    Utils.sleep(MILLISECONDS_BETWEEN_SCANS);
                 } else {
-                    sleep(500);
+                    Utils.sleep(500);
                 }          
             } catch (OperatingSystemNotDefinedException | IOException e) {
                 System.out.println("Disconnected");
@@ -93,14 +94,6 @@ public class FingerprintService extends Thread {
 
     public void stopScanner()  {
         isRunning = false;
-    }
-
-    public void sleep(int milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private ScanResult[] apInfoToScanResult(APInfo[] aps) {

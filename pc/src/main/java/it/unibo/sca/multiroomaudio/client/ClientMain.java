@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
+import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class ClientMain {
 
@@ -54,10 +55,10 @@ public class ClientMain {
             try {
                 uri = new URI(uriString);
                 if (Desktop.isDesktopSupported()) {
+                    Utils.sleep(2000);
                     try {
-                        Thread.sleep(2000);
                         Desktop.getDesktop().browse(uri);
-                    } catch (IOException | InterruptedException | UnsupportedOperationException e) {
+                    } catch (IOException | UnsupportedOperationException e) {
                         System.err.println("Unsupported desktop environment");
                     }
                 }
