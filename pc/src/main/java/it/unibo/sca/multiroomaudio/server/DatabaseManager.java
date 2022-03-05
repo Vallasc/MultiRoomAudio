@@ -320,8 +320,6 @@ public class DatabaseManager {
                 
                 JsonObject fingerprintsObj = roomObj.get("fingerprints").getAsJsonObject();
                 
-                System.out.println(fingerprintsObj);
-                System.out.println("---------------------------------------------------");
                 ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
                 for(String bssid : fingerprintsObj.keySet()){
                     JsonArray fingerprintsArr = fingerprintsObj.get(bssid).getAsJsonArray();
@@ -345,6 +343,8 @@ public class DatabaseManager {
         Speaker speaker = this.getConnectedSpeaker(speakerId);
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
         if(rooms == null || speaker == null) return;
+
+        speaker.resetPlaying();
 
         for(Room room : rooms.values()) {
             List<Speaker> speakers = room.getSpeakerList();

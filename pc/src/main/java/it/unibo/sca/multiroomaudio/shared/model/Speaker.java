@@ -34,6 +34,11 @@ public class Speaker extends Device {
         this.numberNowPlaying += 1;
         this.isMuted = false;
     }
+
+    public synchronized void resetPlaying(){
+        this.numberNowPlaying = 0;
+        this.isMuted = true;
+    }
     
     public synchronized int getNumberNowPlaying() { 
         return numberNowPlaying;
