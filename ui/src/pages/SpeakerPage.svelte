@@ -7,7 +7,7 @@
 
     let socket = null
     const audio = new Audio()
-    audio.muted = true
+    audio.volume = 0
     let songId = -1
     let currentTimeSec = 0
     let songDurationSec = 0
@@ -110,7 +110,7 @@
                 break
             case "MUTE":
                 console.log(message)
-                audio.muted = message.isMuted
+                setMute(message.isMuted)
                 break
         }    
     }
@@ -161,16 +161,26 @@
         audio.load()
     }
 
-    // Update progress bar
-    let updateTime
-    //audio.onplay = () => {
-    setInterval(() => currentTimeSec = audio.currentTime, 500)
-    //}
-
-    audio.onended = () => {
-        console.log("Audio ended")
-        //state = 0
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms))
     }
+
+    async function setMute(value) {
+        if(!value && audio.volume == 0)
+            for(let i=0; i<=10; i++){
+                audio.volume = i/10
+                await sleep(200)
+            }
+        if(value && audio.volume == 1)
+            for(let i=10; i>=0; i--){
+                audio.volume = i/10
+                await sleep(200)
+            }
+    }
+
+    // Update progress bar
+    setInterval(() => currentTimeSec = audio.currentTime, 500)
+
 
 </script>
 

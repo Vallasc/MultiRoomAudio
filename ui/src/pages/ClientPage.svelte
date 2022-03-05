@@ -117,6 +117,7 @@
                 break
             case "SPEAKER_LIST":
                 speakerList = message.speakerList
+                speakerList = speakerList
                 console.log("Speakers")
                 console.log(speakerList)
                 break
