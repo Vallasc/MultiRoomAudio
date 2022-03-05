@@ -79,8 +79,6 @@ public abstract class FingerprintAnalyzer extends Thread {
     }
 
     abstract public String findRoomKey();//in case of max n returns max, in case of euclidean returns the min error for each ap
-    
-    
 
     @Override
     public void run(){
