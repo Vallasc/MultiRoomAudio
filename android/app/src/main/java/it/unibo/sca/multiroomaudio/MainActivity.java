@@ -1,5 +1,6 @@
 package it.unibo.sca.multiroomaudio;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -96,6 +97,15 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(webView.canGoBack() == true){
+            webView.goBack();
+        } else {
+            finish();
+        }
     }
 
     @Override
