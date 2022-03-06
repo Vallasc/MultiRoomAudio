@@ -350,7 +350,7 @@ public class DatabaseManager {
             System.out.println("DEBUG: no speaker binded");
             return;
         }
-        speaker.resetPlaying();
+        speaker.resetClient();
         System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + " <-> "+ roomId + ", is muted: " + speaker.isMuted());
         System.out.println("DEBUG: room -> [speakers]");
         for(Room room : rooms.values()) {
@@ -374,7 +374,7 @@ public class DatabaseManager {
             return;
         }
         System.out.println("DEBUG: unbind speaker [" + speaker.getName() + "]");
-        speaker.resetPlaying();
+        speaker.resetClient();
         for(Room room : rooms.values()) {
             room.getSpeakerList().remove(speaker);
         }

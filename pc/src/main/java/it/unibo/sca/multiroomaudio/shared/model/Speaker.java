@@ -1,9 +1,12 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Speaker extends Device {
     private String name;
     private transient boolean isMuted; //true by default
-    private transient int numberNowPlaying = 0;
+    private transient List<String> reproducingClientsId = new ArrayList<String>();
 
     public Speaker(String id, String name) {
         super(id, 1);
@@ -23,33 +26,32 @@ public class Speaker extends Device {
         return isMuted;
     }
 
-    public void decNumberNowPlaying() {
+    public void addClient(String clientId){
         synchronized (this){
-            if(this.numberNowPlaying > 0)
-                this.numberNowPlaying -= 1;
-            if(this.numberNowPlaying == 0)
+            if(!this.reproducingClientsId.contains(clientId)){
+                this.reproducingClientsId.add(clientId);
+                this.isMuted = false;
+            }
+        }
+    }
+
+    public void removeClient(String clientId){
+        synchronized (this){
+            this.reproducingClientsId.remove(clientId);
+            if(this.reproducingClientsId.size() == 0)
                 this.isMuted = true;
         }
     }
 
-    public void incNumberNowPlaying() {
-        synchronized (this){
-            this.numberNowPlaying += 1;
-            this.isMuted = false;
-        }
+    public void resetClient(){
+        this.reproducingClientsId = new ArrayList<>();
+        this.isMuted = true;
     }
 
-    public void resetPlaying(){
-        synchronized (this){
-            this.numberNowPlaying = 0;
-            this.isMuted = true;
-        }
+    public int getClientsSize(){
+        return this.reproducingClientsId.size();
     }
     
-    public int getNumberNowPlaying() { 
-        return numberNowPlaying;
-    }
-
     @Override
     public boolean equals(Object o) {
         return ((Speaker) o).getId().equals(this.getId());

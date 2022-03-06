@@ -95,7 +95,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                         System.out.println("DEBUG room was: " + roomkey + ", resetting cause new speaker connected");
                         this.printer.print();        
                         try{ 
-                            speakers.forEach(speaker -> speaker.decNumberNowPlaying());
+                            speakers.forEach(speaker -> speaker.removeClient(client.getId()));
                         }catch(NullPointerException e){
                             System.err.println("null pointer when updating speakers");
                         }               
@@ -107,7 +107,8 @@ public abstract class FingerprintAnalyzer extends Thread {
                     System.out.println("DEBUG room is: " + roomkey);
                     this.printer.print();        
                     try{ 
-                        speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                        speakers.forEach(speaker -> speaker.addClient(client.getId()));
+                        
                     }catch(NullPointerException e){
                         System.err.println("null pointer when updating speakers");
                     }
@@ -120,8 +121,8 @@ public abstract class FingerprintAnalyzer extends Thread {
                     this.printer.print();        
                     List<Speaker> prevspeakers = dbm.getConnectedSpeakerRoom(client.getId(), prevRoomKey);
                     try{
-                        prevspeakers.forEach(speaker -> speaker.decNumberNowPlaying());
-                        speakers.forEach(speaker -> speaker.incNumberNowPlaying());
+                        prevspeakers.forEach(speaker -> speaker.removeClient(client.getId()));
+                        speakers.forEach(speaker -> speaker.addClient(client.getId()));
                     }catch(NullPointerException e){
                         System.err.println("null pointer when updating speakers");
                     }
