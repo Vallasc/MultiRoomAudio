@@ -12,7 +12,8 @@ import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
 public class MinimizeRSSErr extends FingerprintAnalyzer{
-
+    protected static final int MAX_VALUE = 15000;
+    
     public MinimizeRSSErr(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
         super(speakerManager, client, dbm, 0);
     }
