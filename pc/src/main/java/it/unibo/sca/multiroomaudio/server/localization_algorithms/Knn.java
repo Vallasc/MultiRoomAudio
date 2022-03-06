@@ -2,17 +2,11 @@ package it.unibo.sca.multiroomaudio.server.localization_algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
@@ -24,8 +18,7 @@ import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class Knn extends FingerprintAnalyzer{
     public static final int POWER_LIMIT = -75;
-
-    private HashMap<String, Double> errors = new HashMap<>(); //<AP, error>
+    private LinkedHashMap<String, Double> errors = new LinkedHashMap<>(); //<AP, error>
     private int k = 1;
     private boolean flagValueError = false;
 
@@ -53,42 +46,26 @@ public class Knn extends FingerprintAnalyzer{
         this.k = k;
     }
 
-    public static HashMap<String, Double> sortByValueAsc(Map<String, Double> map) {
-        List<Map.Entry<String, Double>> list = new LinkedList<Map.Entry<String, Double>>(map.entrySet());
-
-        Collections.sort(list, new Comparator<Map.Entry<String, Double>>() {
-
-            public int compare(Map.Entry<String, Double> m1, Map.Entry<String, Double> m2) {
-                return -(m2.getValue()).compareTo(m1.getValue());
-            }
-        });
-
-        HashMap<String, Double> result = new LinkedHashMap<String, Double>();
-        for (Map.Entry<String, Double> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
-    }
     private double compute(double x, double mu){ 
         return Math.pow(x-mu, 2);
     }
 
-    public void roomError(Room r, ScanResult[] onlines){
+    public void roomError(Room room, ScanResult[] onlines){
         if(onlines == null){
             return;
         }
 
-        if(r.getNScan() == 0)
+        if(room.getNScan() == 0)
             return;
 
-        double[] roomErr = new double[r.getNScan()];
+        double[] roomErr = new double[room.getNScan()];
         Arrays.fill(roomErr, 0);
 
-        List<String> notFound = new ArrayList<>(r.getFingerprints().keySet());
+        List<String> notFound = new ArrayList<>(room.getFingerprints().keySet());
         for(ScanResult online : onlines){
             notFound.remove(online.getBSSID());
             // Array scanresult di bssid della stanza
-            ArrayList<ScanResult> offlines = r.getFingerprints(online.getBSSID());
+            ArrayList<ScanResult> offlines = room.getFingerprints(online.getBSSID());
             if(offlines != null){
                 for(int i = 0; i < offlines.size(); i++){
                     if(offlines.get(i).getSignal() != Room.SCAN_NOT_FOUND)
@@ -97,10 +74,9 @@ public class Knn extends FingerprintAnalyzer{
             }
         }
 
-
         if(this.flagValueError){
             for(String BSSID : notFound){
-                List<ScanResult> offlines = r.getFingerprints(BSSID);
+                List<ScanResult> offlines = room.getFingerprints(BSSID);
                 for(int i=0; i<offlines.size(); i++){
                     ScanResult offline = offlines.get(i);
                     if(offline.getSignal() != Room.SCAN_NOT_FOUND)
@@ -109,31 +85,32 @@ public class Knn extends FingerprintAnalyzer{
             }
         }
 
-
         for(int j = 0; j < roomErr.length; j++){
-            this.errors.put(r.getId()+"_"+j, Math.sqrt(roomErr[j]));
-            //System.out.println(r.getId()+"_"+j + "->" + this.errors.get(r.getId() +"_" + j) );
+            this.errors.put(room.getId()+"_"+j, Math.sqrt(roomErr[j]));
+            //System.out.println(room.getId()+"_"+j + "->" + this.errors.get(room.getId() +"_" + j) );
         }
         //Utils.sleep(4000);
     }
  
     @Override
     public String findRoomKey() {
-        String roomkey = null;
+        String roomKey = null;
         List<Room> rooms = dbm.getClientRooms(client.getId());
-        if(rooms == null){
+
+        if(rooms == null) {
             return null;
         } 
         if(rooms.size() <= 0) {
             return null;
         }
 
+        this.errors.clear();
         ScanResult[] onlines = client.getFingerprints();
         for(Room room : rooms) {
             roomError(room, onlines);
         }
         
-        this.errors = sortByValueAsc(this.errors);
+        this.errors = Utils.sortHashMapByValueAsc(this.errors);
 
         HashMap<String, Integer> classes = new HashMap<>();
         Iterator<String> it = errors.keySet().iterator();
@@ -146,17 +123,16 @@ public class Knn extends FingerprintAnalyzer{
                 classes.put(key, 1);
             ki++;
         }
-
         int max = Integer.MIN_VALUE;
 
         for(String key : classes.keySet()){
             if(classes.get(key) > max){
                 max = classes.get(key);
-                roomkey = key;
+                roomKey = key;
             }
         }
 
         super.printer.setKnn(classes);
-        return roomkey;
+        return roomKey;
     }
 }
