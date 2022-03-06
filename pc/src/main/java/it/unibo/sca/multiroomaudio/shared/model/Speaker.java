@@ -2,52 +2,38 @@ package it.unibo.sca.multiroomaudio.shared.model;
 
 public class Speaker extends Device {
     private String name;
-    private transient boolean isMuted; //true by default
-    private transient int numberNowPlaying = 0;
+    private transient int palyingClients = 0;
 
     public Speaker(String id, String name) {
         super(id, 1);
         this.name = name;
-        this.isMuted = true;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setMuted(boolean isMuted) {
-        this.isMuted = isMuted;
-    }
-
     public boolean isMuted() {
-        return isMuted;
+        return palyingClients == 0;
     }
 
     public void decNumberNowPlaying() {
         synchronized (this){
-            if(this.numberNowPlaying > 0)
-                this.numberNowPlaying -= 1;
-            if(this.numberNowPlaying == 0)
-                this.isMuted = true;
+            if(this.palyingClients > 0)
+                this.palyingClients -= 1;
         }
     }
 
     public void incNumberNowPlaying() {
         synchronized (this){
-            this.numberNowPlaying += 1;
-            this.isMuted = false;
+            this.palyingClients += 1;
         }
     }
 
     public void resetPlaying(){
         synchronized (this){
-            this.numberNowPlaying = 0;
-            this.isMuted = true;
+            this.palyingClients = 0;
         }
-    }
-    
-    public int getNumberNowPlaying() { 
-        return numberNowPlaying;
     }
 
     @Override
