@@ -199,14 +199,19 @@ public class DatabaseManager {
             return;
         }
         if( rooms == null ) return;
-            rooms.remove(roomId.toLowerCase());
-        
+        rooms.remove(roomId.toLowerCase());        
     }
 
     public List<Room> getClientRooms(String clientId){
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
         if( rooms == null ) return new ArrayList<>();
         return new ArrayList<>(rooms.values());
+    }
+
+    public Room getClientRoom(String clientId, String roomId){
+        ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
+        if( rooms == null ) return null;
+        return rooms.get(roomId);
     }
 
     public void putScans(Client client, ScanResult[] scans){
@@ -287,7 +292,7 @@ public class DatabaseManager {
             ScanResult finalResult;
             //save the result only if the mean for the set of scan is significative
             if(signals.get(key).size() > 2){
-                double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
+                double mean = ( signals.get(key).stream().reduce(0d, Double::sum)) /signals.get(key).size();
                 double stddev = Math.sqrt(signals.get(key).stream().reduce(0d, (subtotal, element) -> subtotal + Math.pow((element - mean), 2))/(signals.get(key).size()-1));
                 //System.out.println("mean: " + mean);
                 if(mean > CUT_POWER){
