@@ -1,0 +1,216 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+MERGED from [com.google.android.material:material:1.4.0] /home/vallasc/.gradle/caches/transforms-3/f794c157ce27c216c504b2261e60ef5d/transformed/material-1.4.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.1] /home/vallasc/.gradle/caches/transforms-3/763fcd2e0284e5e571bdcc51d674f4ec/transformed/constraintlayout-2.1.1/AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.appcompat:appcompat:1.3.1] /home/vallasc/.gradle/caches/transforms-3/43711b72eaf2f529e5b9b1576380fb27/transformed/appcompat-1.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/vallasc/.gradle/caches/transforms-3/3cb859c1ac0dd29d128e917789be4254/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.fragment:fragment:1.3.6] /home/vallasc/.gradle/caches/transforms-3/ced132bf9fc06842b5819ef6e28ee688/transformed/fragment-1.3.6/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.activity:activity:1.2.4] /home/vallasc/.gradle/caches/transforms-3/0173ed9dc551c8b1c170efbf05532376/transformed/jetified-activity-1.2.4/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.appcompat:appcompat-resources:1.3.1] /home/vallasc/.gradle/caches/transforms-3/62b1b7211da2e9c93648b1a631905f6a/transformed/jetified-appcompat-resources-1.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/vallasc/.gradle/caches/transforms-3/8ede10147567c2507cc51ace41c13ea6/transformed/drawerlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /home/vallasc/.gradle/caches/transforms-3/d5ce58f194e6eb15743ad13effdd09da/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/vallasc/.gradle/caches/transforms-3/d2646664f8d9727246d320f24126df9c/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.transition:transition:1.2.0] /home/vallasc/.gradle/caches/transforms-3/e7a7361ce08649d63b0b54755f88f036/transformed/transition-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/vallasc/.gradle/caches/transforms-3/08a78bb58e82e932da1f82c2b8b82824/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/vallasc/.gradle/caches/transforms-3/0a2c06990f10f8bf77c6b2eafaa2d2f7/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/vallasc/.gradle/caches/transforms-3/70c058259436dcd4c71d85461afd1b6a/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/vallasc/.gradle/caches/transforms-3/6d6e532017af0c907cd34d38d04e17fc/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /home/vallasc/.gradle/caches/transforms-3/d35f0010fbff61dfb15ae12685344215/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/vallasc/.gradle/caches/transforms-3/973d1c6591a02ca84f2ddc5ef5b8076a/transformed/recyclerview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.0.0] /home/vallasc/.gradle/caches/transforms-3/c0d52683149a4f63c5e66613b9f51e2e/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.5.0] /home/vallasc/.gradle/caches/transforms-3/97e7ec19bd11dff7ae3d399ac9d0fa5b/transformed/core-1.5.0/AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/vallasc/.gradle/caches/transforms-3/58c33f79541fa64793747c2f03ce017d/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1] /home/vallasc/.gradle/caches/transforms-3/c1a2bad483f0938ab658856dbf3c7f56/transformed/jetified-lifecycle-viewmodel-savedstate-2.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.savedstate:savedstate:1.1.0] /home/vallasc/.gradle/caches/transforms-3/940f6159f5551d04c5900cf56e10f7a6/transformed/jetified-savedstate-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] /home/vallasc/.gradle/caches/transforms-3/47e5272538e67774132afc2512bda737/transformed/lifecycle-runtime-2.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.3.1] /home/vallasc/.gradle/caches/transforms-3/1d20e376c94887dfa0b3a5aa12cd6783/transformed/lifecycle-viewmodel-2.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.cardview:cardview:1.0.0] /home/vallasc/.gradle/caches/transforms-3/1bc1de6a32330280351f65a0393bdf57/transformed/cardview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/vallasc/.gradle/caches/transforms-3/d88cacb3ad7019752e911e94c62f5798/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.tracing:tracing:1.0.0] /home/vallasc/.gradle/caches/transforms-3/7a6baf161ab5d6c31b6f6f5d94e198cf/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/vallasc/.gradle/caches/transforms-3/d6b2c6310d0da332cb9475defea77305/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.3.1] /home/vallasc/.gradle/caches/transforms-3/6e3c93787fdaaf7e4199472c64252016/transformed/lifecycle-livedata-core-2.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.1.0] /home/vallasc/.gradle/caches/transforms-3/72de0627c0c71c2c0ac6e20b5aa28ba3/transformed/core-runtime-2.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/vallasc/.gradle/caches/transforms-3/511e2a36f18b29fdf3f425e3962668f8/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/vallasc/.gradle/caches/transforms-3/5dc1b0d68d5be8d395af6b357c3240c1/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/vallasc/.gradle/caches/transforms-3/eb3bd80f829817dc46cef00554f9b4ab/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /home/vallasc/.gradle/caches/transforms-3/998ecad2e598076d0444e5b886cc28b2/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.0.0] /home/vallasc/.gradle/caches/transforms-3/dad45be7fb3d40cd3f820bd1d6623c5b/transformed/jetified-annotation-experimental-1.0.0/AndroidManifest.xml:17:1-24:12
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+	package
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:4:5-42
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:1-34:12
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:6:5-66
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:6:22-64
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:7:5-76
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:7:22-74
+uses-permission#android.permission.CHANGE_WIFI_STATE
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:8:5-76
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:8:22-73
+uses-permission#android.permission.ACCESS_WIFI_STATE
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:9:5-76
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:9:22-73
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:10:5-79
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:10:22-76
+application
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:13:5-32:19
+MERGED from [com.google.android.material:material:1.4.0] /home/vallasc/.gradle/caches/transforms-3/f794c157ce27c216c504b2261e60ef5d/transformed/material-1.4.0/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.material:material:1.4.0] /home/vallasc/.gradle/caches/transforms-3/f794c157ce27c216c504b2261e60ef5d/transformed/material-1.4.0/AndroidManifest.xml:22:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.1] /home/vallasc/.gradle/caches/transforms-3/763fcd2e0284e5e571bdcc51d674f4ec/transformed/constraintlayout-2.1.1/AndroidManifest.xml:9:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.1] /home/vallasc/.gradle/caches/transforms-3/763fcd2e0284e5e571bdcc51d674f4ec/transformed/constraintlayout-2.1.1/AndroidManifest.xml:9:5-20
+MERGED from [androidx.core:core:1.5.0] /home/vallasc/.gradle/caches/transforms-3/97e7ec19bd11dff7ae3d399ac9d0fa5b/transformed/core-1.5.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.5.0] /home/vallasc/.gradle/caches/transforms-3/97e7ec19bd11dff7ae3d399ac9d0fa5b/transformed/core-1.5.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/vallasc/.gradle/caches/transforms-3/d88cacb3ad7019752e911e94c62f5798/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/vallasc/.gradle/caches/transforms-3/d88cacb3ad7019752e911e94c62f5798/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+	android:screenOrientation
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:21:9-45
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.5.0] /home/vallasc/.gradle/caches/transforms-3/97e7ec19bd11dff7ae3d399ac9d0fa5b/transformed/core-1.5.0/AndroidManifest.xml:24:18-86
+	android:supportsRtl
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:19:9-35
+	android:label
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:17:9-41
+	android:launchMode
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:20:9-44
+	android:roundIcon
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:18:9-54
+	android:icon
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:16:9-43
+	android:allowBackup
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:15:9-35
+	android:theme
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:22:9-52
+	android:usesCleartextTraffic
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:14:9-44
+activity#it.unibo.sca.multiroomaudio.MainActivity
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:23:9-30:20
+	android:exported
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:25:13-36
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:24:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:26:13-29:29
+action#android.intent.action.MAIN
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:27:17-69
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:27:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:28:17-77
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:28:27-74
+service#it.unibo.sca.multiroomaudio.services.FingerprintService
+ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:31:9-87
+	android:enabled
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:31:18-40
+	android:name
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml:31:41-84
+uses-sdk
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+MERGED from [com.google.android.material:material:1.4.0] /home/vallasc/.gradle/caches/transforms-3/f794c157ce27c216c504b2261e60ef5d/transformed/material-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.4.0] /home/vallasc/.gradle/caches/transforms-3/f794c157ce27c216c504b2261e60ef5d/transformed/material-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.1] /home/vallasc/.gradle/caches/transforms-3/763fcd2e0284e5e571bdcc51d674f4ec/transformed/constraintlayout-2.1.1/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.1] /home/vallasc/.gradle/caches/transforms-3/763fcd2e0284e5e571bdcc51d674f4ec/transformed/constraintlayout-2.1.1/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.appcompat:appcompat:1.3.1] /home/vallasc/.gradle/caches/transforms-3/43711b72eaf2f529e5b9b1576380fb27/transformed/appcompat-1.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat:1.3.1] /home/vallasc/.gradle/caches/transforms-3/43711b72eaf2f529e5b9b1576380fb27/transformed/appcompat-1.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/vallasc/.gradle/caches/transforms-3/3cb859c1ac0dd29d128e917789be4254/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /home/vallasc/.gradle/caches/transforms-3/3cb859c1ac0dd29d128e917789be4254/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.3.6] /home/vallasc/.gradle/caches/transforms-3/ced132bf9fc06842b5819ef6e28ee688/transformed/fragment-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.3.6] /home/vallasc/.gradle/caches/transforms-3/ced132bf9fc06842b5819ef6e28ee688/transformed/fragment-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.2.4] /home/vallasc/.gradle/caches/transforms-3/0173ed9dc551c8b1c170efbf05532376/transformed/jetified-activity-1.2.4/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.2.4] /home/vallasc/.gradle/caches/transforms-3/0173ed9dc551c8b1c170efbf05532376/transformed/jetified-activity-1.2.4/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.3.1] /home/vallasc/.gradle/caches/transforms-3/62b1b7211da2e9c93648b1a631905f6a/transformed/jetified-appcompat-resources-1.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.3.1] /home/vallasc/.gradle/caches/transforms-3/62b1b7211da2e9c93648b1a631905f6a/transformed/jetified-appcompat-resources-1.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/vallasc/.gradle/caches/transforms-3/8ede10147567c2507cc51ace41c13ea6/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/vallasc/.gradle/caches/transforms-3/8ede10147567c2507cc51ace41c13ea6/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /home/vallasc/.gradle/caches/transforms-3/d5ce58f194e6eb15743ad13effdd09da/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /home/vallasc/.gradle/caches/transforms-3/d5ce58f194e6eb15743ad13effdd09da/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/vallasc/.gradle/caches/transforms-3/d2646664f8d9727246d320f24126df9c/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/vallasc/.gradle/caches/transforms-3/d2646664f8d9727246d320f24126df9c/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.transition:transition:1.2.0] /home/vallasc/.gradle/caches/transforms-3/e7a7361ce08649d63b0b54755f88f036/transformed/transition-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.2.0] /home/vallasc/.gradle/caches/transforms-3/e7a7361ce08649d63b0b54755f88f036/transformed/transition-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/vallasc/.gradle/caches/transforms-3/08a78bb58e82e932da1f82c2b8b82824/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/vallasc/.gradle/caches/transforms-3/08a78bb58e82e932da1f82c2b8b82824/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/vallasc/.gradle/caches/transforms-3/0a2c06990f10f8bf77c6b2eafaa2d2f7/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/vallasc/.gradle/caches/transforms-3/0a2c06990f10f8bf77c6b2eafaa2d2f7/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/vallasc/.gradle/caches/transforms-3/70c058259436dcd4c71d85461afd1b6a/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/vallasc/.gradle/caches/transforms-3/70c058259436dcd4c71d85461afd1b6a/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/vallasc/.gradle/caches/transforms-3/6d6e532017af0c907cd34d38d04e17fc/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/vallasc/.gradle/caches/transforms-3/6d6e532017af0c907cd34d38d04e17fc/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/vallasc/.gradle/caches/transforms-3/d35f0010fbff61dfb15ae12685344215/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/vallasc/.gradle/caches/transforms-3/d35f0010fbff61dfb15ae12685344215/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/vallasc/.gradle/caches/transforms-3/973d1c6591a02ca84f2ddc5ef5b8076a/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] /home/vallasc/.gradle/caches/transforms-3/973d1c6591a02ca84f2ddc5ef5b8076a/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.0.0] /home/vallasc/.gradle/caches/transforms-3/c0d52683149a4f63c5e66613b9f51e2e/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/vallasc/.gradle/caches/transforms-3/c0d52683149a4f63c5e66613b9f51e2e/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.5.0] /home/vallasc/.gradle/caches/transforms-3/97e7ec19bd11dff7ae3d399ac9d0fa5b/transformed/core-1.5.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.5.0] /home/vallasc/.gradle/caches/transforms-3/97e7ec19bd11dff7ae3d399ac9d0fa5b/transformed/core-1.5.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/vallasc/.gradle/caches/transforms-3/58c33f79541fa64793747c2f03ce017d/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/vallasc/.gradle/caches/transforms-3/58c33f79541fa64793747c2f03ce017d/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1] /home/vallasc/.gradle/caches/transforms-3/c1a2bad483f0938ab658856dbf3c7f56/transformed/jetified-lifecycle-viewmodel-savedstate-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1] /home/vallasc/.gradle/caches/transforms-3/c1a2bad483f0938ab658856dbf3c7f56/transformed/jetified-lifecycle-viewmodel-savedstate-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.1.0] /home/vallasc/.gradle/caches/transforms-3/940f6159f5551d04c5900cf56e10f7a6/transformed/jetified-savedstate-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.1.0] /home/vallasc/.gradle/caches/transforms-3/940f6159f5551d04c5900cf56e10f7a6/transformed/jetified-savedstate-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] /home/vallasc/.gradle/caches/transforms-3/47e5272538e67774132afc2512bda737/transformed/lifecycle-runtime-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] /home/vallasc/.gradle/caches/transforms-3/47e5272538e67774132afc2512bda737/transformed/lifecycle-runtime-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.3.1] /home/vallasc/.gradle/caches/transforms-3/1d20e376c94887dfa0b3a5aa12cd6783/transformed/lifecycle-viewmodel-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.3.1] /home/vallasc/.gradle/caches/transforms-3/1d20e376c94887dfa0b3a5aa12cd6783/transformed/lifecycle-viewmodel-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.cardview:cardview:1.0.0] /home/vallasc/.gradle/caches/transforms-3/1bc1de6a32330280351f65a0393bdf57/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /home/vallasc/.gradle/caches/transforms-3/1bc1de6a32330280351f65a0393bdf57/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/vallasc/.gradle/caches/transforms-3/d88cacb3ad7019752e911e94c62f5798/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/vallasc/.gradle/caches/transforms-3/d88cacb3ad7019752e911e94c62f5798/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /home/vallasc/.gradle/caches/transforms-3/7a6baf161ab5d6c31b6f6f5d94e198cf/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /home/vallasc/.gradle/caches/transforms-3/7a6baf161ab5d6c31b6f6f5d94e198cf/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/vallasc/.gradle/caches/transforms-3/d6b2c6310d0da332cb9475defea77305/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/vallasc/.gradle/caches/transforms-3/d6b2c6310d0da332cb9475defea77305/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.3.1] /home/vallasc/.gradle/caches/transforms-3/6e3c93787fdaaf7e4199472c64252016/transformed/lifecycle-livedata-core-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.3.1] /home/vallasc/.gradle/caches/transforms-3/6e3c93787fdaaf7e4199472c64252016/transformed/lifecycle-livedata-core-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] /home/vallasc/.gradle/caches/transforms-3/72de0627c0c71c2c0ac6e20b5aa28ba3/transformed/core-runtime-2.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] /home/vallasc/.gradle/caches/transforms-3/72de0627c0c71c2c0ac6e20b5aa28ba3/transformed/core-runtime-2.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/vallasc/.gradle/caches/transforms-3/511e2a36f18b29fdf3f425e3962668f8/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/vallasc/.gradle/caches/transforms-3/511e2a36f18b29fdf3f425e3962668f8/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/vallasc/.gradle/caches/transforms-3/5dc1b0d68d5be8d395af6b357c3240c1/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/vallasc/.gradle/caches/transforms-3/5dc1b0d68d5be8d395af6b357c3240c1/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/vallasc/.gradle/caches/transforms-3/eb3bd80f829817dc46cef00554f9b4ab/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/vallasc/.gradle/caches/transforms-3/eb3bd80f829817dc46cef00554f9b4ab/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/vallasc/.gradle/caches/transforms-3/998ecad2e598076d0444e5b886cc28b2/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/vallasc/.gradle/caches/transforms-3/998ecad2e598076d0444e5b886cc28b2/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.0.0] /home/vallasc/.gradle/caches/transforms-3/dad45be7fb3d40cd3f820bd1d6623c5b/transformed/jetified-annotation-experimental-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.0.0] /home/vallasc/.gradle/caches/transforms-3/dad45be7fb3d40cd3f820bd1d6623c5b/transformed/jetified-annotation-experimental-1.0.0/AndroidManifest.xml:20:5-22:41
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+		ADDED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
+		INJECTED from /home/vallasc/Repos/MultiRoomAudio/android/app/src/main/AndroidManifest.xml
