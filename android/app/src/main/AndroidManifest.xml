@@ -18,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:launchMode="singleInstance"
+        android:screenOrientation="portrait"
         android:theme="@style/Theme.MultiRoomAudio">
         <activity
             android:name=".MainActivity"
