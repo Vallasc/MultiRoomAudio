@@ -47,15 +47,8 @@ public class Room {
         
         // Fill
         for(Entry<String, List<ScanResult>> entry : fingerprints.entrySet()){
-            System.out.println("size array in: " + entry.getValue().size());
             while(nscan > entry.getValue().size()){
-                //System.out.println("bubba: " + (nscan - entry.getValue().size()));
-                //System.out.println("nscan: " + nscan);
                 entry.getValue().add(null);
-            }
-            System.out.println("size array: " + entry.getValue().size());
-            if(entry.getValue() == list){
-                System.out.println("TROVATO");
             }
         }
         list.set(nscan -1, result);
