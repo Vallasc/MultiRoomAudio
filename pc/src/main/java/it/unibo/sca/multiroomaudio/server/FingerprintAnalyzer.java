@@ -60,7 +60,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                 }
                 prevRoomKey = roomkey;
             }
-            this.printer.print();
+            //this.printer.print();
             Utils.sleep(SLEEP_TIME);
         }
         prevSpeakers.forEach((s) -> s.decNumberNowPlaying());
