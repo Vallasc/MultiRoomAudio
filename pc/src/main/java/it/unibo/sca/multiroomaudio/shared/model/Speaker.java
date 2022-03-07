@@ -30,11 +30,15 @@ public class Speaker extends Device {
         }
     }
 
-    public void resetPlaying(){
+    public int getPlayingClients() {
+        return this.palyingClients;
+    }
+
+    /*public void resetPlaying(){
         synchronized (this){
             this.palyingClients = 0;
         }
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {
