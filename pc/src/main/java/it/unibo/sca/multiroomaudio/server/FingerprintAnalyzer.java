@@ -60,6 +60,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                 }
                 prevRoomKey = roomkey;
             }
+            this.printer.print();
             Utils.sleep(SLEEP_TIME);
         }
         prevSpeakers.forEach((s) -> s.decNumberNowPlaying());
@@ -91,7 +92,7 @@ public abstract class FingerprintAnalyzer extends Thread {
     
     public static class Printer{
         HashMap<String, double[]> res;
-        HashMap<String, Integer> knnRes;
+        HashMap<String, Double> knnRes;
         int type;
         public Printer(int type){
             this.type = type;
@@ -102,7 +103,7 @@ public abstract class FingerprintAnalyzer extends Thread {
 
         }
 
-        public void setKnn(HashMap<String, Integer> knnRes){
+        public void setKnn(HashMap<String, Double> knnRes){
             this.knnRes = knnRes;
         }
 
@@ -122,9 +123,11 @@ public abstract class FingerprintAnalyzer extends Thread {
                 }
             }
             if(this.type == 1){
+                System.out.println("K classes");
                 for(String s : this.knnRes.keySet()){
                     System.out.println("Room: " + s + " corrispondences: " + knnRes.get(s));
                 }
+                System.out.println("");
             }
         }
     }
