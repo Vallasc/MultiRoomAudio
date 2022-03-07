@@ -215,6 +215,7 @@ public class DatabaseManager {
     }
 
     public void putScans(Client client, ScanResult[] scans){
+        MsgScanRoomDone doneMessage = null;
         if(client.getCurrentPositionScans() == 0){
             client.getCurrentTmpScans().clear();
         }
@@ -227,7 +228,6 @@ public class DatabaseManager {
         String roomId = client.getActiveRoom().toLowerCase();
         Room room = clientRooms.get(client.getId()).get(roomId);
         int currentPositionScans = client.getCurrentPositionScans();
-        boolean doneScan = false;
         // If room is not full
         if(room.getNScan() < Room.MAX_POSITION){
             // If corner is not full
@@ -237,41 +237,30 @@ public class DatabaseManager {
                 client.setCurrentPositionScans(currentPositionScans);
             } else { // corner is full
                 // Save corner scans
-                room.setNScan(room.getNScan() + 1);
-                putScansUpdateRoom(client.getId(), roomId, client.getCurrentTmpScans());
-                try {
-                    // Done scan corner
-                    WebSocketHandler.sendMessage(clientSession, 
-                        new MsgScanRoomDone(false, true));
-                } catch (Exception e) {}
+                computeMeanUpdateRoomFingerprints(client.getId(), roomId, client.getCurrentTmpScans());
+                doneMessage = new MsgScanRoomDone(false, true);
                 // Reset corner scan counter
                 client.setCurrentPositionScans(0);
                 client.setActiveRoom(null);
                 if(room.getNScan() >= Room.MAX_POSITION)
-                    doneScan = true;
+                    doneMessage = new MsgScanRoomDone(true, true);
             }
         } else {
-            doneScan = true;
+            doneMessage = new MsgScanRoomDone(true, true);
             client.setActiveRoom(null);
             client.setCurrentPositionScans(0);
         }
-        // Done room scan
-        if(doneScan){
+        if(doneMessage != null)
             try {
-                WebSocketHandler.sendMessage(clientSession, 
-                    new MsgScanRoomDone(true, true));
+                WebSocketHandler.sendMessage(clientSession, doneMessage);
             } catch (Exception e) {}
-        }
-
     }
 
     private static final int CUT_POWER = -80;
     // Set scans for a room
-    public void putScansUpdateRoom(String clientId, String roomId, List<ScanResult> scans){ 
-        /*Room room = clientScans.get(clientId).get(roomId);
-        room.setNScan(room.getNScan() + 1);*/
-        Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
-        Map<String, ScanResult> results = new HashMap<>(); //utility map to retrieve info later on
+    public void computeMeanUpdateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){ 
+        Map<String, List<Double>> signals = new HashMap<>(); //list of all the signals strength for the same ap in the same scan
+        Map<String, ScanResult> results = new HashMap<>();  //utility map to retrieve info later on
         for(ScanResult scan : scans){
             //create a list of results for each scan
             List<Double> listSignals = signals.get(scan.getBSSID());
@@ -280,12 +269,13 @@ public class DatabaseManager {
                 listSignals = new ArrayList<>();
                 listSignals.add(scan.getSignal());
                 signals.put(scan.getBSSID(), listSignals);
-            }else{
+            } else {
                 listSignals.add(scan.getSignal());
             }
-            
         }
 
+        Room room = clientRooms.get(clientId).get(roomId);
+        room.incNScan();
         //if i want to put the variance in it 
         for(String key : signals.keySet()){
             //compute the mean for each set of scan
@@ -297,11 +287,11 @@ public class DatabaseManager {
                 //System.out.println("mean: " + mean);
                 if(mean > CUT_POWER){
                     finalResult = new ScanResult(key, results.get(key).getSSID(), mean, stddev, results.get(key).getFrequency(), results.get(key).getTimestamp());
-                    clientRooms.get(clientId).get(roomId).putClientFingerprints(finalResult);
+                    room.putFingerprints(finalResult);
                 }
             }
-            
         }
+        room.printFingerprints();
     }
 
     public void printFingerprintDb(String clientId){
@@ -329,7 +319,7 @@ public class DatabaseManager {
                 
                 JsonObject fingerprintsObj = roomObj.get("fingerprints").getAsJsonObject();
                 
-                ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
+                HashMap<String, List<ScanResult>> fingerprints =  new HashMap<>();
                 for(String bssid : fingerprintsObj.keySet()){
                     JsonArray fingerprintsArr = fingerprintsObj.get(bssid).getAsJsonArray();
                     List<ScanResult> result = gson.fromJson(fingerprintsArr, scanType);
