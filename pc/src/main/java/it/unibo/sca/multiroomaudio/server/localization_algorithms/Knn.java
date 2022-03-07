@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
@@ -17,10 +16,11 @@ import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class Knn extends FingerprintAnalyzer{
-    public static final int POWER_LIMIT = -75;
-    private HashMap<String, Double> errors = new LinkedHashMap<>(); //<AP, error>
+    public static final int POWER_LIMIT = -70;
+    private HashMap<String, Double> errors = new LinkedHashMap<>(); //<ReferencePoint, error>
     private int k = 1;
-    private boolean flagValueError = false;
+    private boolean initUnknownAP = false;
+    private boolean useWeight = false;
 
     public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
         super(speakerManager, client, dbm, 1);
@@ -31,14 +31,15 @@ public class Knn extends FingerprintAnalyzer{
         this.k = k;
     }
 
-    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, boolean f) {
+    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, boolean initUnknownAP) {
         super(speakerManager, client, dbm, 1);
-        this.flagValueError = f;
+        this.initUnknownAP = initUnknownAP;
     }
 
-    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int k, boolean f) {
+    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int k, boolean initUnknownAP, boolean useWeight) {
         super(speakerManager, client, dbm, 1);
-        this.flagValueError = f;
+        this.initUnknownAP = initUnknownAP;
+        this.useWeight = useWeight;
         this.k = k;
     }
 
@@ -46,14 +47,45 @@ public class Knn extends FingerprintAnalyzer{
         this.k = k;
     }
 
-    private double compute(double x, double mu){ 
+    
+    private HashMap<String, Double> selectK(boolean addWeights){
+        // Get first k
+        this.errors = Utils.sortHashMapByValueAsc(this.errors);
+        double invDistance = 0;
+
+        if(addWeights){
+            // Calculate  inverse of distance
+            Iterator<String> it = errors.keySet().iterator();
+            for(int i = 0; it.hasNext() && i < k; i++) {
+                String key = it.next();
+                invDistance += 1/(Math.pow(errors.get(key), 2));
+            }
+        }
+
+        // Calculate weights and classes
+        HashMap<String, Double> classes = new HashMap<>();
+        Iterator<String> it = errors.keySet().iterator();
+        for(int i = 0; it.hasNext() && i < k; i++) {
+            String key = it.next();
+            String keyAggregated = key.split("_")[0];
+            double weight = 1;
+            if(addWeights)
+                weight = (1/ Math.pow(errors.get(key), 2)) / (invDistance);
+            if(classes.containsKey(keyAggregated)) 
+                classes.put(keyAggregated, classes.get(keyAggregated) + weight);
+            else
+                classes.put(keyAggregated, weight);
+        }
+
+        return classes;
+    }
+
+    private double computePower(double x, double mu){ 
         return Math.pow(x-mu, 2);
     }
 
-    public void roomError(Room room, ScanResult[] onlines){
-        if(onlines == null)
-            return;
-        if(room.getNScan() == 0)
+    public void computeRoomError(Room room, List<ScanResult> onlines){
+        if(onlines == null || room.getNScan() == 0)
             return;
 
         double[] roomErr = new double[room.getNScan()];
@@ -61,32 +93,26 @@ public class Knn extends FingerprintAnalyzer{
 
         List<String> notFound = new ArrayList<>(room.getFingerprints().keySet());
         // Foreach BSSID in online fingerprint
-        //System.out.println("NSCAN:" + room.getNScan());
         for(ScanResult online : onlines){
             notFound.remove(online.getBSSID());
             // Array of others RP fingerprints
             List<ScanResult> offlines = room.getFingerprints(online.getBSSID());
-            //System.out.println("OFFLINE");
             if(offlines != null){
                 for(int i = 0; i < offlines.size(); i++){
-                    //if(offlines.get(i).getSignal() != Room.SCAN_NOT_FOUND)
                     if(offlines.get(i) != null){
-                        roomErr[i] += compute(online.getSignal(), offlines.get(i).getSignal());
-                        //System.out.println(offlines.get(i).getBSSID());
+                        roomErr[i] += computePower(online.getSignal(), offlines.get(i).getSignal());
                     }
                 }
             }
         }
 
-        if(this.flagValueError){
+        if(this.initUnknownAP){
             for(String BSSID : notFound){
                 List<ScanResult> offlines = room.getFingerprints(BSSID);
                 if(offlines != null){
                     for(int i=0; i< offlines.size(); i++){
-                        //ScanResult offline = offlines.get(i);
-                        //if(offline.getSignal() != Room.SCAN_NOT_FOUND)
                         if(offlines.get(i) != null)
-                            roomErr[i] += compute(POWER_LIMIT, offlines.get(i).getSignal());
+                            roomErr[i] += computePower(POWER_LIMIT, offlines.get(i).getSignal());
                     }
                 }
             }
@@ -109,27 +135,14 @@ public class Knn extends FingerprintAnalyzer{
         } 
 
         this.errors.clear();
-        ScanResult[] onlines = client.getFingerprints();
+        List<ScanResult> onlines = client.getFingerprints();
         for(Room room : rooms) {
-            roomError(room, onlines);
+            computeRoomError(room, onlines);
         }
         
-        this.errors = Utils.sortHashMapByValueAsc(this.errors);
+        HashMap<String, Double> classes = selectK(this.useWeight);
 
-        HashMap<String, Integer> classes = new HashMap<>();
-        Iterator<String> it = errors.keySet().iterator();
-        int ki = 0;
-        while(it.hasNext() && ki < k) {
-            String key = it.next().split("_")[0];
-            if(classes.containsKey(key)) 
-                classes.put(key, classes.get(key) + 1);
-            else
-                classes.put(key, 1);
-            ki++;
-        }
-
-
-        int max = Integer.MIN_VALUE;
+        double max = Double.MIN_VALUE;
         for(String key : classes.keySet()){
             if(classes.get(key) > max){
                 max = classes.get(key);
