@@ -38,7 +38,13 @@ public class Room {
         return fingerprints.size();
     }
 
-    public void putFingerprints(ScanResult result){
+    public void putFingerprints(List<ScanResult> scanResults){ 
+        this.incNScan();
+        for(ScanResult scan : scanResults)
+            this.putFingerprint(scan);
+    }
+
+    public void putFingerprint(ScanResult result){
         List<ScanResult> list = fingerprints.get(result.getBSSID());
         if(list == null){
             list = new ArrayList<>();
@@ -52,25 +58,6 @@ public class Room {
             }
         }
         list.set(nscan -1, result);
-
-        /*List<ScanResult> list = fingerprints.get(result.getBSSID());
-        if(list == null){
-            List<ScanResult> results = new ArrayList<>();
-            if(nscan > 1){
-                for(int i = 0; i< nscan - 1; i++)
-                    results.add(i, new ScanResult(result.getBSSID(), result.getSSID(), SCAN_NOT_FOUND, result.getStddev(), result.getFrequency(), result.getTimestamp()));
-            }
-            results.add( nscan - 1, result);
-            fingerprints.put(result.getBSSID(), results);
-                
-        }else{
-            int len = list.size();
-            if(len < nscan)
-                for(int i = len; i< nscan - 1; i++){
-                    list.add(i, new ScanResult(result.getBSSID(), result.getSSID(), SCAN_NOT_FOUND, result.getStddev(), result.getFrequency(), result.getTimestamp()));
-                }
-            list.add(nscan-1, result);
-        }*/
     }
 
     public ArrayList<ScanResult> getFingerprints(String bssid){
