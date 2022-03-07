@@ -76,7 +76,7 @@ public class SocketHandler extends Thread{
                 MsgScanResult resultMessage = gson.fromJson(dIn.readUTF(), MsgScanResult.class);
                 //System.out.println(resultMessage.toJson());
                 if(myDevice.getActiveRoom() == null) {
-                    System.out.println("Current scan len:" + resultMessage.getApList().length);
+                    //System.out.println("Current scan len:" + resultMessage.getApList().length);
                     myDevice.setFingerprints(resultMessage.getApList());
                 } else {
                     //System.out.println("Current scan len:" + resultMessage.getApList().length);
