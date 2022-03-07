@@ -214,16 +214,14 @@ public class DatabaseManager {
         return rooms.get(roomId);
     }
 
-    public void putScans(Client client, ScanResult[] scans){
+    public void saveRoomScans(Client client, ScanResult[] scans){
         MsgScanRoomDone doneMessage = null;
-        if(client.getCurrentPositionScans() == 0){
+        if(client.getCurrentPositionScans() == 0)
             client.getCurrentTmpScans().clear();
-        }
 
         Session clientSession = getClientWebSession(client.getId());
-        if(clientSession == null || client.getActiveRoom() == null){ // stop scanning process
+        if(clientSession == null || client.getActiveRoom() == null) // Stop scanning process
             return;
-        }
 
         String roomId = client.getActiveRoom().toLowerCase();
         Room room = clientRooms.get(client.getId()).get(roomId);
@@ -235,9 +233,9 @@ public class DatabaseManager {
                 client.getCurrentTmpScans().addAll(Arrays.asList(scans));
                 currentPositionScans++;
                 client.setCurrentPositionScans(currentPositionScans);
-            } else { // corner is full
+            } else { // Corner is full
                 // Save corner scans
-                computeMeanUpdateRoomFingerprints(client.getId(), roomId, client.getCurrentTmpScans());
+                updateRoomFingerprints(client.getId(), roomId, client.getCurrentTmpScans());
                 doneMessage = new MsgScanRoomDone(false, true);
                 // Reset corner scan counter
                 client.setCurrentPositionScans(0);
@@ -256,12 +254,62 @@ public class DatabaseManager {
             } catch (Exception e) {}
     }
 
-    private static final int CUT_POWER = -80;
+    private static final int CUT_POWER = -65;
+
+    public void updateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){
+        // Calculate mean stdev and aggregate samples
+        scans = computeMeanFingeprint(scans);
+        Room room = clientRooms.get(clientId).get(roomId);
+        room.putFingerprints(scans);
+        room.printFingerprints();
+    }
+
+    static private double mean(List<ScanResult> list){
+        double mean = 0;
+        for(var scan : list)
+            mean += scan.getSignal();
+        mean = mean / list.size();
+        return mean;
+    }
+
+    static private double stddev(List<ScanResult> list, double mean){
+        double der = 0;
+        for(var scan : list){
+            der += Math.pow(scan.getSignal() - mean, 2);
+        }
+        double stddev = Math.sqrt(der/list.size());
+        return stddev;
+    }
+
+    static public List<ScanResult> computeMeanFingeprint(List<ScanResult> scans){
+        Map<String, List<ScanResult>> signals = new HashMap<>(); // List of all the signals strength for the same ap in the same scan
+        for(var scanResult : scans){
+            List<ScanResult> listSignals = signals.get(scanResult.getBSSID());
+            if(listSignals == null){
+                listSignals = new ArrayList<>();
+                signals.put(scanResult.getBSSID(), listSignals);
+            }
+            listSignals.add(scanResult);
+        }
+        List<ScanResult> outResults = new ArrayList<>();
+        for(var entry : signals.entrySet()){
+            // Calc mean signal
+            double mean = mean(entry.getValue());
+            if(mean > CUT_POWER){
+                double stddev = stddev(entry.getValue(), mean);
+                ScanResult result = entry.getValue().get(0);
+                result = result.cloneWith(mean, stddev);
+                outResults.add(result);
+            }
+        }
+        return outResults;
+    }
+
     // Set scans for a room
-    public void computeMeanUpdateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){ 
+    /*public void computeMeanUpdateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){ 
         Map<String, List<Double>> signals = new HashMap<>(); //list of all the signals strength for the same ap in the same scan
         Map<String, ScanResult> results = new HashMap<>();  //utility map to retrieve info later on
-        for(ScanResult scan : scans){
+        for(var scan : scans){
             //create a list of results for each scan
             List<Double> listSignals = signals.get(scan.getBSSID());
             results.putIfAbsent(scan.getBSSID(), scan);
@@ -292,7 +340,7 @@ public class DatabaseManager {
             }
         }
         room.printFingerprints();
-    }
+    }*/
 
     public void printFingerprintDb(String clientId){
         for(String clientKey : clientRooms.keySet()){
