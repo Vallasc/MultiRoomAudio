@@ -18,7 +18,7 @@ import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class Knn extends FingerprintAnalyzer{
     public static final int POWER_LIMIT = -75;
-    private LinkedHashMap<String, Double> errors = new LinkedHashMap<>(); //<AP, error>
+    private HashMap<String, Double> errors = new LinkedHashMap<>(); //<AP, error>
     private int k = 1;
     private boolean flagValueError = false;
 
@@ -51,10 +51,8 @@ public class Knn extends FingerprintAnalyzer{
     }
 
     public void roomError(Room room, ScanResult[] onlines){
-        if(onlines == null){
+        if(onlines == null)
             return;
-        }
-
         if(room.getNScan() == 0)
             return;
 
@@ -62,25 +60,36 @@ public class Knn extends FingerprintAnalyzer{
         Arrays.fill(roomErr, 0);
 
         List<String> notFound = new ArrayList<>(room.getFingerprints().keySet());
+        // Foreach BSSID in online fingerprint
+        //System.out.println("NSCAN:" + room.getNScan());
         for(ScanResult online : onlines){
             notFound.remove(online.getBSSID());
-            // Array scanresult di bssid della stanza
-            ArrayList<ScanResult> offlines = room.getFingerprints(online.getBSSID());
+            // Array of others RP fingerprints
+            List<ScanResult> offlines = room.getFingerprints(online.getBSSID());
+            //System.out.println("OFFLINE");
             if(offlines != null){
                 for(int i = 0; i < offlines.size(); i++){
-                    if(offlines.get(i).getSignal() != Room.SCAN_NOT_FOUND)
+                    //if(offlines.get(i).getSignal() != Room.SCAN_NOT_FOUND)
+                    if(offlines.get(i) != null){
                         roomErr[i] += compute(online.getSignal(), offlines.get(i).getSignal());
+                        //System.out.println(offlines.get(i).getBSSID());
+                    }
                 }
             }
         }
 
+        Utils.sleep(500);
+
         if(this.flagValueError){
             for(String BSSID : notFound){
                 List<ScanResult> offlines = room.getFingerprints(BSSID);
-                for(int i=0; i<offlines.size(); i++){
-                    ScanResult offline = offlines.get(i);
-                    if(offline.getSignal() != Room.SCAN_NOT_FOUND)
-                        roomErr[i] += compute(POWER_LIMIT, offline.getSignal());
+                if(offlines != null){
+                    for(int i=0; i< offlines.size(); i++){
+                        //ScanResult offline = offlines.get(i);
+                        //if(offline.getSignal() != Room.SCAN_NOT_FOUND)
+                        if(offlines.get(i) != null)
+                            roomErr[i] += compute(POWER_LIMIT, offlines.get(i).getSignal());
+                    }
                 }
             }
         }
@@ -97,12 +106,9 @@ public class Knn extends FingerprintAnalyzer{
         String roomKey = null;
         List<Room> rooms = dbm.getClientRooms(client.getId());
 
-        if(rooms == null) {
+        if(rooms == null || rooms.size() == 0) {
             return null;
         } 
-        if(rooms.size() <= 0) {
-            return null;
-        }
 
         this.errors.clear();
         ScanResult[] onlines = client.getFingerprints();
@@ -123,8 +129,9 @@ public class Knn extends FingerprintAnalyzer{
                 classes.put(key, 1);
             ki++;
         }
-        int max = Integer.MIN_VALUE;
 
+
+        int max = Integer.MIN_VALUE;
         for(String key : classes.keySet()){
             if(classes.get(key) > max){
                 max = classes.get(key);
