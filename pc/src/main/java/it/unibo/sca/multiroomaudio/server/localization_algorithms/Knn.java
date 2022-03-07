@@ -78,8 +78,6 @@ public class Knn extends FingerprintAnalyzer{
             }
         }
 
-        Utils.sleep(500);
-
         if(this.flagValueError){
             for(String BSSID : notFound){
                 List<ScanResult> offlines = room.getFingerprints(BSSID);
