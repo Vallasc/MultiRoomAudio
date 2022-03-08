@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
+import it.unibo.sca.multiroomaudio.server.localization_algorithms.Bayes;
 import it.unibo.sca.multiroomaudio.server.localization_algorithms.Knn;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
@@ -71,6 +72,8 @@ public class SocketHandler extends Thread{
         //String object = (String) constructor.newInstance("Hello");
 
         FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm, 5, true, false);
+        //FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
+        
         fAnalyzernew.start();
         while(isRunning){
             try {

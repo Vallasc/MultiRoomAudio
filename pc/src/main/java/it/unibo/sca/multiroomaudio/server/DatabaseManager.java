@@ -278,6 +278,8 @@ public class DatabaseManager {
             der += Math.pow(scan.getSignal() - mean, 2);
         }
         double stddev = Math.sqrt(der/list.size());
+        if(stddev == 0)
+            stddev = 0.005;
         return stddev;
     }
 

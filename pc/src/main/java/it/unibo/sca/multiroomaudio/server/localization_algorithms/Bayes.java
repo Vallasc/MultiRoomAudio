@@ -18,11 +18,13 @@ public class Bayes extends FingerprintAnalyzer{
     }
 
     private double compute(double x, double mu, double stddev){
-        double exponent = Math.pow(Math.E, -Math.pow((x-mu), 2)/2*Math.pow(stddev, 2));
-        return (1/Math.sqrt(2*Math.PI*stddev))*exponent;
+        double numExp = Math.pow((x-mu), 2);
+        double denExp = 2*Math.pow(stddev, 2);
+        double exponent = Math.pow(2.718, -(numExp/denExp));
+        return (1/(Math.sqrt(2*Math.PI)*stddev))*exponent;
     }
     
-    private double roomError(Room r, List<ScanResult> onlines){
+    private double roomError(Room r, List<ScanResult> onlines, int rSize){
         if(onlines == null){
             return -1d;
         }
@@ -30,32 +32,31 @@ public class Bayes extends FingerprintAnalyzer{
         if(nScan == 0){
             return -1d;
         }
-        
-        double[] prob = new double[nScan];
-        int initIndex = 0; 
-        ScanResult online;
-        ArrayList<ScanResult> offlines = null;
-        boolean flagFound = false;
-        while(initIndex < onlines.size() && !flagFound){
-            online = onlines.get(initIndex);
-            offlines = r.getFingerprints(online.getBSSID());
-            if(offlines != null){
-                for(int j = 0; j < offlines.size(); j++){
-                    prob[j] = compute(online.getSignal(), offlines.get(j).getSignal(), offlines.get(j).getStddev());
-                }
-                flagFound = true;
-            }
-            initIndex +=1;
-            
-        }
-        
 
-        for(int i = initIndex; i<onlines.size(); i++){
-            online = onlines.get(i);
-            offlines = r.getFingerprints(online.getBSSID());
+        List<String> notFound = new ArrayList<>(r.getFingerprints().keySet());
+        double[] prob = new double[nScan];
+        Arrays.fill(prob, 0);
+        for(ScanResult online : onlines){
+            notFound.remove(online.getBSSID());
+            List<ScanResult> offlines = r.getFingerprints(online.getBSSID());
             if(offlines != null){
-                for(int j = 0; j < offlines.size(); j++){
-                    prob[j] *= compute(online.getSignal(), offlines.get(j).getSignal(), offlines.get(j).getStddev());
+                for(int i = 0; i < offlines.size(); i++){
+                    if(offlines.get(i) != null){
+                        if(prob[i] == 0)
+                            prob[i] = compute(online.getSignal(), offlines.get(i).getSignal(), offlines.get(i).getStddev());
+                        else
+                            prob[i] *= compute(online.getSignal(), offlines.get(i).getSignal(), offlines.get(i).getStddev());
+                    }
+                }
+            }
+        }
+
+        for(String BSSID : notFound){
+            List<ScanResult> offlines = r.getFingerprints(BSSID);
+            if(offlines != null){
+                for(int i=0; i< offlines.size(); i++){
+                    if(offlines.get(i) != null)
+                        prob[i] *= 1/rSize;
                 }
             }
         }
@@ -82,7 +83,7 @@ public class Bayes extends FingerprintAnalyzer{
         double max = -1;
         
         for(Room room : rooms){
-            double app = roomError(room, onlines);
+            double app = roomError(room, onlines, rooms.size());
             if(app == -1d) return null;
             if(app > max){
                 max = app;

@@ -79,7 +79,7 @@ public class Room {
             for(int i = 0; i <fingerprints.get(bssid).size(); i++){
                 ScanResult fp = fingerprints.get(bssid).get(i);
                 if(fp != null)
-                    System.out.println("\t" + fingerprints.get(bssid).get(i).getSignal());
+                    System.out.println("\t" + fingerprints.get(bssid).get(i).getSignal() + " " + fingerprints.get(bssid).get(i).getStddev());
                 else
                     System.out.println("\tnull");
             }
