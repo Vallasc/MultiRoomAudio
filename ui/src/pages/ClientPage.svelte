@@ -15,7 +15,6 @@
     } from "framework7-svelte"
     import { deviceId, hostname, webPort, musicPort, webSocket } from "../stores"
     import NowPlaying from "./NowPlaying.svelte"
-    import AudioAnalyser from "./AudioAnalyser.svelte"
 
     let socket
     const blankSong =
@@ -228,7 +227,6 @@
 
 </script>
 
-<AudioAnalyser></AudioAnalyser>
 <Page>
     <!-- Top Navbar -->
     <Navbar title="Multiroom Audio">
