@@ -12,7 +12,8 @@ import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
 public class MinimizeRSSErr extends FingerprintAnalyzer{
-
+    protected static final int MAX_VALUE = 15000;
+    
     public MinimizeRSSErr(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
         super(speakerManager, client, dbm, 0);
     }
@@ -25,7 +26,7 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         return Math.pow(x - mu, 2);
     }
 
-    private double roomError(Room r, ScanResult[] onlines){
+    private double roomError(Room r, List<ScanResult> onlines){
         
         if(onlines == null){
             return -1d;
@@ -66,7 +67,7 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
         }
         String roomId = null;
         double min = MAX_VALUE;
-        ScanResult[] onlines = client.getFingerprints();
+        List<ScanResult> onlines = client.getFingerprints();
         for(Room room : rooms) {
             double app = roomError(room, onlines);
             if(app == -1d) return null;

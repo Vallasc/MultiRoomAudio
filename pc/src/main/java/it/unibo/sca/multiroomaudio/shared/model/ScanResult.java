@@ -66,6 +66,10 @@ public class ScanResult implements Comparable<Object> {
                 '}';
     }
     
+    public ScanResult cloneWith(double signal, double stddev){
+        return new ScanResult(this.BSSID, this.SSID, signal, stddev, this.frequency, this.timestamp);
+    }
+
     public static int compareByBSSID(ScanResult a, ScanResult b){
         return a.getBSSID().compareTo(b.getBSSID());
     }

@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -14,7 +13,6 @@ import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
 import it.unibo.sca.multiroomaudio.server.localization_algorithms.Knn;
-import it.unibo.sca.multiroomaudio.server.localization_algorithms.MinimizeRSSErr;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 
@@ -67,10 +65,12 @@ public class SocketHandler extends Thread{
         myDevice.setActiveRoom(null);
         System.out.println("START SERVING: " + clientId);
         //FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
-        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm, 1, false);
+
         //Constructor<?> fAnalyzernew = this.algo.getConstructor(SpeakerManager.class, Client.class, DatabaseManager.class);
         //Constructor constructor = Class.forName("java.lang.String").getConstructor(String.class);
         //String object = (String) constructor.newInstance("Hello");
+
+        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm, 5, true, false);
         fAnalyzernew.start();
         while(isRunning){
             try {
@@ -81,11 +81,11 @@ public class SocketHandler extends Thread{
                 MsgScanResult resultMessage = gson.fromJson(dIn.readUTF(), MsgScanResult.class);
                 //System.out.println(resultMessage.toJson());
                 if(myDevice.getActiveRoom() == null) {
-                    //System.out.println("Current scan len:" + currentAPInfo.length);
+                    //System.out.println("Current scan len:" + resultMessage.getApList().length);
                     myDevice.setFingerprints(resultMessage.getApList());
                 } else {
                     //System.out.println("Current scan len:" + resultMessage.getApList().length);
-                    dbm.putScans(myDevice, resultMessage.getApList());
+                    dbm.saveRoomScans(myDevice, resultMessage.getApList());
                 }
             } catch (SocketException e) {
                 //e.printStackTrace();

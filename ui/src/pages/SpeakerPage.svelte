@@ -47,6 +47,7 @@
     }
 
     function alertConnectionClosed(){
+        setMute(true)
         f7.dialog.preloader('Connection closed...')
         setTimeout( () => location.reload(), 5000)
     }

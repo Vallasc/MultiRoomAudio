@@ -22,7 +22,7 @@ public class Bayes extends FingerprintAnalyzer{
         return (1/Math.sqrt(2*Math.PI*stddev))*exponent;
     }
     
-    private double roomError(Room r, ScanResult[] onlines){
+    private double roomError(Room r, List<ScanResult> onlines){
         if(onlines == null){
             return -1d;
         }
@@ -36,8 +36,8 @@ public class Bayes extends FingerprintAnalyzer{
         ScanResult online;
         ArrayList<ScanResult> offlines = null;
         boolean flagFound = false;
-        while(initIndex < onlines.length && !flagFound){
-            online = onlines[initIndex];
+        while(initIndex < onlines.size() && !flagFound){
+            online = onlines.get(initIndex);
             offlines = r.getFingerprints(online.getBSSID());
             if(offlines != null){
                 for(int j = 0; j < offlines.size(); j++){
@@ -50,8 +50,8 @@ public class Bayes extends FingerprintAnalyzer{
         }
         
 
-        for(int i = initIndex; i<onlines.length; i++){
-            online = onlines[i];
+        for(int i = initIndex; i<onlines.size(); i++){
+            online = onlines.get(i);
             offlines = r.getFingerprints(online.getBSSID());
             if(offlines != null){
                 for(int j = 0; j < offlines.size(); j++){
@@ -77,7 +77,7 @@ public class Bayes extends FingerprintAnalyzer{
             return null;
         }
         String roomId = null;
-        ScanResult[] onlines = client.getFingerprints();
+        List<ScanResult> onlines = client.getFingerprints();
 
         double max = -1;
         

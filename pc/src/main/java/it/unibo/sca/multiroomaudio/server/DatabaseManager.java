@@ -199,8 +199,7 @@ public class DatabaseManager {
             return;
         }
         if( rooms == null ) return;
-            rooms.remove(roomId.toLowerCase());
-        
+        rooms.remove(roomId.toLowerCase());        
     }
 
     public List<Room> getClientRooms(String clientId){
@@ -209,20 +208,24 @@ public class DatabaseManager {
         return new ArrayList<>(rooms.values());
     }
 
-    public void putScans(Client client, ScanResult[] scans){
-        if(client.getCurrentPositionScans() == 0){
+    public Room getClientRoom(String clientId, String roomId){
+        ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
+        if( rooms == null ) return null;
+        return rooms.get(roomId);
+    }
+
+    public void saveRoomScans(Client client, ScanResult[] scans){
+        MsgScanRoomDone doneMessage = null;
+        if(client.getCurrentPositionScans() == 0)
             client.getCurrentTmpScans().clear();
-        }
 
         Session clientSession = getClientWebSession(client.getId());
-        if(clientSession == null || client.getActiveRoom() == null){ // stop scanning process
+        if(clientSession == null || client.getActiveRoom() == null) // Stop scanning process
             return;
-        }
 
         String roomId = client.getActiveRoom().toLowerCase();
         Room room = clientRooms.get(client.getId()).get(roomId);
         int currentPositionScans = client.getCurrentPositionScans();
-        boolean doneScan = false;
         // If room is not full
         if(room.getNScan() < Room.MAX_POSITION){
             // If corner is not full
@@ -230,73 +233,76 @@ public class DatabaseManager {
                 client.getCurrentTmpScans().addAll(Arrays.asList(scans));
                 currentPositionScans++;
                 client.setCurrentPositionScans(currentPositionScans);
-            } else { // corner is full
+            } else { // Corner is full
                 // Save corner scans
-                room.setNScan(room.getNScan() + 1);
-                putScansUpdateRoom(client.getId(), roomId, client.getCurrentTmpScans());
-                try {
-                    // Done scan corner
-                    WebSocketHandler.sendMessage(clientSession, 
-                        new MsgScanRoomDone(false, true));
-                } catch (Exception e) {}
+                updateRoomFingerprints(client.getId(), roomId, client.getCurrentTmpScans());
+                doneMessage = new MsgScanRoomDone(false, true);
                 // Reset corner scan counter
                 client.setCurrentPositionScans(0);
                 client.setActiveRoom(null);
                 if(room.getNScan() >= Room.MAX_POSITION)
-                    doneScan = true;
+                    doneMessage = new MsgScanRoomDone(true, true);
             }
         } else {
-            doneScan = true;
+            doneMessage = new MsgScanRoomDone(true, true);
             client.setActiveRoom(null);
             client.setCurrentPositionScans(0);
         }
-        // Done room scan
-        if(doneScan){
+        if(doneMessage != null)
             try {
-                WebSocketHandler.sendMessage(clientSession, 
-                    new MsgScanRoomDone(true, true));
+                WebSocketHandler.sendMessage(clientSession, doneMessage);
             } catch (Exception e) {}
-        }
-
     }
 
-    private static final int CUT_POWER = -80;
-    // Set scans for a room
-    public void putScansUpdateRoom(String clientId, String roomId, List<ScanResult> scans){ 
-        /*Room room = clientScans.get(clientId).get(roomId);
-        room.setNScan(room.getNScan() + 1);*/
-        Map<String, List<Double>> signals = new HashMap<>();//list of all the signals strength for the same ap in the same scan
-        Map<String, ScanResult> results = new HashMap<>(); //utility map to retrieve info later on
-        for(ScanResult scan : scans){
-            //create a list of results for each scan
-            List<Double> listSignals = signals.get(scan.getBSSID());
-            results.putIfAbsent(scan.getBSSID(), scan);
+    private static final int CUT_POWER = -65;
+
+    public void updateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){
+        // Calculate mean stdev and aggregate samples
+        scans = computeMeanFingeprint(scans);
+        Room room = clientRooms.get(clientId).get(roomId);
+        room.putFingerprints(scans);
+        room.printFingerprints();
+    }
+
+    static private double mean(List<ScanResult> list){
+        double mean = 0;
+        for(var scan : list)
+            mean += scan.getSignal();
+        mean = mean / list.size();
+        return mean;
+    }
+
+    static private double stddev(List<ScanResult> list, double mean){
+        double der = 0;
+        for(var scan : list){
+            der += Math.pow(scan.getSignal() - mean, 2);
+        }
+        double stddev = Math.sqrt(der/list.size());
+        return stddev;
+    }
+
+    static public List<ScanResult> computeMeanFingeprint(List<ScanResult> scans){
+        Map<String, List<ScanResult>> signals = new HashMap<>(); // List of all the signals strength for the same ap in the same scan
+        for(var scanResult : scans){
+            List<ScanResult> listSignals = signals.get(scanResult.getBSSID());
             if(listSignals == null){
                 listSignals = new ArrayList<>();
-                listSignals.add(scan.getSignal());
-                signals.put(scan.getBSSID(), listSignals);
-            }else{
-                listSignals.add(scan.getSignal());
+                signals.put(scanResult.getBSSID(), listSignals);
             }
-            
+            listSignals.add(scanResult);
         }
-
-        //if i want to put the variance in it 
-        for(String key : signals.keySet()){
-            //compute the mean for each set of scan
-            ScanResult finalResult;
-            //save the result only if the mean for the set of scan is significative
-            if(signals.get(key).size() > 2){
-                double mean = signals.get(key).stream().reduce(0d, Double::sum)/signals.get(key).size();
-                double stddev = Math.sqrt(signals.get(key).stream().reduce(0d, (subtotal, element) -> subtotal + Math.pow((element - mean), 2))/(signals.get(key).size()-1));
-                //System.out.println("mean: " + mean);
-                if(mean > CUT_POWER){
-                    finalResult = new ScanResult(key, results.get(key).getSSID(), mean, stddev, results.get(key).getFrequency(), results.get(key).getTimestamp());
-                    clientRooms.get(clientId).get(roomId).putClientFingerprints(finalResult);
-                }
+        List<ScanResult> outResults = new ArrayList<>();
+        for(var entry : signals.entrySet()){
+            // Calc mean signal
+            double mean = mean(entry.getValue());
+            if(mean > CUT_POWER){
+                double stddev = stddev(entry.getValue(), mean);
+                ScanResult result = entry.getValue().get(0);
+                result = result.cloneWith(mean, stddev);
+                outResults.add(result);
             }
-            
         }
+        return outResults;
     }
 
     public void printFingerprintDb(String clientId){
@@ -324,7 +330,7 @@ public class DatabaseManager {
                 
                 JsonObject fingerprintsObj = roomObj.get("fingerprints").getAsJsonObject();
                 
-                ConcurrentHashMap<String, List<ScanResult>> fingerprints =  new ConcurrentHashMap<>();
+                HashMap<String, List<ScanResult>> fingerprints =  new HashMap<>();
                 for(String bssid : fingerprintsObj.keySet()){
                     JsonArray fingerprintsArr = fingerprintsObj.get(bssid).getAsJsonArray();
                     List<ScanResult> result = gson.fromJson(fingerprintsArr, scanType);
@@ -347,10 +353,9 @@ public class DatabaseManager {
         Speaker speaker = this.getConnectedSpeaker(speakerId);
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
         if(rooms == null || speaker == null){
-            System.out.println("DEBUG: no speaker binded");
+            System.out.println("DEBUG: no speaker bound");
             return;
         }
-        speaker.resetClient();
         System.out.println("DEBUG: bind speaker\n\t" + speaker.getName() + " <-> "+ roomId + ", is muted: " + speaker.isMuted());
         System.out.println("DEBUG: room -> [speakers]");
         for(Room room : rooms.values()) {
@@ -374,7 +379,6 @@ public class DatabaseManager {
             return;
         }
         System.out.println("DEBUG: unbind speaker [" + speaker.getName() + "]");
-        speaker.resetClient();
         for(Room room : rooms.values()) {
             room.getSpeakerList().remove(speaker);
         }

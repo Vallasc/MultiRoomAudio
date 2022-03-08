@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import it.unibo.sca.multiroomaudio.server.DatabaseManager;
+
 public class Client extends Device {
-    public class SharedState{
+    public static final int FINGERPRINT_WINDOW_SIZE = 2;
+    public class OfflinePhaseState{
         private String activeRoom = null;
         private List<ScanResult> currentTmpScans = new ArrayList<>();
         private int currentPositionScans = 0;
@@ -13,22 +16,30 @@ public class Client extends Device {
 
     private final String ip;
     private final String mac;
-    private transient ScanResult[] fingerprints;
+    private transient List<ScanResult> fingerprints;
+    private transient List<ScanResult> oldFingerprints;
+    private transient int fingerprintsCounter;
     //is true if start is clicked, false otherwise
-    private transient SharedState state;
+    private transient OfflinePhaseState state;
 
     public Client(int type, String mac, String ip) {
         super(mac, 0);
         this.mac = mac;
         this.ip = ip;
-        this.state = new SharedState();
+        this.state = new OfflinePhaseState();
+        this.fingerprintsCounter = 0;
+        this.fingerprints = new ArrayList<>();
+        this.oldFingerprints = new ArrayList<>();
     }
 
     public Client(String id) {
         super(id, 0);
-        this.state = new SharedState();
+        this.state = new OfflinePhaseState();
         this.ip = null;
         this.mac = null;
+        this.fingerprintsCounter = 0;
+        this.fingerprints = new ArrayList<>();
+        this.oldFingerprints = new ArrayList<>();
     }
     
     public String getIp() {
@@ -36,10 +47,17 @@ public class Client extends Device {
     }
 
     public void setFingerprints(ScanResult[] scans) {
-        this.fingerprints = scans;
+        if(fingerprintsCounter < 3) {
+            this.oldFingerprints.addAll(Arrays.asList(scans));
+            fingerprintsCounter++;
+        } else {
+            this.fingerprints = DatabaseManager.computeMeanFingeprint(this.oldFingerprints);
+            this.oldFingerprints.clear();
+            fingerprintsCounter = 0;
+        }
     }
 
-    public ScanResult[] getFingerprints() {
+    public List<ScanResult> getFingerprints() {
         return fingerprints;
     }
 
