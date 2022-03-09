@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map.Entry;
 //Stanza(Nome, Map<BSSID, List<Fingerprint>>)
 public class Room {
-    public static final int SCAN_NOT_FOUND = 100;
     public static final int SCANS_FOR_EACH_POSITION = 4;
-    public static final int MAX_POSITION = 10;
+    public static final int MAX_POSITION = 20;
     private final String id;
     private final HashMap<String, List<ScanResult>> fingerprints; //<bssid, []>
     private int nscan; // index scan position

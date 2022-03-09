@@ -13,12 +13,12 @@ import it.unibo.sca.multiroomaudio.server.SpeakerManager;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
+import it.unibo.sca.multiroomaudio.utils.GlobalState;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class Knn extends FingerprintAnalyzer{
-    public static final int POWER_LIMIT = -70;
     private HashMap<String, Double> errors = new LinkedHashMap<>(); //<ReferencePoint, error>
-    private int k = 1;
+    private int k;
     private boolean initUnknownAP = false;
     private boolean useWeight = false;
 
@@ -107,6 +107,7 @@ public class Knn extends FingerprintAnalyzer{
         }
 
         if(this.initUnknownAP){
+            int POWER_LIMIT = GlobalState.getInstance().getCutPower() - 10;
             for(String BSSID : notFound){
                 List<ScanResult> offlines = room.getFingerprints(BSSID);
                 if(offlines != null){
@@ -122,11 +123,13 @@ public class Knn extends FingerprintAnalyzer{
             this.errors.put(room.getId()+"_"+j, Math.sqrt(roomErr[j]));
             //System.out.println(room.getId()+"_"+j + "->" + this.errors.get(room.getId() +"_" + j) );
         }
-        //Utils.sleep(4000);
     }
  
     @Override
     public String findRoomKey() {
+        this. k = GlobalState.getInstance().getK();
+        this.useWeight = GlobalState.getInstance().getUseWeights();
+
         String roomKey = null;
         List<Room> rooms = dbm.getClientRooms(client.getId());
 

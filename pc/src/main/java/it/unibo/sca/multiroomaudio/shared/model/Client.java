@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
+import it.unibo.sca.multiroomaudio.utils.GlobalState;
 
 public class Client extends Device {
-    public static final int FINGERPRINT_WINDOW_SIZE = 2;
     public class OfflinePhaseState{
         private String activeRoom = null;
         private List<ScanResult> currentTmpScans = new ArrayList<>();
@@ -47,7 +47,8 @@ public class Client extends Device {
     }
 
     public void setFingerprints(ScanResult[] scans) {
-        if(fingerprintsCounter < 3) {
+        int FINGERPRINT_WINDOW_SIZE = GlobalState.getInstance().getClientFingerprintWindowSize();
+        if(fingerprintsCounter <= FINGERPRINT_WINDOW_SIZE) {
             this.oldFingerprints.addAll(Arrays.asList(scans));
             fingerprintsCounter++;
         } else {
