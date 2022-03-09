@@ -46,7 +46,7 @@ public class Client extends Device {
         this.oldFingerprints = new ArrayList<>();
         this.confirmationFingerprints = new ArrayList<>();
         this.isMoving = false;
-
+    }
     
     public String getIp() {
         return ip;
