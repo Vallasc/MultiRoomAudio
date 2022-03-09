@@ -135,7 +135,7 @@
                 socket.send(
                     JSON.stringify({
                         type: "CONFIRMATION_ROOM",
-                        roomId: "result",//value here is what user selects
+                        roomId: "result", //TODO: value here is what user selects
                 })
         )
 

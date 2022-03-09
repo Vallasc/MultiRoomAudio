@@ -22,6 +22,7 @@ import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanRoomDone;
 import it.unibo.sca.multiroomaudio.shared.model.*;
+import it.unibo.sca.multiroomaudio.utils.GlobalState;
 
 public class DatabaseManager {
     private final List<Song> songs = new ArrayList<Song>();
@@ -254,8 +255,6 @@ public class DatabaseManager {
             } catch (Exception e) {}
     }
 
-    private static final int CUT_POWER = -65;
-
     public void updateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){
         // Calculate mean stdev and aggregate samples
         scans = computeMeanFingeprint(scans);
@@ -303,7 +302,7 @@ public class DatabaseManager {
         for(var entry : signals.entrySet()){
             // Calc mean signal
             double mean = mean(entry.getValue());
-            if(mean > CUT_POWER){
+            if(mean > GlobalState.getInstance().getCutPower()){
                 double stddev = stddev(entry.getValue(), mean);
                 ScanResult result = entry.getValue().get(0);
                 result = result.cloneWith(mean, stddev);

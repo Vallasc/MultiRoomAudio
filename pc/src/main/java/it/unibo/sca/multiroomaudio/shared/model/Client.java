@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
+import it.unibo.sca.multiroomaudio.utils.GlobalState;
 
 public class Client extends Device {
-    public static final int FINGERPRINT_WINDOW_SIZE = 2;
     public class OfflinePhaseState{
         private String activeRoom = null;
         private List<ScanResult> currentTmpScans = new ArrayList<>();
@@ -22,6 +22,7 @@ public class Client extends Device {
     private transient int fingerprintsCounter;
     //is true if start is clicked, false otherwise
     private transient OfflinePhaseState state;
+    private transient boolean isMoving;
 
     public Client(int type, String mac, String ip) {
         super(mac, 0);
@@ -32,6 +33,7 @@ public class Client extends Device {
         this.fingerprints = new ArrayList<>();
         this.oldFingerprints = new ArrayList<>();
         this.confirmationFingerprints = new ArrayList<>();
+        this.isMoving = false;
     }
 
     public Client(String id) {
@@ -43,14 +45,16 @@ public class Client extends Device {
         this.fingerprints = new ArrayList<>();
         this.oldFingerprints = new ArrayList<>();
         this.confirmationFingerprints = new ArrayList<>();
-    }
+        this.isMoving = false;
+
     
     public String getIp() {
         return ip;
     }
 
     public void setFingerprints(ScanResult[] scans) {
-        if(fingerprintsCounter < 3) {
+        int FINGERPRINT_WINDOW_SIZE = GlobalState.getInstance().getClientFingerprintWindowSize();
+        if(fingerprintsCounter <= FINGERPRINT_WINDOW_SIZE) {
             this.oldFingerprints.addAll(Arrays.asList(scans));
             fingerprintsCounter++;
         } else {
@@ -104,7 +108,16 @@ public class Client extends Device {
     public int getCurrentPositionScans() {
         return state.currentPositionScans;
     }
+
     public void setCurrentPositionScans(int currentPositionScans) {
         state.currentPositionScans = currentPositionScans;
+    }
+
+    public boolean isMoving() {
+        return isMoving;
+    }
+
+    public void setMoving(boolean isMoving) {
+        this.isMoving = isMoving;
     }
 }
