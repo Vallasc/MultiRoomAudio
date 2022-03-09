@@ -21,6 +21,7 @@ public class Client extends Device {
     private transient int fingerprintsCounter;
     //is true if start is clicked, false otherwise
     private transient OfflinePhaseState state;
+    private transient boolean isMoving;
 
     public Client(int type, String mac, String ip) {
         super(mac, 0);
@@ -30,6 +31,7 @@ public class Client extends Device {
         this.fingerprintsCounter = 0;
         this.fingerprints = new ArrayList<>();
         this.oldFingerprints = new ArrayList<>();
+        this.isMoving = false;
     }
 
     public Client(String id) {
@@ -40,6 +42,7 @@ public class Client extends Device {
         this.fingerprintsCounter = 0;
         this.fingerprints = new ArrayList<>();
         this.oldFingerprints = new ArrayList<>();
+        this.isMoving = false;
     }
     
     public String getIp() {
@@ -90,7 +93,16 @@ public class Client extends Device {
     public int getCurrentPositionScans() {
         return state.currentPositionScans;
     }
+
     public void setCurrentPositionScans(int currentPositionScans) {
         state.currentPositionScans = currentPositionScans;
+    }
+
+    public boolean isMoving() {
+        return isMoving;
+    }
+
+    public void setMoving(boolean isMoving) {
+        this.isMoving = isMoving;
     }
 }
