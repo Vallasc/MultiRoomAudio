@@ -1,5 +1,6 @@
 package it.unibo.sca.multiroomaudio.server.localization_algorithms;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +11,8 @@ import java.util.List;
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
+import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgConfirmation;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
@@ -54,7 +57,7 @@ public class Knn extends FingerprintAnalyzer{
         double invDistance = 0;
 
         if(addWeights){
-            // Calculate  inverse of distance
+            // Calculate inverse of distance
             Iterator<String> it = errors.keySet().iterator();
             for(int i = 0; it.hasNext() && i < k; i++) {
                 String key = it.next();
@@ -149,7 +152,12 @@ public class Knn extends FingerprintAnalyzer{
                 roomKey = key;
             }
         }
-
+        if(max <= this.k/2 && this.errors.size() >= this.k){
+            client.setConfirmationFP(onlines);
+            try {
+                WebSocketHandler.sendMessage(dbm.getClientWebSession(client.getId()), new MsgConfirmation());
+            } catch (IOException e) {}
+        }
         super.printer.setKnn(classes);
         return roomKey;
     }

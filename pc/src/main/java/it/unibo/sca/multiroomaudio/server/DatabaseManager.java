@@ -264,6 +264,12 @@ public class DatabaseManager {
         room.printFingerprints();
     }
 
+    public void updateRoomFingerprintsConfirm(Client client, String roomId){
+        Room room = clientRooms.get(client.getId()).get(roomId);
+        room.putFingerprints(client.getConfirmationFingerprints());
+        client.clearConfirmation();
+    }
+
     static private double mean(List<ScanResult> list){
         double mean = 0;
         for(var scan : list)

@@ -17,6 +17,7 @@ import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.player.MsgPlay;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgBindSpeaker;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgConfirmationRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgCreateRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgRoomURL;
@@ -140,6 +141,13 @@ public class WebSocketHandler {
                             dbm.unbindSpeaker(connected.getId(), msgBindSpeaker.getSpeakerId());
                         // Update rooms
                         sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
+                        break;
+                    case "CONFIRMATION_ROOM":
+                        MsgConfirmationRoom msgConfirmationRoom = gson.fromJson(message, MsgConfirmationRoom.class);
+                        if(msgConfirmationRoom.getRoomId() != null)
+                            dbm.updateRoomFingerprintsConfirm(client, msgConfirmationRoom.getRoomId());
+                        else
+                            client.clearConfirmation();
                         break;
                 }
             }

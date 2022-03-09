@@ -130,6 +130,15 @@
                 console.log("Rooms")
                 console.log(rooms)
                 break
+            case "CONFIRMATION":
+                console.log('popup here to select the room');
+                socket.send(
+                    JSON.stringify({
+                        type: "CONFIRMATION_ROOM",
+                        roomId: "result",//value here is what user selects
+                })
+        )
+
         }
     }
 

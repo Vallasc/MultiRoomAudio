@@ -18,6 +18,7 @@ public class Client extends Device {
     private final String mac;
     private transient List<ScanResult> fingerprints;
     private transient List<ScanResult> oldFingerprints;
+    private transient List<ScanResult> confirmationFingerprints; //used in case the probability during the online phase is not so clear
     private transient int fingerprintsCounter;
     //is true if start is clicked, false otherwise
     private transient OfflinePhaseState state;
@@ -30,6 +31,7 @@ public class Client extends Device {
         this.fingerprintsCounter = 0;
         this.fingerprints = new ArrayList<>();
         this.oldFingerprints = new ArrayList<>();
+        this.confirmationFingerprints = new ArrayList<>();
     }
 
     public Client(String id) {
@@ -40,6 +42,7 @@ public class Client extends Device {
         this.fingerprintsCounter = 0;
         this.fingerprints = new ArrayList<>();
         this.oldFingerprints = new ArrayList<>();
+        this.confirmationFingerprints = new ArrayList<>();
     }
     
     public String getIp() {
@@ -82,8 +85,20 @@ public class Client extends Device {
         return state.currentTmpScans;
     }
 
+    public List<ScanResult> getConfirmationFingerprints(){
+        return this.confirmationFingerprints;
+    }
+
     public void setCurrentTmpScans(List<ScanResult> currentTmpScans) {
         state.currentTmpScans = currentTmpScans;
+    }
+
+    public void setConfirmationFP(List<ScanResult> onlines){
+        this.confirmationFingerprints.addAll(onlines); 
+    }
+
+    public void clearConfirmation(){
+        this.confirmationFingerprints.clear();
     }
 
     public int getCurrentPositionScans() {
