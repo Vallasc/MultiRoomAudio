@@ -1,5 +1,5 @@
 <script>
-    import { App, View } from "framework7-svelte"
+    import { App, View, f7 } from "framework7-svelte"
     import ClientPage from "./pages/ClientPage.svelte"
     import RoomsPage from "./pages/RoomsPage.svelte"
     import SpeakerPage from "./pages/SpeakerPage.svelte"
@@ -7,7 +7,7 @@
     import { deviceId, hostname, webPort, musicPort } from "./stores"
 
     const f7Params = {
-        pushState: true,
+        id: "com.unibo.multiroomaudio",
         theme : "md",
         routes: [
             {
