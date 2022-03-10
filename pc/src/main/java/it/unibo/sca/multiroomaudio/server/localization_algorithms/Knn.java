@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+
+import org.eclipse.jetty.websocket.api.Session;
 
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
@@ -50,7 +53,6 @@ public class Knn extends FingerprintAnalyzer{
         this.k = k;
     }
 
-    
     private HashMap<String, Double> selectK(boolean addWeights){
         // Get first k
         this.errors = Utils.sortHashMapByValueAsc(this.errors);
@@ -155,13 +157,25 @@ public class Knn extends FingerprintAnalyzer{
                 roomKey = key;
             }
         }
-        if(max <= this.k/2 && this.errors.size() >= this.k){
-            client.setConfirmationFP(onlines);
-            try {
-                WebSocketHandler.sendMessage(dbm.getClientWebSession(client.getId()), new MsgConfirmation());
-            } catch (IOException e) {}
-        }
+
+        if( (!this.useWeight && max <= this.k/2 && this.errors.size() >= this.k) || 
+            (this.useWeight && max <= 0.7))
+            confirmRoom(onlines, new ArrayList<>(classes.keySet()));
+
+
         super.printer.setKnn(classes);
         return roomKey;
+    }
+
+    public void confirmRoom(List<ScanResult> scan, List<String> keys){
+        if(client.getConfirmationFingerprints().size() != 0 || scan.size() == 0)
+            return;
+        System.out.println("DEBUG: Confirm room");
+        client.setConfirmationFP(scan);
+        try {
+            Session session = dbm.getClientWebSession(client.getId());
+            if(session != null)
+                WebSocketHandler.sendMessage(session, new MsgConfirmation(keys));
+        } catch (IOException e) {}  
     }
 }
