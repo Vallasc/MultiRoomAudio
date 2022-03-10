@@ -46,6 +46,9 @@ public class WebSocketHandler {
             if(device instanceof Speaker){
                 speakerManager.updateSpeakerList();
             }
+            if(device instanceof Client){
+                ((Client) device).clearConfirmation();
+            }
             System.out.println("DEVICE [" + device.getId() + "]: disconnected");
         }
     }
