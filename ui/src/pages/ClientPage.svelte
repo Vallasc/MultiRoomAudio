@@ -92,7 +92,6 @@
         //console.log(message)
         switch (message.type) {
             case "PLAY":
-                //console.log(message)
                 state = 1
                 playingSong = message
                 playingSong.song.albumImageUrl = makeImageurl(
@@ -131,15 +130,43 @@
                 console.log(rooms)
                 break
             case "CONFIRMATION":
-                console.log('popup here to select the room');
-                socket.send(
-                    JSON.stringify({
-                        type: "CONFIRMATION_ROOM",
-                        roomId: "result", //TODO: value here is what user selects
-                })
-        )
-
+                console.log(message)
+                confirmRoom(message.rooms)
+                break;
         }
+    }
+
+    function confirmRoom(rooms){
+        /*let timer = setTimeout(() => {
+            dialog.close()
+            sendConfirmation(null)
+        }, 20000)*/
+        let buttons = []
+        for( let room of rooms ){
+            console.log(room)
+            buttons.push({
+                text: room,
+                onClick: () => {
+                    sendConfirmation(room)
+                    //clearTimeout(timer)
+                }
+            })
+        }
+        let dialog = f7.dialog.create({
+            title: 'Room confirm',
+            text: 'Select the room where you are',
+            buttons: buttons,
+            verticalButtons: true,
+        }).open()
+    }
+
+    function sendConfirmation(roomId){
+        console.log("Send room confirmation")
+        socket.send(
+            JSON.stringify({
+                type: "CONFIRMATION_ROOM",
+                roomId: roomId
+        }))
     }
 
     function bindSpeaker(roomId, speakerId){
