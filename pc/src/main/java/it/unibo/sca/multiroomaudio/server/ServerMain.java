@@ -1,5 +1,6 @@
 package it.unibo.sca.multiroomaudio.server;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -155,7 +156,7 @@ public class ServerMain {
         }
 
         public void run() {
-            try (Writer writer = new FileWriter(filepath + "\\devices.json")) {
+            try (Writer writer = new FileWriter(filepath + File.separator + "devices.json")) {
                 Gson gson = new GsonBuilder().create();
                 gson.toJson(dbm.getDevices(), writer);
             }catch(IOException e){
@@ -163,7 +164,7 @@ public class ServerMain {
                 e.printStackTrace();
             }
 
-            try (Writer writer = new FileWriter(filepath + "\\fingerprints.json")) {
+            try (Writer writer = new FileWriter(filepath + File.separator + "fingerprints.json")) {
                 Gson gson = new GsonBuilder().create();
                 gson.toJson(dbm.getClientRooms(), writer);
             }catch(IOException e){
