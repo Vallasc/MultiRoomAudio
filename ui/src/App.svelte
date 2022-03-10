@@ -7,6 +7,7 @@
     import { deviceId, hostname, webPort, musicPort } from "./stores"
 
     const f7Params = {
+        pushState: true,
         theme : "md",
         routes: [
             {

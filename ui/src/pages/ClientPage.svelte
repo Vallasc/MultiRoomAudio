@@ -152,6 +152,13 @@
                 }
             })
         }
+        buttons.push({
+                text: "I DON'T KNOW",
+                onClick: () => {
+                    sendConfirmation(null)
+                    //clearTimeout(timer)
+                }
+            })
         let dialog = f7.dialog.create({
             title: 'Room confirm',
             text: 'Select the room where you are',
