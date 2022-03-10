@@ -34,6 +34,13 @@
     let rooms = []
     $: roomsLenght = rooms.length
 
+    /*export let f7router
+
+    function onBackKeyDown() {
+        f7.popup.close()
+        f7router.back()
+    }*/
+
     onMount(() => {
         fetchSongs()
         setTimeout( () => socketSetup(), 1000)
