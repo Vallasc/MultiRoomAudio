@@ -5,8 +5,8 @@ public class GlobalState {
     private GlobalState() {}
 
     private int cutPower = -65;
-    private int k = 4;
-    private boolean useWeights = false;
+    private int k = 5;
+    private boolean useWeights = true;
     private int clientFingerprintWindowSize = 2;
 
     public static GlobalState getInstance() {
