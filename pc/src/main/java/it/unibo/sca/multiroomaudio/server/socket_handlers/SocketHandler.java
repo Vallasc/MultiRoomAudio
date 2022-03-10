@@ -65,13 +65,8 @@ public class SocketHandler extends Thread{
         Client myDevice = (Client) dbm.getDevice(clientId); 
         myDevice.setActiveRoom(null);
         System.out.println("START SERVING: " + clientId);
-        //FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
 
-        //Constructor<?> fAnalyzernew = this.algo.getConstructor(SpeakerManager.class, Client.class, DatabaseManager.class);
-        //Constructor constructor = Class.forName("java.lang.String").getConstructor(String.class);
-        //String object = (String) constructor.newInstance("Hello");
-
-        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm, 5, true, false);
+        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm, 5, true, true);
         //FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
         
         fAnalyzernew.start();
