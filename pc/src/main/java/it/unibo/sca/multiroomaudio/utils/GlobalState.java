@@ -4,9 +4,10 @@ public class GlobalState {
     private static GlobalState INSTANCE;
     private GlobalState() {}
 
-    private int cutPower = -65;
-    private int k = 5;
-    private boolean useWeights = true;
+    private int cutPower = -70;
+    private int k = 4;
+    private boolean useWeights = false;
+    private boolean confirmRoom = true;
     private int clientFingerprintWindowSize = 2;
 
     public static GlobalState getInstance() {
@@ -17,7 +18,7 @@ public class GlobalState {
     }
 
     public void setCutPower(int cutPower) {
-        if(-80 <= cutPower && cutPower <= -30 ){
+        if(-80 <= cutPower && cutPower <= 0 ){
             this.cutPower = cutPower;
         }
     }
@@ -52,5 +53,13 @@ public class GlobalState {
         if(1 <= value && value <= 4 ){
             this.clientFingerprintWindowSize = value;
         }
+    }
+
+    public boolean getConfirmRoom() {
+        return confirmRoom;
+    }
+
+    public void setConfirmRoom(boolean confirmRoom) {
+        this.confirmRoom = confirmRoom;
     }
 }
