@@ -14,6 +14,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +39,7 @@ import java.util.UUID;
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.services.FingerprintService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String TAG = MainActivity.class.getCanonicalName();
 
     public static final String SEND_WEB_SERVER_URL = "sendWebServerUrl";
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private Button button_speakaer;
     private Button button_client;
     private String id;
+    private boolean isMoving;
 
     private boolean permissionGranted;
 
@@ -97,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
+        SensorManager sensorManager=(SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
+        isMoving = false;
     }
 
     @Override
@@ -114,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SEND_WEB_SERVER_URL);
         LocalBroadcastManager.getInstance(this).registerReceiver(intentReceiver, intentFilter);
+        //webView.reload();
     }
 
     @Override
@@ -256,4 +265,21 @@ public class MainActivity extends AppCompatActivity {
         stopService(intent2);
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType()==Sensor.TYPE_LINEAR_ACCELERATION){
+            int totalValues = (int) (( Math.abs(event.values[0]) + Math.abs(event.values[1]) + Math.abs(event.values[2])) * 100);
+            //Log.d(TAG, "Accel: " + totalValues);
+            boolean lastIsMoving = isMoving;
+            isMoving = totalValues > 50;
+            if(isMoving != lastIsMoving){
+                webView.loadUrl("javascript:window.setIsMoving(" + isMoving + ")");
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 }
