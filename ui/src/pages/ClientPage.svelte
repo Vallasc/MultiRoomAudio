@@ -13,7 +13,7 @@
         BlockTitle,
         f7
     } from "framework7-svelte"
-    import { deviceId, hostname, webPort, musicPort, webSocket } from "../stores"
+    import { deviceId, hostname, webPort, musicPort, webSocket, isMoving } from "../stores"
     import NowPlaying from "./NowPlaying.svelte"
 
     let socket
@@ -33,13 +33,6 @@
     $: speakerLenght = speakerList.length
     let rooms = []
     $: roomsLenght = rooms.length
-
-    /*export let f7router
-
-    function onBackKeyDown() {
-        f7.popup.close()
-        f7router.back()
-    }*/
 
     onMount(() => {
         fetchSongs()
@@ -87,13 +80,6 @@
         )
     }
 
-    function makeImageurl(albumImageUrl) {
-        if (albumImageUrl != null)
-            albumImageUrl =
-                "http://" + $hostname + ":" + $musicPort + "/" + albumImageUrl.replace("./", "")
-        else albumImageUrl = blankSong
-        return albumImageUrl
-    }
 
     function processMessage(message) {
         //console.log(message)
@@ -101,9 +87,7 @@
             case "PLAY":
                 state = 1
                 playingSong = message
-                playingSong.song.albumImageUrl = makeImageurl(
-                    playingSong.song.albumImageUrl
-                )
+                fixSong(playingSong.song)
                 progress =
                     (playingSong.fromTimeSec * 100) /
                     (playingSong.song.durationMs / 1000)
@@ -111,9 +95,7 @@
             case "PAUSE":
                 state = 2
                 playingSong = message
-                playingSong.song.albumImageUrl = makeImageurl(
-                    playingSong.song.albumImageUrl
-                )
+                fixSong(playingSong.song)
                 progress =
                     (playingSong.fromTimeSec * 100) /
                     (playingSong.song.durationMs / 1000)
@@ -138,16 +120,14 @@
                 break
             case "CONFIRMATION":
                 console.log(message)
-                confirmRoom(message.rooms)
+                if(!$isMoving)
+                    confirmRoom(message.rooms)
                 break;
         }
     }
 
     function confirmRoom(rooms){
-        /*let timer = setTimeout(() => {
-            dialog.close()
-            sendConfirmation(null)
-        }, 20000)*/
+        let timer
         let buttons = []
         for( let room of rooms ){
             console.log(room)
@@ -155,7 +135,7 @@
                 text: room,
                 onClick: () => {
                     sendConfirmation(room)
-                    //clearTimeout(timer)
+                    clearTimeout(timer)
                 }
             })
         }
@@ -163,7 +143,7 @@
                 text: "I DON'T KNOW",
                 onClick: () => {
                     sendConfirmation(null)
-                    //clearTimeout(timer)
+                    clearTimeout(timer)
                 }
             })
         let dialog = f7.dialog.create({
@@ -172,6 +152,10 @@
             buttons: buttons,
             verticalButtons: true,
         }).open()
+        timer = setTimeout(() => {
+            dialog.close()
+            sendConfirmation(null)
+        }, 30000)
     }
 
     function sendConfirmation(roomId){
@@ -194,16 +178,21 @@
         popupRooms.instance().close()
     }
 
+    function fixSong(song){
+        song.albumImageUrl ? song.albumImageUrl = "http://" + $hostname + ":" + $musicPort + "/" + song.albumImageUrl.replace("./", "")
+                               : song.albumImageUrl = blankSong
+        song.songUrl = "http://" + location.hostname + ":" + $musicPort + "/" + song.songUrl.replace("./", "")
+        song.title = song.title ? song.title : song.fileName
+        song.artist = song.artist ? song.artist : ""
+    }
+
     async function fetchSongs() {
         let res = await fetch("http://" + $hostname + ":" + $musicPort + "/songs", {
             method: "GET",
         })
         songs = await res.json()
         songs.forEach((song) => {
-            if (song.albumImageUrl != null)
-                song.albumImageUrl = "http://" + location.hostname + ":" + $musicPort + "/" + song.albumImageUrl.replace("./", "")
-            else song.albumImageUrl = "./imgs/blank_album.png"
-            song.songUrl = "http://" + location.hostname + ":" + $musicPort + "/" + song.songUrl.replace("./", "")
+            fixSong(song)
             song.isPlaying = false
         })
         console.log("Song list")
@@ -280,10 +269,12 @@
 <Page>
     <!-- Top Navbar -->
     <Navbar title="Multiroom Audio">
-        <NavRight>
-            <Link iconMd="material:other_houses" iconOnly href="/rooms/" />
-            <Link iconMd="material:settings" iconOnly />
-        </NavRight>
+        {#if socket}
+            <NavRight>
+                <Link iconMd="material:other_houses" iconOnly href="/rooms" />
+                <Link iconMd="material:settings" iconOnly href="/settings"/>
+            </NavRight>
+        {/if}
     </Navbar>
     <Toolbar top>
         <div class="list-speakers">
@@ -371,6 +362,7 @@
     {/if}
     {#if songsLenght > 0}
         <List mediaList>
+            <div style="margin-top:-30px"></div>
             {#each songs as song}
                 {#if setLastTitleBlock(song.dirPath)}
                     <li class="list-group-title">
