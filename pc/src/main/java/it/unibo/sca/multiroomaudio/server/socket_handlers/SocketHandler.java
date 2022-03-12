@@ -28,7 +28,6 @@ public class SocketHandler extends Thread{
         this.clientSocket = clientSocket;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
-        //this.algo = algo;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class SocketHandler extends Thread{
             String json = dIn.readUTF();
             MsgHello hello = gson.fromJson(json, MsgHello.class);
             clientId = hello.getId();
-            if( clientId== null || (clientId!= null && dbm.isConnectedSocket(clientId))){ //already connected
+            if( clientId == null || (clientId!= null && dbm.isConnectedSocket(clientId))){ //already connected
                 System.out.println("Client [" + clientId + "] is already connected");
                 dOut.writeUTF(gson.toJson(new MsgHelloBack(clientId, true)));
                 dOut.close();
@@ -66,7 +65,7 @@ public class SocketHandler extends Thread{
         myDevice.setActiveRoom(null);
         System.out.println("START SERVING: " + clientId);
 
-        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm, 5, true, true);
+        FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm);
         //FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
         
         fAnalyzernew.start();
@@ -100,8 +99,6 @@ public class SocketHandler extends Thread{
             if(!dbm.isConnectedSocket(clientId) || !isRunning){
                 try {
                     isRunning = false;
-                    //dbm.setDeviceStop(clientId, nScan);
-                    myDevice.setActiveRoom(null);
                     dOut.close();
                 }catch(Exception e) {
                     e.printStackTrace();
