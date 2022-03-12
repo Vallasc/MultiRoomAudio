@@ -23,6 +23,7 @@ import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgDeleteRoom;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgRoomURL;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgRooms;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanRoom;
+import it.unibo.sca.multiroomaudio.shared.messages.settings.MsgSettings;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Device;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
@@ -67,10 +68,15 @@ public class WebSocketHandler {
             dbm.removeConnectedWebDevicesAndDisconnect(msg.getId()); // One web connection at time
             dbm.addConnectedWebDevice(session, msg);
             System.out.println("DEVICE [" + msg.getId() + "]: connected");
-            speakerManager.updateSpeakerList();
             if(msg.getDeviceType() == 0){ // Client
                 sendMessage(session, new MsgRooms(dbm.getClientRooms(msg.getId())));
+                Client client = (Client) dbm.getDevice(msg.getId());
+                client.setActiveRoom(null);
+                client.setOffline(false);
+            } else { // Speaker
+                speakerManager.updateAudioState();
             }
+            speakerManager.updateSpeakerList();
         } else { 
             Device connected = dbm.getConnectedWebDevice(session);
             if(connected != null && connected instanceof Client) {
@@ -129,9 +135,11 @@ public class WebSocketHandler {
                         if(msgScanRoom.getRoomId() != null){
                             System.out.println("DEBUG: START scan");
                             client.setActiveRoom(msgScanRoom.getRoomId().toLowerCase());
+                            client.setOffline(true);
                         } else {
                             System.out.println("DEBUG: STOP scan");
                             client.setActiveRoom(null);
+                            client.setOffline(false);
                         }
                         // Update client rooms
                         sendMessage(session, new MsgRooms(dbm.getClientRooms(connected.getId())));
@@ -152,6 +160,13 @@ public class WebSocketHandler {
                         else
                             client.clearConfirmation();
                         break;
+                    case "SETTINGS":
+                        MsgSettings msgSettings = gson.fromJson(message, MsgSettings.class);
+                        msgSettings.saveSettings();
+                        break;
+                    case "GET_SETTINGS":
+                        sendMessage(session, new MsgSettings());
+                        break;             
                 }
             }
         }
