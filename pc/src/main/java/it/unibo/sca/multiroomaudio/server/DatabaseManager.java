@@ -115,7 +115,8 @@ public class DatabaseManager {
 
         // Create Device if not present
         devices.putIfAbsent(initMessage.getId(), newDevice);
-        connectedWebDevices.putIfAbsent(session, newDevice);
+        Device oldDevice = devices.get(initMessage.getId());
+        connectedWebDevices.put(session, oldDevice);
     }
 
     public void removeConnectedWebDevicesAndDisconnect(String deviceId){
@@ -238,21 +239,22 @@ public class DatabaseManager {
                 // Save corner scans
                 updateRoomFingerprints(client.getId(), roomId, client.getCurrentTmpScans());
                 doneMessage = new MsgScanRoomDone(false, true);
-                // Reset corner scan counter
-                client.setCurrentPositionScans(0);
-                client.setActiveRoom(null);
                 if(room.getNScan() >= Room.MAX_POSITION)
                     doneMessage = new MsgScanRoomDone(true, true);
             }
         } else {
             doneMessage = new MsgScanRoomDone(true, true);
-            client.setActiveRoom(null);
-            client.setCurrentPositionScans(0);
         }
-        if(doneMessage != null)
+        if(doneMessage != null){
+            // Reset corner scan counter
+            client.setCurrentPositionScans(0);
+            client.setActiveRoom(null);
+            if(doneMessage.isAllRoomDone())
+                client.setOffline(false);
             try {
                 WebSocketHandler.sendMessage(clientSession, doneMessage);
             } catch (Exception e) {}
+        }
     }
 
     public void updateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){
@@ -260,7 +262,7 @@ public class DatabaseManager {
         scans = computeMeanFingeprint(scans);
         Room room = clientRooms.get(clientId).get(roomId);
         room.putFingerprints(scans);
-        room.printFingerprints();
+        //room.printFingerprints();
     }
 
     public void updateRoomFingerprintsConfirm(Client client, String roomId){
