@@ -50,7 +50,6 @@ public class ServerMain {
         String musicHttpLocation = "C:\\Users\\giaco\\Music";
         //String musicHttpLocation = "/home/vallasc/Musica";
         String filepath = "./db";
-        String algo = "knn";
         int i = 0;
         boolean flagResume = false;
         DatabaseManager dbm = new DatabaseManager();
@@ -62,9 +61,6 @@ public class ServerMain {
                 } else if(args[i].equals("-f") || args[i].equals("-filepath")){
                     i += 1;
                     filepath = handleOption("-f", args, i, args.length);
-                } else if(args[i].equals("-a") || args[i].equals("-algo")){
-                    i += 1;
-                    algo = handleOption("-a", args, i, args.length);
                 } else if(args[i].equals("-r") || args[i].equals("-resume")){
                     flagResume = true;
                 } else {
@@ -78,7 +74,7 @@ public class ServerMain {
             Gson gson = new Gson();
             JsonReader reader;
             try {
-                reader = new JsonReader(new FileReader(filepath+ "\\devices.json"));
+                reader = new JsonReader(new FileReader(filepath + File.separator + "devices.json"));
                 //Type type = new TypeToken<ArrayList<Device>>(){}.getType();
                 JsonObject list = gson.fromJson(reader, JsonObject.class);
                 int k = 0;
@@ -104,11 +100,12 @@ public class ServerMain {
                     k++;
                 }
 
-                reader = new JsonReader(new FileReader(filepath+ "\\fingerprints.json"));
+                reader = new JsonReader(new FileReader(filepath + File.separator + "fingerprints.json"));
                 JsonObject json = gson.fromJson(reader, JsonObject.class);
                 dbm.putFingerprintsResume(json);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                System.out.println("Database file not found");
             }
         }
 
