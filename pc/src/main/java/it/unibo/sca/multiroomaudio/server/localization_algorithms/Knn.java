@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jetty.websocket.api.Session;
 
@@ -23,34 +22,29 @@ import it.unibo.sca.multiroomaudio.utils.GlobalState;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public class Knn extends FingerprintAnalyzer{
+    private final int RETRY_TIME_CYCLES = 50;
+
     private HashMap<String, Double> errors = new LinkedHashMap<>(); //<ReferencePoint, error>
     private int k;
     private boolean initUnknownAP = false;
     private boolean useWeight = false;
+    private int retryCounter = 0;
+    private String oldRoomKey = null;
+    private boolean confirmRoom = false;
+    private HashMap<String, Double> classes = new HashMap<>();
+
+    private boolean useGlobalVars = true;
 
     public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
-        super(speakerManager, client, dbm, 1);
+        super(speakerManager, client, dbm);
     }
 
-    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int k) {
-        super(speakerManager, client, dbm, 1);
+    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int k, boolean useWeight, boolean confirmRoom) {
+        super(speakerManager, client, dbm);
         this.k = k;
-    }
-
-    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, boolean initUnknownAP) {
-        super(speakerManager, client, dbm, 1);
-        this.initUnknownAP = initUnknownAP;
-    }
-
-    public Knn(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int k, boolean initUnknownAP, boolean useWeight) {
-        super(speakerManager, client, dbm, 1);
-        this.initUnknownAP = initUnknownAP;
         this.useWeight = useWeight;
-        this.k = k;
-    }
-
-    public void setK(int k){
-        this.k = k;
+        this.confirmRoom = confirmRoom;
+        this.useGlobalVars = false;
     }
 
     private HashMap<String, Double> selectK(boolean addWeights){
@@ -68,7 +62,7 @@ public class Knn extends FingerprintAnalyzer{
         }
 
         // Calculate weights and classes
-        HashMap<String, Double> classes = new HashMap<>();
+        this.classes = new HashMap<>();
         Iterator<String> it = errors.keySet().iterator();
         for(int i = 0; it.hasNext() && i < k; i++) {
             String key = it.next();
@@ -132,8 +126,11 @@ public class Knn extends FingerprintAnalyzer{
  
     @Override
     public String findRoomKey() {
-        this. k = GlobalState.getInstance().getK();
-        this.useWeight = GlobalState.getInstance().getUseWeights();
+        if(useGlobalVars){
+            this. k = GlobalState.getInstance().getK();
+            this.useWeight = GlobalState.getInstance().getUseWeights();
+            this.confirmRoom = GlobalState.getInstance().getConfirmRoom();
+        }
 
         String roomKey = null;
         List<Room> rooms = dbm.getClientRooms(client.getId());
@@ -158,18 +155,25 @@ public class Knn extends FingerprintAnalyzer{
             }
         }
 
-        if( (!this.useWeight && max <= this.k/2 && this.errors.size() >= this.k) || 
-            (this.useWeight && max <= 0.7))
-            confirmRoom(onlines, new ArrayList<>(classes.keySet()));
+        if( ((!this.useWeight && max < (Math.floor(this.k/2) + 1) ) || (this.useWeight && max <= 0.6)) && max > 0){
+            if(this.confirmRoom)
+                confirmRoom(onlines, new ArrayList<>(classes.keySet()));
+            roomKey = oldRoomKey;
+        }
 
+        oldRoomKey = roomKey;
+        retryCounter--;
 
-        super.printer.setKnn(classes);
         return roomKey;
     }
 
     public void confirmRoom(List<ScanResult> scan, List<String> keys){
-        if(client.getConfirmationFingerprints().size() != 0 || scan.size() == 0)
+        if(client.getConfirmationFingerprints().size() != 0 || scan.size() == 0 || client.isOffline())
             return;
+        if(retryCounter > 0){
+            return;
+        }
+        retryCounter = RETRY_TIME_CYCLES;
         System.out.println("DEBUG: Confirm room");
         client.setConfirmationFP(scan);
         try {
@@ -177,5 +181,13 @@ public class Knn extends FingerprintAnalyzer{
             if(session != null)
                 WebSocketHandler.sendMessage(session, new MsgConfirmation(keys));
         } catch (IOException e) {}  
+    }
+
+    public void printResults(){
+        System.out.println("KNN results:");
+        for(var entry : this.classes.entrySet()){
+            System.out.println("Room: " + entry.getKey() + ", corrispondences: " + entry.getValue());
+        }
+        System.out.println("");
     }
 }
