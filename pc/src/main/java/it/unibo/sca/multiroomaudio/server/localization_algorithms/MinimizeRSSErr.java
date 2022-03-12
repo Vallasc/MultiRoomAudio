@@ -15,12 +15,9 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
     protected static final int MAX_VALUE = 15000;
     
     public MinimizeRSSErr(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
-        super(speakerManager, client, dbm, 0);
+        super(speakerManager, client, dbm);
     }
 
-    public MinimizeRSSErr(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int t) {
-        super(speakerManager, client, dbm, t);
-    }
 
     protected double compute(double x, double mu){
         return Math.pow(x - mu, 2);
@@ -51,7 +48,7 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
             roomErr[j] = Math.sqrt(roomErr[j]);
         }
         Arrays.sort(roomErr);
-        super.printer.set(r.getId(), roomErr);
+        //super.printer.set(r.getId(), roomErr);
         return roomErr[0];
 
     }
@@ -77,6 +74,12 @@ public class MinimizeRSSErr extends FingerprintAnalyzer{
             }
         }
         return roomId;
+    }
+
+    @Override
+    public void printResults() {
+        // TODO Auto-generated method stub
+        
     }
     
 }
