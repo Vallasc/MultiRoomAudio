@@ -9,6 +9,7 @@ import it.unibo.sca.multiroomaudio.utils.GlobalState;
 
 public class Client extends Device {
     public class OfflinePhaseState{
+        private boolean isOffline = false;
         private String activeRoom = null;
         private List<ScanResult> currentTmpScans = new ArrayList<>();
         private int currentPositionScans = 0;
@@ -20,7 +21,6 @@ public class Client extends Device {
     private transient int fingerprintsCounter;
     //is true if start is clicked, false otherwise
     private transient OfflinePhaseState state;
-    private transient boolean isMoving;
 
     public Client(String id) {
         super(id, 0);
@@ -29,7 +29,6 @@ public class Client extends Device {
         this.fingerprints = new ArrayList<>();
         this.oldFingerprints = new ArrayList<>();
         this.confirmationFingerprints = new ArrayList<>();
-        this.isMoving = false;
     }
 
     public void setFingerprints(ScanResult[] scans) {
@@ -91,11 +90,10 @@ public class Client extends Device {
         state.currentPositionScans = currentPositionScans;
     }
 
-    public boolean isMoving() {
-        return isMoving;
+    public boolean isOffline() {
+        return state.isOffline;
     }
-
-    public void setMoving(boolean isMoving) {
-        this.isMoving = isMoving;
+    public void setOffline(boolean isOffline) {
+        state.isOffline = isOffline;
     }
 }
