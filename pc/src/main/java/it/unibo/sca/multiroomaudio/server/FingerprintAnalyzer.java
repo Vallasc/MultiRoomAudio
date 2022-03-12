@@ -1,7 +1,6 @@
 package it.unibo.sca.multiroomaudio.server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import it.unibo.sca.multiroomaudio.shared.model.Client;
@@ -11,28 +10,21 @@ import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public abstract class FingerprintAnalyzer extends Thread {
 
-    private static final int SLEEP_TIME = 200;
+    public static final int SLEEP_TIME = 200;
     protected final Client client;
     protected final DatabaseManager dbm;
-
-    protected double[] roomErr;
-    private SpeakerManager speakerManager;
+    private final SpeakerManager speakerManager;
     private boolean stopped;
-    protected int type;
-    protected Printer printer;
-    
 
-    public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm, int type) {
+    public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
         this.client = client;
         this.dbm = dbm;
         this.speakerManager = speakerManager;
         this.stopped = false;
-        this.printer = new Printer(type);
-        this.type = type;
     }
 
-
     abstract public String findRoomKey();
+    abstract public void printResults();
 
     @Override
     public void run(){
@@ -47,7 +39,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                 boolean areSameSpeakers = speakers.containsAll(prevSpeakers) && prevSpeakers.containsAll(speakers);
                 if( !roomkey.equals(prevRoomKey) || !areSameSpeakers ) { // new Room or new Speaker
                     System.out.println("DEBUG room is: " + roomkey);
-                    this.printer.print();
+                    this.printResults();
                     prevSpeakers.forEach((s) -> s.decNumberNowPlaying());
                     prevSpeakers.clear();
                     prevSpeakers.addAll(speakers);
@@ -60,7 +52,7 @@ public abstract class FingerprintAnalyzer extends Thread {
                 }
                 prevRoomKey = roomkey;
             }
-            //this.printer.print();
+            this.printResults();
             Utils.sleep(SLEEP_TIME);
         }
         prevSpeakers.forEach((s) -> s.decNumberNowPlaying());
@@ -86,48 +78,6 @@ public abstract class FingerprintAnalyzer extends Thread {
             Room newRoom = dbm.getClientRoom(client.getId(), newRoomKey);
             if(newRoom != null && !newRoom.getUrlEnter().equals("")){
                 Utils.getHTTPRequest(newRoom.getUrlEnter());
-            }
-        }
-    }
-    
-    public static class Printer{
-        HashMap<String, double[]> res;
-        HashMap<String, Double> knnRes;
-        int type;
-        public Printer(int type){
-            this.type = type;
-            if(this.type == 0)
-                this.res = new HashMap<>();
-            if(this.type == 1)
-                this.knnRes = new HashMap<>();
-
-        }
-
-        public void setKnn(HashMap<String, Double> knnRes){
-            this.knnRes = knnRes;
-        }
-
-
-        public void set(String s, double[] res){
-            this.res.put(s, res);
-        }
-
-        public void print(){
-            if(this.type == 0){
-                double[] arr;
-                for(String key : this.res.keySet()){
-                    System.out.println("Results for room: " + key);
-                    arr = this.res.get(key);
-                    for(int i = 0; i < arr.length; i++)
-                        System.out.println(arr[i]);
-                }
-            }
-            if(this.type == 1){
-                System.out.println("K classes");
-                for(String s : this.knnRes.keySet()){
-                    System.out.println("Room: " + s + " corrispondences: " + knnRes.get(s));
-                }
-                System.out.println("");
             }
         }
     }
