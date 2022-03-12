@@ -3,8 +3,8 @@
     import ClientPage from "./pages/ClientPage.svelte"
     import RoomsPage from "./pages/RoomsPage.svelte"
     import SpeakerPage from "./pages/SpeakerPage.svelte"
-    import AboutPage from "./pages/AboutPage.svelte"
-    import { deviceId, hostname, webPort, musicPort } from "./stores"
+    import SettingsPage from "./pages/SettingsPage.svelte"
+    import { deviceId, hostname, webPort, musicPort, isMoving } from "./stores"
 
     const f7Params = {
         id: "com.unibo.multiroomaudio",
@@ -23,8 +23,8 @@
                 component: SpeakerPage,
             },
             {
-                path: "/load",
-                component: AboutPage,
+                path: "/settings",
+                component: SettingsPage,
             },
         ],
     }
@@ -32,7 +32,6 @@
     const urlParams = new URLSearchParams(window.location.search)
     let isClient = false
     let isSpeaker = false
-    let clientConnection = false
     
     $hostname = location.hostname
     $deviceId = urlParams.get("id")
@@ -46,16 +45,20 @@
     }
 
     let themeDark = false
+
+    function setIsMoving(value){
+        $isMoving = value
+        console.log("isMoving: " + value)
+    }
+    window.setIsMoving = setIsMoving
 </script>
 
 <App {...f7Params} {themeDark}>
-    {#if clientConnection}
-        <View url="/load" />
-    {:else if isClient}
+    {#if isClient}
         <View url="/musiclist" />
     {:else if isSpeaker}
         <View url="/speaker" stackPages={true} main={true} />
     {:else}
-        <h1>Open Multiroom Audio on your pc</h1>
+        <h1>Open a Multiroom-Audio Client</h1>
     {/if}
 </App>
