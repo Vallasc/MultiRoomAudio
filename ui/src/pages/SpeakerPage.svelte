@@ -129,11 +129,13 @@
                 imageUrl = blankSong
             else 
                 imageUrl = "http://" + $hostname + ":" + $musicPort + "/" + song.albumImageUrl.replace("./", "")
-            title = song.title
-            artist = song.artist
+            title = song.title ? song.title : song.fileName
+            artist = song.artist ? song.artist : ""
 
             let res = await fetch("http://" + $hostname + ":" + $musicPort + "/" + song.songUrl.replace("./", ""))
             let blob = await res.blob()
+
+            audio.pause()
             audio.src = URL.createObjectURL(blob)
             audio.onloadeddata = () => {
                 songDurationSec = audio.duration
@@ -146,7 +148,7 @@
             const syncWindow = 4
             if(audio.currentTime > message.fromTimeSec + syncWindow/2 || audio.currentTime < message.fromTimeSec - syncWindow/2)
                 audio.currentTime = message.fromTimeSec
-            if(audio.paused)
+            if(audio.paused && !audio.ended)
                 audio.play()
                 
         }
@@ -167,12 +169,12 @@
     }
 
     async function setMute(value) {
-        if(!value && audio.volume == 0)
+        if(!value && audio.volume < 1)
             for(let i=0; i<=10; i++){
                 audio.volume = i/10
                 await sleep(200)
             }
-        if(value && audio.volume == 1)
+        if(value && audio.volume > 0)
             for(let i=10; i>=0; i--){
                 audio.volume = i/10
                 await sleep(200)
