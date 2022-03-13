@@ -1,4 +1,4 @@
-Abstract
+Abstract '\n'
 Introduzione: (1 pag max)
 - [ ] definizione del problema 
 - [ ] stato dell'arte(?)
