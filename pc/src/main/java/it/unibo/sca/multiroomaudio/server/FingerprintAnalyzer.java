@@ -6,6 +6,7 @@ import java.util.List;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
+import it.unibo.sca.multiroomaudio.utils.GlobalState;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public abstract class FingerprintAnalyzer extends Thread {
@@ -15,6 +16,8 @@ public abstract class FingerprintAnalyzer extends Thread {
     protected final DatabaseManager dbm;
     private final SpeakerManager speakerManager;
     private boolean stopped;
+
+    private int oldFingerprintCounter = 0;
 
     public FingerprintAnalyzer(SpeakerManager speakerManager, Client client, DatabaseManager dbm) {
         this.client = client;
@@ -52,7 +55,11 @@ public abstract class FingerprintAnalyzer extends Thread {
                 }
                 prevRoomKey = roomkey;
             }
-            this.printResults();
+            
+            if(client.getFingerprintsCounter() != oldFingerprintCounter)
+                this.printResults();
+            oldFingerprintCounter = client.getFingerprintsCounter();
+            
             Utils.sleep(SLEEP_TIME);
         }
         prevSpeakers.forEach((s) -> s.decNumberNowPlaying());
