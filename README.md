@@ -20,7 +20,7 @@ Implementazione:
 - [ ] Java per l'implementazione del backend
 	- [ ] speaker
 	- [ ] client
-	- [ ] server - [ ] > db, socket e websocket, knn(fingerprintanalyzer), musicmanager
+	- [ ] server -> db, socket e websocket, knn(fingerprintanalyzer), musicmanager
 	- [ ] Gson
 - [ ] Svelte (interfaccia)
 - [ ] Estensione del servizio
