@@ -33,14 +33,13 @@ public class Client extends Device {
 
     public void setFingerprints(ScanResult[] scans) {
         int FINGERPRINT_WINDOW_SIZE = GlobalState.getInstance().getClientFingerprintWindowSize();
-        if(fingerprintsCounter <= FINGERPRINT_WINDOW_SIZE) {
+        if(fingerprintsCounter % FINGERPRINT_WINDOW_SIZE != 0) {
             this.oldFingerprints.addAll(Arrays.asList(scans));
-            fingerprintsCounter++;
         } else {
             this.fingerprints = DatabaseManager.computeMeanFingeprint(this.oldFingerprints);
             this.oldFingerprints.clear();
-            fingerprintsCounter = 0;
         }
+        fingerprintsCounter++;
     }
 
     public List<ScanResult> getFingerprints() {
@@ -93,7 +92,16 @@ public class Client extends Device {
     public boolean isOffline() {
         return state.isOffline;
     }
+
     public void setOffline(boolean isOffline) {
         state.isOffline = isOffline;
+    }
+
+    public int getFingerprintsCounter(){
+        return this.fingerprintsCounter;
+    }
+
+    public void setFingerprintsCounter(int fingerprintCounter){
+        this.fingerprintsCounter = fingerprintCounter;
     }
 }
