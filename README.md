@@ -1,4 +1,4 @@
-Abstract
+- [x] Abstract
 
 Introduzione: (1 pag max)
 - [ ] definizione del problema 
