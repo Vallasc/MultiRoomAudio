@@ -6,8 +6,8 @@ Introduzione: (1 pag max)
 - [ ] soluzione proposta
 
 Progettazione:
-- [ ] vincoli del problema (server locale o no, limitazioni sui dispositivi android, significatività dei segnali)
 - [ ] fingerprint e perchè fingerprinting invece di triangolazione
+- [ ] vincoli del problema (server locale o no, limitazioni sui dispositivi android, significatività dei segnali)
 - [ ] bayes, maxmatch, minimize, knn, wknn (spiegato ad alto livello con le formule matematiche  praticamente, no algoritmo)
 - [ ] client, speaker, server (cosa sono, diagramma classi (?), focus su dualità socket e websocket)
 - [ ] messages
