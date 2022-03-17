@@ -1,14 +1,14 @@
 - [x] Abstract
 
 Introduzione: (1 pag max)
-- [ ] definizione del problema 
-- [ ] stato dell'arte(?)
-- [ ] soluzione proposta
+- [x] definizione del problema 
+- [x] stato dell'arte(?)
+- [x] soluzione proposta
 
 Progettazione:
 - [ ] vincoli del problema (server locale o no, limitazioni sui dispositivi android, significatività dei segnali)
-- [ ] fingerprint e perchè fingerprinting invece di triangolazione
-- [ ] bayes, maxmatch, minimize, knn, wknn (spiegato ad alto livello con le formule matematiche  praticamente, no algoritmo)
+- [x] fingerprint e perchè fingerprinting invece di triangolazione
+- [x] bayes, maxmatch, minimize, knn, wknn (spiegato ad alto livello con le formule matematiche  praticamente, no algoritmo)
 - [ ] client, speaker, server (cosa sono, diagramma classi (?), focus su dualità socket e websocket)
 - [ ] messages
 - [ ] offline e online phase nel nostro sistema
