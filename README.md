@@ -11,7 +11,7 @@ Progettazione:
 - [x] bayes, maxmatch, minimize, knn, wknn (spiegato ad alto livello con le formule matematiche  praticamente, no algoritmo)
 - [ ] client, speaker, server (cosa sono, diagramma classi (?), focus su dualità socket e websocket)
 - [ ] messages
-- [ ] offline e online phase nel nostro sistema
+- [x] offline e online phase nel nostro sistema
 - [ ] Interfaccia (non tanto quanto è bella ma cosa permette di fare)
 
 Implementazione:
