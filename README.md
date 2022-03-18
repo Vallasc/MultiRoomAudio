@@ -10,7 +10,6 @@ Progettazione:
 - [x] fingerprint e perchè fingerprinting invece di triangolazione
 - [x] bayes, maxmatch, minimize, knn, wknn (spiegato ad alto livello con le formule matematiche  praticamente, no algoritmo)
 - [x] client, speaker, server 
-- [ ] messages
 - [x] offline e online phase nel nostro sistema
 - [ ] Interfaccia (non tanto quanto è bella ma cosa permette di fare)
 
