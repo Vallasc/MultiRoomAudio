@@ -155,7 +155,8 @@ public class Knn extends FingerprintAnalyzer{
             }
         }
 
-        if( ((!this.useWeight && max < (Math.floor(this.k/2) + 1) ) || (this.useWeight && max <= 0.6)) && max > 0){ //TODO k/ num classi
+        if( ((!this.useWeight && max < (Math.floor(this.k/classes.size()) + 1) ) 
+                        || (this.useWeight && max <= (1/classes.size()))) && max > 0){
             if(this.confirmRoom)
                 confirmRoom(onlines, new ArrayList<>(classes.keySet()));
             roomKey = oldRoomKey;
