@@ -9,7 +9,7 @@ Progettazione:
 - [ ] vincoli del problema (server locale o no, limitazioni sui dispositivi android, significatività dei segnali)
 - [x] fingerprint e perchè fingerprinting invece di triangolazione
 - [x] bayes, maxmatch, minimize, knn, wknn (spiegato ad alto livello con le formule matematiche  praticamente, no algoritmo)
-- [ ] client, speaker, server (cosa sono, diagramma classi (?), focus su dualità socket e websocket)
+- [x] client, speaker, server 
 - [ ] messages
 - [x] offline e online phase nel nostro sistema
 - [ ] Interfaccia (non tanto quanto è bella ma cosa permette di fare)
