@@ -15,11 +15,11 @@ Progettazione:
 
 Implementazione:
 - [ ] Android + linux + windows
-- [ ] Individuazione server, costanti del sistema, persistenza "db" e valori forniti "dall'utente"
+- [x] Individuazione server, costanti del sistema, persistenza "db" e valori forniti "dall'utente"
 - [ ] Java per l'implementazione del backend
 	- [ ] speaker
 	- [ ] client
-	- [ ] server -> db, socket e websocket, knn(fingerprintanalyzer), musicmanager
+	- [x] server -> db, socket e websocket, knn(fingerprintanalyzer), musicmanager
 	- [ ] Gson
 - [ ] Svelte (interfaccia)
 - [ ] Estensione del servizio
