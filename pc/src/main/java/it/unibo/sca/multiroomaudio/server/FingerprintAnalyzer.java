@@ -6,7 +6,6 @@ import java.util.List;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
-import it.unibo.sca.multiroomaudio.utils.GlobalState;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
 public abstract class FingerprintAnalyzer extends Thread {

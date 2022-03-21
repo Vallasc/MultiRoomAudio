@@ -24,9 +24,9 @@ import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 public class ServerMain {
 
-    private final static int FINGERPRINT_SERVER_PORT = 8497;
-    private final static int WEB_SERVER_PORT = 8082;
-    private final static int MUSIC_SERVER_PORT = 8081;
+    private final static int FINGERPRINT_SERVER_PORT = 9497;
+    private final static int WEB_SERVER_PORT = 9090;
+    private final static int MUSIC_SERVER_PORT = 9091;
 
     private static DatagramThread udpHandler;
     private static MusicOrchestrationManager musicManager;
@@ -45,10 +45,7 @@ public class ServerMain {
     }
 
     public static void main(String[] args){
-        //default values
-        //String musicHttpLocation = "E:\\francesco\\music";
-        String musicHttpLocation = "C:\\Users\\giaco\\Music";
-        //String musicHttpLocation = "/home/vallasc/Musica";
+        String musicHttpLocation = "./";
         String filepath = "./db";
         int i = 0;
         boolean flagResume = false;
