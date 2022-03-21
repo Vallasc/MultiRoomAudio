@@ -148,15 +148,18 @@ public class Knn extends FingerprintAnalyzer{
         HashMap<String, Double> classes = selectK(this.useWeight);
 
         double max = Double.MIN_VALUE;
+        double total = 0;
         for(String key : classes.keySet()){
             if(classes.get(key) > max){
                 max = classes.get(key);
+                total += max; 
                 roomKey = key;
             }
         }
 
-        if( ((!this.useWeight && max < (Math.floor(this.k/classes.size()) + 1) ) 
-                        || (this.useWeight && max <= (1/classes.size()))) && max > 0){
+        int newk = (int) Math.min(total, k);
+        if(  (!this.useWeight && max/newk <=  0.7 ) 
+            || (this.useWeight && max <= 0.7 ) ){
             if(this.confirmRoom)
                 confirmRoom(onlines, new ArrayList<>(classes.keySet()));
             roomKey = oldRoomKey;
