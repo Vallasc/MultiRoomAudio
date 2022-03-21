@@ -6,10 +6,11 @@ if [ -z "$1" ]; then
 fi
 
 JAR="target/multi_room_audio_client-0.0.1-jar-with-dependencies.jar"
+shift
 
 case "$1" in
     "server")
-        java -cp "$JAR" it.unibo.sca.multiroomaudio.server.ServerMain
+        java -cp "$JAR" it.unibo.sca.multiroomaudio.server.ServerMain "$@"
         ;;
     "client")
         sudo java -cp "$JAR" it.unibo.sca.multiroomaudio.client.ClientMain
