@@ -154,7 +154,7 @@ public class ServerMain {
                 Gson gson = new GsonBuilder().create();
                 gson.toJson(dbm.getDevices(), writer);
             }catch(IOException e){
-                System.err.println("error while serializing the devices file");
+                System.err.println("error while serializing the devices file.");
                 e.printStackTrace();
             }
 
@@ -162,7 +162,7 @@ public class ServerMain {
                 Gson gson = new GsonBuilder().create();
                 gson.toJson(dbm.getClientRooms(), writer);
             }catch(IOException e){
-                System.err.println("error while serializing the fingerprints file");
+                System.err.println("error while serializing the fingerprints file.");
                 e.printStackTrace();
             }
 

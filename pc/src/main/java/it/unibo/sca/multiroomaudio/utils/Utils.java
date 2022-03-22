@@ -27,6 +27,7 @@ public class Utils {
     public static void getHTTPRequest(String urlString){
         try {
             InputStream response = new URL(urlString).openStream();
+            response.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

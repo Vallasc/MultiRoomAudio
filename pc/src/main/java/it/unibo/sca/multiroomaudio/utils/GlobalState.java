@@ -7,7 +7,7 @@ public class GlobalState {
     private int cutPower = -70;
     private int k = 4;
     private boolean useWeights = false;
-    private boolean confirmRoom = false;
+    private boolean confirmRoom = true;
     private int clientFingerprintWindowSize = 2;
 
     public static GlobalState getInstance() {

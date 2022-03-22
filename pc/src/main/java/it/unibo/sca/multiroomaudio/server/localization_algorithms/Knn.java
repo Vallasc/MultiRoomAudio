@@ -21,10 +21,13 @@ import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 import it.unibo.sca.multiroomaudio.utils.GlobalState;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
+/**
+ * Class that implements KNN algorithm
+ */
 public class Knn extends FingerprintAnalyzer{
-    private final int RETRY_TIME_CYCLES = 50;
+    private final int RETRY_TIME_CYCLES = 400;
 
-    private HashMap<String, Double> errors = new LinkedHashMap<>(); //<ReferencePoint, error>
+    private HashMap<String, Double> errors = new LinkedHashMap<>(); // <ReferencePoint, error>
     private int k;
     private boolean initUnknownAP = false;
     private boolean useWeight = false;
@@ -47,6 +50,11 @@ public class Knn extends FingerprintAnalyzer{
         this.useGlobalVars = false;
     }
 
+    /**
+     * Select k nearest neighbours
+     * @param addWeights use weighted nearest neighbours
+     * @return results map
+     */
     private HashMap<String, Double> selectK(boolean addWeights){
         // Get first k
         this.errors = Utils.sortHashMapByValueAsc(this.errors);
@@ -83,6 +91,11 @@ public class Knn extends FingerprintAnalyzer{
         return Math.pow(x-mu, 2);
     }
 
+    /**
+     * Compute error for each reference point in room
+     * @param room selected room
+     * @param onlines online scan
+     */
     public void computeRoomError(Room room, List<ScanResult> onlines){
         if(onlines == null || room.getNScan() == 0)
             return;
@@ -105,6 +118,7 @@ public class Knn extends FingerprintAnalyzer{
             }
         }
 
+        // Set unknown AP power to POWER_LIMIT
         if(this.initUnknownAP){
             int POWER_LIMIT = GlobalState.getInstance().getCutPower() - 10;
             for(String BSSID : notFound){
@@ -124,6 +138,9 @@ public class Knn extends FingerprintAnalyzer{
         }
     }
  
+    /**
+     * Find room based on currrent online scan
+     */
     @Override
     public String findRoomKey() {
         if(useGlobalVars){
@@ -150,9 +167,9 @@ public class Knn extends FingerprintAnalyzer{
         double max = Double.MIN_VALUE;
         double total = 0;
         for(String key : classes.keySet()){
+            total += classes.get(key);
             if(classes.get(key) > max){
                 max = classes.get(key);
-                total += max; 
                 roomKey = key;
             }
         }
@@ -171,12 +188,14 @@ public class Knn extends FingerprintAnalyzer{
         return roomKey;
     }
 
+    /**
+     * Send message to open cofirmation popup 
+     * @param scan current scan
+     * @param keys rooms ids
+     */
     public void confirmRoom(List<ScanResult> scan, List<String> keys){
-        if(client.getConfirmationFingerprints().size() != 0 || scan.size() == 0 || client.isOffline())
+        if(retryCounter > 0 || scan.size() == 0 || client.isOffline())
             return;
-        if(retryCounter > 0){
-            return;
-        }
         retryCounter = RETRY_TIME_CYCLES;
         System.out.println("DEBUG: Confirm room");
         client.setConfirmationFP(scan);
@@ -187,6 +206,9 @@ public class Knn extends FingerprintAnalyzer{
         } catch (IOException e) {}  
     }
 
+    /**
+     * Print KNN results
+     */
     public void printResults(){
         System.out.println("KNN results:");
         for(var entry : this.classes.entrySet()){

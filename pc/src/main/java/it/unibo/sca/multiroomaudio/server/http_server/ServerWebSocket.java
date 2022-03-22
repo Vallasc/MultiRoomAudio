@@ -7,6 +7,9 @@ import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 
 import java.io.*;
 
+/**
+ * Web Socket handler
+ */
 @WebSocket
 public class ServerWebSocket {
 

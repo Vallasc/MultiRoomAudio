@@ -142,7 +142,6 @@
         buttons.push({
                 text: "I DON'T KNOW",
                 onClick: () => {
-                    sendConfirmation(null)
                     clearTimeout(timer)
                 }
             })
@@ -154,7 +153,6 @@
         }).open()
         timer = setTimeout(() => {
             dialog.close()
-            sendConfirmation(null)
         }, 30000)
     }
 

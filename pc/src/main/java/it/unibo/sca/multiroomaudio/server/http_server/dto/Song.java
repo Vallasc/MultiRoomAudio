@@ -91,7 +91,7 @@ public class Song {
         String fileName = p.getFileName().toString();
         song.fileName = fileName;
         song.dirPath = song.filePath.replace(fileName, "");
-        song.dirPath = song.dirPath.replaceAll("^\\\\+", ""); //TODO Testing
+        song.dirPath = song.dirPath.replaceAll("^\\\\+", "");
         song.dirPath = song.dirPath.replaceAll("^\\/+", "");
         song.dirPath = song.dirPath.replaceAll("\\\\+$", "");
         song.dirPath = song.dirPath.replaceAll("\\/+$", "");

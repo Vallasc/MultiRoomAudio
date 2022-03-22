@@ -12,7 +12,6 @@ import com.google.gson.Gson;
 import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
-import it.unibo.sca.multiroomaudio.server.localization_algorithms.Bayes;
 import it.unibo.sca.multiroomaudio.server.localization_algorithms.Knn;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
