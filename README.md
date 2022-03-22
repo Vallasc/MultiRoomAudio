@@ -1,31 +1,44 @@
-- [x] Abstract
+# Multi-Room Audio
+Multi-Room Audio is a system that uses the context to reproduce music in the indoor location where the user is found. It uses radio-fingerprinting to locate the user position inside the house and consequently deciding which speaker needs to be activated.
 
-Introduzione: (1 pag max)
-- [x] definizione del problema 
-- [x] stato dell'arte(?)
-- [x] soluzione proposta
+### Feautures
+* Multi-platform: Android, Windows and Linux
+* KNN, WKNN localization algorithms
+* Easy to use interface
 
-Progettazione:
-- [ ] vincoli del problema (server locale o no, limitazioni sui dispositivi android, significatività dei segnali)
-- [x] fingerprint e perchè fingerprinting invece di triangolazione
-- [x] bayes, maxmatch, minimize, knn, wknn (spiegato ad alto livello con le formule matematiche  praticamente, no algoritmo)
-- [x] client, speaker, server 
-- [x] offline e online phase nel nostro sistema
-- [ ] Interfaccia (non tanto quanto è bella ma cosa permette di fare)
 
-Implementazione:
-- [ ] Android + linux + windows
-- [x] Individuazione server, costanti del sistema, persistenza "db" e valori forniti "dall'utente"
-- [ ] Java per l'implementazione del backend
-	- [ ] speaker
-	- [ ] client
-	- [x] server -> db, socket e websocket, knn(fingerprintanalyzer), musicmanager
-	- [ ] Gson
-- [ ] Svelte (interfaccia)
-- [ ] Estensione del servizio
+### How to build
+````
+$> cd ui
+$> npm install
+$> npm run build
+$> cd ../pc
+$> mvn clean package
+````
 
-Valutazione(al variare dei parametri):
+### How to run
+You don't need to do the build to run the programs, there are pre-compiled executables.
+#### Server
+````
+$> cd pc
+# On linux
+$> ./run.sh server -m \music\directory -r
+# On Windows
+$> .\run.bat server -m /music/directory -r
+````
 
-- [ ] Accuratezza 
-- [ ] Velocità
+#### Client
+````
+# On linux
+$> ./run.sh client
+# On Windows
+$> .\run.bat client
+````
 
+#### Speaker
+````
+# On linux
+$> ./run.sh speaker
+# On Windows
+$> .\run.bat speaker
+````
