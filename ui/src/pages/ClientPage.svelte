@@ -266,7 +266,7 @@
 
 <Page>
     <!-- Top Navbar -->
-    <Navbar title="Multiroom Audio">
+    <Navbar title="Multi-Room Audio">
         {#if socket}
             <NavRight>
                 <Link iconMd="material:other_houses" iconOnly href="/rooms" />

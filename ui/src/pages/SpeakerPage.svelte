@@ -1,13 +1,14 @@
 <script>
     import NowPlaying from "./NowPlaying.svelte"
-    import { Page, f7 } from "framework7-svelte"
+    import { Page, f7, f7ready, Navbar, NavRight, Link, NavTitle } from "framework7-svelte"
     import { onMount } from 'svelte'
-    import { f7ready } from 'framework7-svelte'
     import { deviceId, hostname, webPort, musicPort } from "../stores"
 
     let socket = null
     const audio = new Audio()
     audio.volume = 0
+    let muted = true
+
     let songId = -1
     let currentTimeSec = 0
     let songDurationSec = 0
@@ -179,6 +180,7 @@
                 audio.volume = i/10
                 await sleep(200)
             }
+        muted = audio.volume == 0
     }
 
     // Update progress bar
@@ -188,12 +190,15 @@
 </script>
 
 <Page>
-    <div class="navbar" data-f7-slot="fixed">
-        <div class="navbar-bg" />
-        <div class="navbar-inner sliding">
-            <div class="title" >Multiroom Audio</div>
-        </div>
-    </div>
+    <Navbar title="Multi-Room Audio - {speakerName}" transparent noShadow>
+        <NavRight>
+            {#if muted}
+                <Link iconMd="material:volume_mute" iconOnly/>
+            {:else}
+                <Link iconMd="material:volume_up" iconOnly/>
+            {/if}
+        </NavRight>
+    </Navbar>
     <NowPlaying 
         imageUrl = {imageUrl} 
         title = {title} 
@@ -205,20 +210,7 @@
 </Page>
 
 <style>
-    .navbar-bg {
-        background: transparent;
-    }
-
-    .navbar-bg:before {
-        background: transparent;
-    }
-
-    .title {
-        text-align: center;
-        color: var(--f7-fab-bg-color,var(--f7-theme-color));
-    }
-
-    .navbar-inner {
-        justify-content: center;
+    :global(.title) {
+        opacity: 1 !important;
     }
 </style>
