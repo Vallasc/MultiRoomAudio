@@ -257,13 +257,13 @@
         margin-right: 16px;
         margin-bottom: 13%;
         width: 70%;
-        max-width: 900px;
+        max-width: 300px;
     }
     .button-stop {
         margin-left: 16px;
         margin-right: 16px;
-        margin-bottom: 16px;
-        width: 30%;
+        margin-bottom: 24px;
+        width: 70%;
         max-width: 300px;
         min-width: 150px;
     }
