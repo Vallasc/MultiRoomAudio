@@ -19,7 +19,9 @@ import com.mpatric.mp3agic.UnsupportedTagException;
 import it.unibo.sca.multiroomaudio.server.MusicOrchestrationManager;
 import it.unibo.sca.multiroomaudio.server.http_server.dto.Song;
 
-// Only mp3 format supported
+/**
+ * HTTP server for mp3 music
+ */
 public class MusicHttpServer extends HttpServer {
     private File dir;
     private ArrayList<Song> songs;
@@ -48,7 +50,14 @@ public class MusicHttpServer extends HttpServer {
         service.staticFiles.header("Access-Control-Allow-Origin", "*");
     }
 
-    public MusicHttpServer listMusic() throws IOException{
+
+    /**
+     * List all mp3s in song directory
+     * Only mp3 format is supported
+     * @return
+     * @throws IOException
+     */
+    public MusicHttpServer listMusic() throws IOException {
         songs.clear();
         System.out.println("Songs:");
         Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
@@ -82,6 +91,11 @@ public class MusicHttpServer extends HttpServer {
         return this;
     }
 
+    /**
+     * Get extesion of a file
+     * @param filename 
+     * @return  extension
+     */
     public Optional<String> getExtension(String filename) {
         return Optional.ofNullable(filename)
           .filter(f -> f.contains("."))

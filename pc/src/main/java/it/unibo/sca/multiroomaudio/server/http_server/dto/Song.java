@@ -14,6 +14,9 @@ import com.mpatric.mp3agic.UnsupportedTagException;
 
 import it.unibo.sca.multiroomaudio.server.http_server.EncodingUtil;
 
+/**
+ * Song data transfer object
+ */
 public class Song {
     private int id;
     private String artist = null;
@@ -75,6 +78,16 @@ public class Song {
         return fileName;
     }
 
+    /**
+     * From mp3 file to song object
+     * @param id songid
+     * @param filePath song path
+     * @param musicDir  music directory
+     * @return Song object
+     * @throws UnsupportedTagException
+     * @throws InvalidDataException
+     * @throws IOException
+     */
     public static Song fromMp3File(int id, Path filePath, File musicDir) 
                                         throws UnsupportedTagException, InvalidDataException, IOException{
         File songFile = filePath.toFile();

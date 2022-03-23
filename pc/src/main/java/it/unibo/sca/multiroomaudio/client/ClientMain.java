@@ -16,6 +16,9 @@ import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
+/**
+ * Main client class
+ */
 public class ClientMain {
 
     public static void main(String[] args) {
@@ -27,7 +30,7 @@ public class ClientMain {
         if(!discoverService.discover()) return;
         String id = null;
         
-        //create socket for the fingerprints     
+        // Create socket for the fingerprints     
         Socket socket = null;
         try {
             socket = new Socket(discoverService.getServerAddress(), discoverService.getFingerprintPort());
@@ -41,7 +44,7 @@ public class ClientMain {
             e.printStackTrace();
         }
 
-
+        // If device is not rejected
         if(!msg.isRejected()) {
             (new FingerprintService(socket)).start();
             if(id == null)
@@ -57,6 +60,7 @@ public class ClientMain {
                 if (Desktop.isDesktopSupported()) {
                     Utils.sleep(2000);
                     try {
+                        // Open web app
                         Desktop.getDesktop().browse(uri);
                     } catch (IOException | UnsupportedOperationException e) {
                         System.err.println("Unsupported desktop environment");
@@ -74,6 +78,10 @@ public class ClientMain {
         }
     }
 
+    /**
+     * Gen a random ID and save it in preferences
+     * @return ID
+     */
     private static String getUniqueId(){
         Preferences prefs = Preferences.userNodeForPackage(ClientMain.class);
         String id = prefs.get("ID", null);

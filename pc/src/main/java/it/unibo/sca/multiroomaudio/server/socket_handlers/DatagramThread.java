@@ -10,7 +10,10 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 
-public class DatagramThread extends Thread{
+/**
+ * Handle datagram packets and send them to DatagramExecutor
+ */
+public class DatagramThread extends Thread {
     private final int bufferSize = 1024 * 4;
     private final int fingerprintServerPort;
     private final int webServerPort;
@@ -24,6 +27,9 @@ public class DatagramThread extends Thread{
         this.musicServerPort = musicServerPort;
     }
 
+    /**
+     * Main loop
+     */
     public void run(){
         System.out.println("Broadcast receiver started");
         datagramAnalyser = new DatagramExecutor(fingerprintServerPort, webServerPort, musicServerPort);
@@ -46,6 +52,9 @@ public class DatagramThread extends Thread{
         } 
     }
 
+    /**
+     * Stop service
+     */
     public void stopService(){
         datagramAnalyser.stopService();
 		stopped = true;

@@ -16,6 +16,9 @@ import it.unibo.sca.multiroomaudio.shared.messages.player.MsgStop;
 import it.unibo.sca.multiroomaudio.shared.model.Device;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
+/**
+ * Handles music player and the current song status
+ */
 public class MusicOrchestrationManager extends Thread {
     private final static Logger LOGGER = Logger.getLogger(MusicOrchestrationManager.class.getSimpleName());
 
@@ -28,6 +31,9 @@ public class MusicOrchestrationManager extends Thread {
         musicPlayer = new Player(databaseManager.getSongs());
     }
 
+    /**
+     * Main loop
+     */
     @Override
     public void run() {
         super.run();
@@ -52,15 +58,27 @@ public class MusicOrchestrationManager extends Thread {
         }
     }
 
+    /**
+     * Stop service
+     */
     public void stopService(){
 		stopped = true;
 		this.interrupt();
 	}
 
+    /**
+     * Set music list
+     * @param songs List of songs
+     */
     public void setMusicList(ArrayList<Song> songs){
         this.databaseManager.getSongs().addAll(songs);
     }
 
+    /**
+     * Play a certain song from a certain time
+     * @param songId song id
+     * @param fromSec time to start in seconds
+     */
     public void playSong(int songId, float fromSec) {
         try{
             this.databaseManager.getSongs().get(songId);
@@ -73,6 +91,9 @@ public class MusicOrchestrationManager extends Thread {
         LOGGER.info("PLAYING: " + musicPlayer.getCurrentSong().getTitle());
     }
 
+    /**
+     * Pause current song
+     */
     public void pauseCurrentSong() {
         synchronized (musicPlayer) {
             musicPlayer.pause();
@@ -80,6 +101,9 @@ public class MusicOrchestrationManager extends Thread {
         LOGGER.info("PAUSE: " + musicPlayer.getCurrentSong().getTitle());
     }
     
+    /**
+     * Stop current song
+     */
     public void stopCurrentSong() {
         synchronized (musicPlayer) {
                 musicPlayer.stop();
@@ -87,6 +111,9 @@ public class MusicOrchestrationManager extends Thread {
         LOGGER.info("STOP: " + musicPlayer.getCurrentSong().getTitle());
     }
 
+    /**
+     * Skip song
+     */
     public void nextSong() {
         synchronized (musicPlayer) {
             musicPlayer.next();
@@ -94,6 +121,9 @@ public class MusicOrchestrationManager extends Thread {
         LOGGER.info("NEXT: " + musicPlayer.getCurrentSong().getTitle());
     }
 
+    /**
+     * Previous song
+     */
     public void prevSong() {
         synchronized (musicPlayer) {
             musicPlayer.prev();
@@ -101,6 +131,9 @@ public class MusicOrchestrationManager extends Thread {
         LOGGER.info("PREV: " + musicPlayer.getCurrentSong().getTitle());  
     }
 
+    /**
+     * Abstract player that track the past time
+     */
     public class Player {
         private List<Song> songs;
         private int songIndex = 0;

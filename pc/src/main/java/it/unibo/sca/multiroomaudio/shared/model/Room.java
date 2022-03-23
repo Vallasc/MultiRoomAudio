@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-//Stanza(Nome, Map<BSSID, List<Fingerprint>>)
+
+/**
+ * Room object model
+ */
 public class Room {
     public static final int SCANS_FOR_EACH_POSITION = 4;
     public static final int MAX_POSITION = 30;

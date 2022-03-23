@@ -8,8 +8,11 @@ import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
+/**
+ * Analyze fingeprints in the online phase
+ */
 public abstract class FingerprintAnalyzer extends Thread {
-
+    // Sleep time after each computation
     public static final int SLEEP_TIME = 200;
     protected final Client client;
     protected final DatabaseManager dbm;
@@ -28,6 +31,9 @@ public abstract class FingerprintAnalyzer extends Thread {
     abstract public String findRoomKey();
     abstract public void printResults();
 
+    /**
+     * Main loop
+     */
     @Override
     public void run(){
         String prevRoomKey = "";
@@ -37,7 +43,7 @@ public abstract class FingerprintAnalyzer extends Thread {
         while(!this.stopped){
             String roomkey = findRoomKey();
             if(roomkey != null){
-                List<Speaker> speakers = dbm.getConnectedSpeakerRoom(client.getId(), roomkey);
+                List<Speaker> speakers = dbm.getConnectedSpeakersRoom(client.getId(), roomkey);
                 boolean areSameSpeakers = speakers.containsAll(prevSpeakers) && prevSpeakers.containsAll(speakers);
                 if( !roomkey.equals(prevRoomKey) || !areSameSpeakers ) { // new Room or new Speaker
                     System.out.println("DEBUG room is: " + roomkey);
@@ -69,10 +75,18 @@ public abstract class FingerprintAnalyzer extends Thread {
         System.out.println("STOP FINGERPRINT ANALYZER: " + client.getId());
     }
 
+    /**
+     * Stop service
+     */
     public void stopService() {
         this.stopped = true;
     }
 
+    /**
+     * Make GET requests to urls
+     * @param prevRoomKey leave room
+     * @param newRoomKey enter room
+     */
     public void doRoomRequests(String prevRoomKey, String newRoomKey){
         if( prevRoomKey != null ){
             Room prevRoom = dbm.getClientRoom(client.getId(), prevRoomKey);

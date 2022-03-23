@@ -14,6 +14,9 @@ import it.unibo.sca.multiroomaudio.shared.messages.player.MsgSpeakerList;
 import it.unibo.sca.multiroomaudio.shared.model.Device;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
+/**
+ * Utility methods for handling speakers
+ */
 public class SpeakerManager {
     private final static Logger LOGGER = Logger.getLogger(SpeakerManager.class.getSimpleName());
     private final DatabaseManager dbm;
@@ -22,6 +25,9 @@ public class SpeakerManager {
         this.dbm = dbm;
     }
 
+    /**
+     * Send updated speaker list to all clients
+     */
     public void updateSpeakerList(){
         LOGGER.info("Update speaker list of all clients");
         List<Speaker> speakers = dbm.getConnectedWebSpeakers().stream()
@@ -33,6 +39,11 @@ public class SpeakerManager {
         });
     }
 
+    /**
+     * Send speaker list to a certain session
+     * @param session Session
+     * @param speakers list of speakers
+     */
     public void sendSpeakersList(Session session, List<Speaker> speakers){
         MsgSpeakerList message = new MsgSpeakerList(speakers);
         try {
@@ -42,6 +53,9 @@ public class SpeakerManager {
         }
     }
 
+    /**
+     * Send message to update current speaker audio state
+     */
     public void updateAudioState(){
         dbm.getConnectedWebDevices().stream()
             .filter(pair -> pair.getRight() instanceof Speaker)

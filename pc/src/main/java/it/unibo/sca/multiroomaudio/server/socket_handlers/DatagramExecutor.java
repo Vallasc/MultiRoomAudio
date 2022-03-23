@@ -14,6 +14,9 @@ import it.unibo.sca.multiroomaudio.discovery.MsgDiscoveredServer;
 import it.unibo.sca.multiroomaudio.discovery.MsgDiscovery;
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
+/**
+ * Class that haandles discovery messages
+ */
 public class DatagramExecutor extends Thread {
 	private BlockingQueue<Pair<byte[], InetAddress>> requestQ;
 	private static byte[] data;
@@ -30,7 +33,10 @@ public class DatagramExecutor extends Thread {
 		} 
 	}
 	
-	
+	/**
+	 * Send datagram packet
+	 * @param receiver destination address
+	 */
 	private void sendDatagram(InetAddress receiver){
         DatagramSocket socket;
         try {
@@ -44,6 +50,9 @@ public class DatagramExecutor extends Thread {
         }
     }
 
+	/**
+	 * Main loop
+	 */
 	public void run() {
 		System.out.println("Datagram handler started");
 		while(!stopped) {

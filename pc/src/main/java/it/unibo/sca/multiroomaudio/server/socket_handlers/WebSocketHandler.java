@@ -29,6 +29,9 @@ import it.unibo.sca.multiroomaudio.shared.model.Device;
 import it.unibo.sca.multiroomaudio.shared.model.Room;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
 
+/**
+ * Handle connection with web devices
+ */
 public class WebSocketHandler {
     private static final Gson gson = new Gson();
     private final DatabaseManager dbm;  
@@ -41,6 +44,10 @@ public class WebSocketHandler {
         this.speakerManager = speakerManager;
     }
 
+    /**
+     * Handle connection close by client
+     * @param session client session
+     */
     public void handleClose(Session session){
         Device device = dbm.removeConnectedWebDevice(session);
         if(device != null){
@@ -54,6 +61,13 @@ public class WebSocketHandler {
         }
     }
 
+    /**
+     * Handle message sent by client
+     * @param session client session
+     * @param message client message
+     * @throws JsonSyntaxException
+     * @throws IOException
+     */
     public void handleMessage(org.eclipse.jetty.websocket.api.Session session, String message) throws JsonSyntaxException, IOException{
 
         String msgType = gson.fromJson(message, JsonObject.class).get("type").getAsString();
@@ -172,6 +186,12 @@ public class WebSocketHandler {
         }
     }
 
+    /**
+     * Send a message to a specific client session
+     * @param session client session
+     * @param message client message
+     * @throws IOException
+     */
     public static void sendMessage(Session session, Msg message) throws IOException{
         synchronized (session) {
             session.getRemote().sendString( gson.toJson(message) );

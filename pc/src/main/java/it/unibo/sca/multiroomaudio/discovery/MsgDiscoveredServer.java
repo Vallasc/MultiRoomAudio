@@ -2,6 +2,10 @@ package it.unibo.sca.multiroomaudio.discovery;
 
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
+/**
+ * Message in response to DISCOVERY with
+ * all server ports
+ */
 public class MsgDiscoveredServer extends Msg{
     private int fingerprintPort;
     private int serverPort;

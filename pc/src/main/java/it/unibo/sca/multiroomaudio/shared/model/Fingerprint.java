@@ -2,6 +2,9 @@ package it.unibo.sca.multiroomaudio.shared.model;
 
 import java.util.HashMap;
 
+/**
+ * Fingeprint object model
+ */
 public class Fingerprint {
     
     // Key = BSSID

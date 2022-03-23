@@ -1,5 +1,8 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
+/**
+ * Scan result object model
+ */
 public class ScanResult implements Comparable<Object> {
     private final String BSSID;
     private final String SSID;

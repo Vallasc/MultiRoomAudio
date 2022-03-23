@@ -1,4 +1,6 @@
-package it.unibo.sca.multiroomaudio.shared.messages;
+package it.unibo.sca.multiroomaudio.shared.messages.settings;
+
+import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
 public class MsgStartScan extends Msg{
     boolean start = false;

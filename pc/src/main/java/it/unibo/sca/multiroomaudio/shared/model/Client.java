@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import it.unibo.sca.multiroomaudio.server.DatabaseManager;
 import it.unibo.sca.multiroomaudio.utils.GlobalState;
+import it.unibo.sca.multiroomaudio.utils.Utils;
 
+/**
+ * Cleint object model
+ */
 public class Client extends Device {
     public class OfflinePhaseState{
         private boolean isOffline = false;
@@ -36,7 +39,7 @@ public class Client extends Device {
         if(fingerprintsCounter % FINGERPRINT_WINDOW_SIZE != 0) {
             this.oldFingerprints.addAll(Arrays.asList(scans));
         } else {
-            this.fingerprints = DatabaseManager.computeMeanFingeprint(this.oldFingerprints);
+            this.fingerprints = Utils.computeMeanFingeprint(this.oldFingerprints);
             this.oldFingerprints.clear();
         }
         fingerprintsCounter++;

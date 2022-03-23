@@ -1,5 +1,8 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
+/**
+ * Speaker object model
+ */
 public class Speaker extends Device {
     private String name;
     private transient int palyingClients = 0;

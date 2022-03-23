@@ -22,6 +22,10 @@ import it.unibo.sca.multiroomaudio.server.socket_handlers.SocketHandler;
 import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 import it.unibo.sca.multiroomaudio.shared.model.Speaker;
+
+/**
+ * Main entry point of server
+ */
 public class ServerMain {
 
     private final static int FINGERPRINT_SERVER_PORT = 9497;
@@ -123,8 +127,7 @@ public class ServerMain {
         new MainHttpServer(WEB_SERVER_PORT, 
             new ServerWebSocket(
                 new WebSocketHandler(dbm, musicManager, speakerManger)
-                ),
-            dbm ).start();      
+                )).start();      
 
         Runtime.getRuntime().addShutdownHook(new ShutDownHandler(dbm, filepath));
 
@@ -140,6 +143,9 @@ public class ServerMain {
 		}
     }
 
+    /**
+     * Stop services and save current db state to file
+     */
     static class ShutDownHandler extends Thread {
 
         private final DatabaseManager dbm;

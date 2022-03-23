@@ -8,6 +8,9 @@ import java.util.List;
 
 import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 
+/**
+ * Class that is used to discover the server in the local network
+ */
 public class DiscoveryService {
     private static final int bufferSize = 1024;
     public static final int DATAGRAM_PORT_SEND = 6262;
@@ -26,6 +29,9 @@ public class DiscoveryService {
         interfaceIndex = 0;
     }
 
+    /**
+     * Get all valid interfaces
+     */
     private void getSpecs(){
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
@@ -48,6 +54,10 @@ public class DiscoveryService {
         }
     }
 
+    /**
+     * Discover serever based on interfaces
+     * @return
+     */
     public boolean discover(){
         getSpecs();
 

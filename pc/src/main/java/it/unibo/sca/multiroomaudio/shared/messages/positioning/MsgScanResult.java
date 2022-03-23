@@ -1,5 +1,6 @@
-package it.unibo.sca.multiroomaudio.shared.messages;
+package it.unibo.sca.multiroomaudio.shared.messages.positioning;
 
+import it.unibo.sca.multiroomaudio.shared.messages.Msg;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 
 public class MsgScanResult extends Msg {

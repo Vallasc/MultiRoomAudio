@@ -1,5 +1,9 @@
 package it.unibo.sca.multiroomaudio.utils;
 
+/**
+ * Global state of the sever, can be modified using
+ * client web app
+ */
 public class GlobalState {
     private static GlobalState INSTANCE;
     private GlobalState() {}

@@ -1,5 +1,8 @@
 package it.unibo.sca.multiroomaudio.shared.model;
 
+/**
+ * Device object model
+ */
 public abstract class Device { 
     private final String id;
     private final int type;

@@ -6,6 +6,9 @@ import java.net.URISyntaxException;
 
 import it.unibo.sca.multiroomaudio.discovery.DiscoveryService;
 
+/**
+ * Main speaker entry point
+ */
 public class SpeakerMain {
     
     public static void main(String[] args) {

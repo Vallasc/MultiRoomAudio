@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -22,8 +21,12 @@ import it.unibo.sca.multiroomaudio.server.socket_handlers.WebSocketHandler;
 import it.unibo.sca.multiroomaudio.shared.messages.MsgHello;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanRoomDone;
 import it.unibo.sca.multiroomaudio.shared.model.*;
-import it.unibo.sca.multiroomaudio.utils.GlobalState;
+import it.unibo.sca.multiroomaudio.utils.Utils;
 
+/**
+ * Handles storage of devices, rooms and speakers.
+ * Implements methods to retrieve them in a easy way.
+ */
 public class DatabaseManager {
     private final List<Song> songs = new ArrayList<Song>();
     private final ConcurrentHashMap<String, Device> devices = new ConcurrentHashMap<>(); //all the devices seen by the server
@@ -31,25 +34,21 @@ public class DatabaseManager {
     private final ConcurrentHashMap<String, Client> connectedSocketDevices = new ConcurrentHashMap<>(); //all the connected socket devices
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Room>> clientRooms = new ConcurrentHashMap<>(); //the rooms for each client
 
-    //-------------------------------DEVICES-----------------------------------------------------------
+    // Devices
 
-    public String getKeyDevice(String id){
-        // Can throw ConcurrentModificationException if an element is deleted during the iteration
-        // but we don't delete devices :)
-        for(String key : devices.keySet())
-            if(devices.get(key).getId().equals(id))
-                return key;
-        return null;
-    }
-
-    public boolean deviceContains(String device){
-        return devices.containsKey(device);
-    }
-
+    /**
+     * Get device by key
+     * @param key device id
+     * @return device object
+     */
     public Device getDevice(String key){
         return devices.get(key);
     }
 
+    /**
+     * Get all registered devices
+     * @return devices map
+     */
     public HashMap<String, Device> getDevices(){
         HashMap<String, Device> toSave = new HashMap<>();
         int i = 0;
@@ -60,30 +59,41 @@ public class DatabaseManager {
         return toSave;
     }
 
+    /**
+     * Set a specific device
+     * @param device Device object
+     */
     public void setDevices(Device device){
         this.devices.put(device.getId(), device);
     }
 
-    //--------------------------------CONNECTEDWEBDEVICES----------------------------------------------------
+    // Web devices
+
+    /**
+     * Get all connected web speakers
+     * @return list of <session, speaker device>
+     */
     public List<Pair<Session, Device>> getConnectedWebSpeakers(){
         return getConnectedWebDevices().stream()
                     .filter(pair -> pair.getRight() instanceof Speaker)
                     .collect(Collectors.toList());
     }
 
-    public List<String> getConnectedWebSpeakersName(){
-        return getConnectedWebDevices().stream()
-                    .filter(pair -> pair.getRight() instanceof Speaker)
-                    .map(pair -> ((Speaker)pair.getRight()).getName())
-                    .collect(Collectors.toList());
-    }
-
+    /**
+     * Get all connected web clients
+     * @return list of <session, client device>
+     */
     public List<Pair<Session, Device>> getConnectedWebClients(){
         return getConnectedWebDevices().stream()
                     .filter(pair -> pair.getRight() instanceof Client)
                     .collect(Collectors.toList());
     }
 
+    /**
+     * Get a connected speaker by its id
+     * @param id speaker id
+     * @return Speaker object
+     */
     public Speaker getConnectedSpeaker(String id){
         return (Speaker) getConnectedWebDevices().stream()
                     .filter(pair -> pair.getRight() instanceof Speaker)
@@ -91,7 +101,13 @@ public class DatabaseManager {
                     .findAny().get().getRight();
     }
 
-    public List<Speaker> getConnectedSpeakerRoom(String clientId, String roomId){
+    /**
+     * Get all connected speaker of clientId present in roomId
+     * @param clientId client id
+     * @param roomId room id
+     * @return list of speakers
+     */
+    public List<Speaker> getConnectedSpeakersRoom(String clientId, String roomId){
         try {
             return clientRooms.get(clientId).get(roomId.toLowerCase())
                                 .getSpeakerList();
@@ -100,12 +116,21 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Get all connected web devices
+     * @return list of <session, device>
+     */
     public List<Pair<Session, Device>> getConnectedWebDevices(){
         return connectedWebDevices.entrySet().stream()
                                     .map( (entry) -> new ImmutablePair<Session, Device>(entry.getKey(), entry.getValue()))
                                     .collect(Collectors.toList()); // Streams are immutable
     }
 
+    /**
+     * Set a web device connected
+     * @param session device session
+     * @param initMessage HelloMessage
+     */
     public void addConnectedWebDevice(Session session, MsgHello initMessage){
         Device newDevice;
         if(initMessage.getDeviceType() == 0)
@@ -119,6 +144,10 @@ public class DatabaseManager {
         connectedWebDevices.put(session, oldDevice);
     }
 
+    /**
+     * Remove web device from connected map
+     * @param deviceId device id
+     */
     public void removeConnectedWebDevicesAndDisconnect(String deviceId){
         for(Pair<Session, Device> pair : getConnectedWebDevices()){
             if(pair.getRight().getId().equals(deviceId)){
@@ -128,14 +157,29 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Remove web device from connected map using session
+     * @param session device session
+     * @return removed Device
+     */
     public Device removeConnectedWebDevice(Session session){
         return connectedWebDevices.remove(session);
     }
 
+    /**
+     * Get a connected web device by his session
+     * @param session device session
+     * @return Device object
+     */
     public Device getConnectedWebDevice(Session session){
         return connectedWebDevices.get(session);
     }
 
+    /**
+     * Get session of a client
+     * @param clientId  client id
+     * @return Session object
+     */
     public Session getClientWebSession(String clientId){
         for( Pair<Session, Device> pair : getConnectedWebClients()) {
             if( pair.getRight().getId().equals(clientId)){
@@ -145,27 +189,51 @@ public class DatabaseManager {
         return null;
     }
 
-    //--------------------------------CONNECTEDSOCKETDEVICES---------------------------------------------------
+    // Socket devices
+
+    /**
+     * Get all socket clients
+     * @return list of socket clients
+     */
     public List<Client> getConnectedSocketClients(){
         return connectedSocketDevices.values().stream().collect(Collectors.toList()); // Streams are immutable
     }
 
-    public void addConnectedSocketClient(String mac, MsgHello initMessage){
+    /**
+     * Add a connected socket client
+     * @param initMessage HelloMessage
+     */
+    public void addConnectedSocketClient(MsgHello initMessage){
         Client newDevice = new Client(initMessage.getId());
         // Create Device if not present
         devices.putIfAbsent(initMessage.getId(), newDevice);
         connectedSocketDevices.putIfAbsent(initMessage.getId(), (Client) devices.get(initMessage.getId()));
     }
 
+    /**
+     * Remove a connected socket client
+     * @param clientId client id
+     */
     public void removeConnectedSocketClient(String clientId){
         connectedSocketDevices.remove(clientId);
     }
 
+    /**
+     * Check if a certain id is connected by socket
+     * @param clientId client id
+     * @return true if clientId is connected by socket, false otherwise
+     */
     public boolean isConnectedSocket(String clientId){
         return connectedSocketDevices.containsKey(clientId);
     }
 
-    //-------------------------------ROOMS-----------------------------------------
+    // Rooms
+
+    /**
+     * Create room and bind to clientId
+     * @param clientId client id
+     * @param roomId room id
+     */
     public void setClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> rooms;
         rooms = clientRooms.get(clientId);
@@ -180,6 +248,13 @@ public class DatabaseManager {
         System.out.println("New room for client "+ clientId + ", roomID: " + roomId);
     }
 
+    /**
+     * Set webhooks for a certain room
+     * @param clientId client id
+     * @param roomId room id
+     * @param urlEnter url on room enter
+     * @param urlLeave url on room leave
+     */
     public void setRoomUrls(String clientId, String roomId, String urlEnter, String urlLeave){
         ConcurrentHashMap<String, Room> rooms;
         rooms = clientRooms.get(clientId);
@@ -192,6 +267,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Delete a room
+     * @param clientId clieint id
+     * @param roomId room id
+     */
     public void deleteClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> rooms;
         try{
@@ -204,18 +284,34 @@ public class DatabaseManager {
         rooms.remove(roomId.toLowerCase());        
     }
 
+    /**
+     * Get all rooms for clientId
+     * @param clientId client id
+     * @return list of rooms
+     */
     public List<Room> getClientRooms(String clientId){
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
         if( rooms == null ) return new ArrayList<>();
         return new ArrayList<>(rooms.values());
     }
 
+    /**
+     * Get a certain room of clientId
+     * @param clientId client id
+     * @param roomId room id
+     * @return  Room object
+     */
     public Room getClientRoom(String clientId, String roomId){
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);
         if( rooms == null ) return null;
         return rooms.get(roomId);
     }
 
+    /**
+     * Save scans for current active client room
+     * @param client Client object
+     * @param scans Array of scans
+     */
     public void saveRoomScans(Client client, ScanResult[] scans){
         MsgScanRoomDone doneMessage = null;
         if(client.getCurrentPositionScans() == 0)
@@ -257,63 +353,34 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Update directly room fingerprints
+     * @param clientId client id
+     * @param roomId room id
+     * @param scans AP scans
+     */
     public void updateRoomFingerprints(String clientId, String roomId, List<ScanResult> scans){
         // Calculate mean stdev and aggregate samples
-        scans = computeMeanFingeprint(scans);
+        scans = Utils.computeMeanFingeprint(scans);
         Room room = clientRooms.get(clientId).get(roomId);
         room.putFingerprints(scans);
-        //room.printFingerprints();
     }
 
+    /**
+     * Update directly room fingerprints and clean confirmation array
+     * @param client client Object
+     * @param roomId room id
+     */
     public void updateRoomFingerprintsConfirm(Client client, String roomId){
         Room room = clientRooms.get(client.getId()).get(roomId);
         room.putFingerprints(client.getConfirmationFingerprints());
         client.clearConfirmation();
     }
 
-    static private double mean(List<ScanResult> list){
-        double mean = 0;
-        for(var scan : list)
-            mean += scan.getSignal();
-        mean = mean / list.size();
-        return mean;
-    }
-
-    static private double stddev(List<ScanResult> list, double mean){
-        double der = 0;
-        for(var scan : list){
-            der += Math.pow(scan.getSignal() - mean, 2);
-        }
-        double stddev = Math.sqrt(der/list.size());
-        if(stddev == 0)
-            stddev = 0.005;
-        return stddev;
-    }
-
-    static public List<ScanResult> computeMeanFingeprint(List<ScanResult> scans){
-        Map<String, List<ScanResult>> signals = new HashMap<>(); // List of all the signals strength for the same ap in the same scan
-        for(var scanResult : scans){
-            List<ScanResult> listSignals = signals.get(scanResult.getBSSID());
-            if(listSignals == null){
-                listSignals = new ArrayList<>();
-                signals.put(scanResult.getBSSID(), listSignals);
-            }
-            listSignals.add(scanResult);
-        }
-        List<ScanResult> outResults = new ArrayList<>();
-        for(var entry : signals.entrySet()){
-            // Calc mean signal
-            double mean = mean(entry.getValue());
-            if(mean > GlobalState.getInstance().getCutPower()){
-                double stddev = stddev(entry.getValue(), mean);
-                ScanResult result = entry.getValue().get(0);
-                result = result.cloneWith(mean, stddev);
-                outResults.add(result);
-            }
-        }
-        return outResults;
-    }
-
+    /**
+     * Print fingerprints of clientId
+     * @param clientId client id
+     */
     public void printFingerprintDb(String clientId){
         for(String clientKey : clientRooms.keySet()){
             for(String roomKey : clientRooms.get(clientKey).keySet()){
@@ -323,10 +390,18 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Get all client -> Rooms map
+     * @return client-rooms map
+     */
     public ConcurrentHashMap<String, ConcurrentHashMap<String, Room>> getClientRooms(){
         return this.clientRooms;
     }
 
+    /**
+     * Resume fingerprint from json
+     * @param json JsonObject
+     */
     public void putFingerprintsResume(JsonObject json){
         Gson gson = new Gson();
         Type scanType = new TypeToken<ArrayList<ScanResult>>(){}.getType();
@@ -352,11 +427,22 @@ public class DatabaseManager {
         }
     }
 
-    //-------------------------------SONGS-----------------------------------------
+    // Songs
+
+    /**
+     * Get all songs
+     * @return list of songs
+     */
     public List<Song> getSongs() {
         return this.songs;
     }
 
+    /**
+     * Bind speaker to a certain room
+     * @param clientId client id
+     * @param speakerId speaker id
+     * @param roomId room id
+     */
     public void bindSpeaker(String clientId, String speakerId, String roomId) {
         roomId = roomId.toLowerCase();
         Speaker speaker = this.getConnectedSpeaker(speakerId);
@@ -380,6 +466,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Unbind speaker
+     * @param clientId client id
+     * @param speakerId speaker id
+     */
     public void unbindSpeaker(String clientId, String speakerId) {
         Speaker speaker = this.getConnectedSpeaker(speakerId);
         ConcurrentHashMap<String, Room> rooms = clientRooms.get(clientId);

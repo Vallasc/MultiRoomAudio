@@ -11,9 +11,14 @@ import io.github.vallasc.APInfo;
 import io.github.vallasc.WlanScanner;
 import io.github.vallasc.WlanScanner.OperatingSystemNotDefinedException;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanResult;
+import it.unibo.sca.multiroomaudio.shared.messages.settings.MsgStartScan;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
 import it.unibo.sca.multiroomaudio.utils.Utils;
 
+/**
+ * Class that is used to scan the APs and send them to server 
+ */
 public class FingerprintService extends Thread {
     static final int MILLISECONDS_BETWEEN_SCANS = 300;
 
