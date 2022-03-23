@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import io.github.vallasc.APInfo;
 import io.github.vallasc.WlanScanner;
 import io.github.vallasc.WlanScanner.OperatingSystemNotDefinedException;
-import it.unibo.sca.multiroomaudio.shared.messages.*;
 import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanResult;
 import it.unibo.sca.multiroomaudio.shared.messages.settings.MsgStartScan;
 import it.unibo.sca.multiroomaudio.shared.model.ScanResult;
