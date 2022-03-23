@@ -14,14 +14,18 @@ import it.unibo.sca.multiroomaudio.server.FingerprintAnalyzer;
 import it.unibo.sca.multiroomaudio.server.SpeakerManager;
 import it.unibo.sca.multiroomaudio.server.localization_algorithms.Knn;
 import it.unibo.sca.multiroomaudio.shared.messages.*;
+import it.unibo.sca.multiroomaudio.shared.messages.positioning.MsgScanResult;
+import it.unibo.sca.multiroomaudio.shared.messages.settings.MsgStartScan;
 import it.unibo.sca.multiroomaudio.shared.model.Client;
 
+/**
+ * Handles Socket connection requesting APs scans from client
+ */
 public class SocketHandler extends Thread{
     private final Socket clientSocket;
     private final DatabaseManager dbm;
     private final SpeakerManager speakerManager;
     private boolean isRunning;
-    //private final Class algo;
 
     public SocketHandler(Socket clientSocket, DatabaseManager dbm, SpeakerManager speakerManager){
         this.clientSocket = clientSocket;
@@ -52,7 +56,7 @@ public class SocketHandler extends Thread{
                 return;
             }
 
-            dbm.addConnectedSocketClient(clientId, hello);
+            dbm.addConnectedSocketClient(hello);
             dOut.writeUTF(gson.toJson(new MsgHelloBack(clientId, false)));
             
         } catch (IOException e) {
@@ -65,7 +69,6 @@ public class SocketHandler extends Thread{
         System.out.println("START SERVING: " + clientId);
 
         FingerprintAnalyzer fAnalyzernew = new Knn(speakerManager, myDevice, dbm);
-        //FingerprintAnalyzer fAnalyzernew = new Bayes(speakerManager, myDevice, dbm);
         
         fAnalyzernew.start();
         while(isRunning){
